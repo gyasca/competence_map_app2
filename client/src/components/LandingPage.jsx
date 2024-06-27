@@ -10,10 +10,11 @@ import {
   Toolbar,
 } from "@mui/material";
 import { makeStyles } from "@mui/styles";
+import HeroText from "./HeroText";
 
 const useStyles = makeStyles((theme) => ({
   hero: {
-    backgroundImage: `url('/background.png')`,
+    // backgroundImage: `url('/competence_background.jpeg')`,
     backgroundSize: "cover",
     backgroundPosition: "center",
     height: "70vh",
@@ -21,6 +22,17 @@ const useStyles = makeStyles((theme) => ({
     justifyContent: "center",
     alignItems: "center",
     color: "#fff",
+  },
+  blurredBackground: {
+    position: "absolute",
+    left: 0,
+    width: "100%",
+    height: "75vh",
+    backgroundImage: `url('/competence_background.jpeg')`,
+    backgroundSize: "cover",
+    backgroundPosition: "center",
+    filter: "blur(3px)", // Apply blur here
+    zIndex: -1, // Place behind content
   },
   content: {
     textAlign: "center",
@@ -64,7 +76,9 @@ const LandingPage = () => {
           <Button color="inherit">Login</Button>
         </Toolbar> */}
       </AppBar>
+      {/* Old hero text and background together */}
       <Box className={classes.hero}>
+        <Box className={classes.blurredBackground} /> {/* New element */}
         <Box className={classes.content}>
           <Typography variant="h2" component="h1" gutterBottom>
             Welcome to NYP CM App
@@ -72,16 +86,18 @@ const LandingPage = () => {
           <Typography variant="h5" component="p" gutterBottom>
             Your ultimate competence mapping solution
           </Typography>
-          <Button 
-  variant="contained" 
-  color="white" 
-  sx={{ color: 'primary.main' }} 
-  size="large"
->
-  Get Started
-</Button>
+          <Button
+            variant="contained"
+            color="white"
+            sx={{ color: "primary.main" }}
+            size="large"
+          >
+            Get Started
+          </Button>
         </Box>
       </Box>
+      {/* End of old hero text and background together */}
+      {/* <HeroText /> Add the HeroText component here */}
       <Container maxWidth="md" className={classes.features}>
         <Grid container spacing={4}>
           <Grid item xs={12} md={4}>
@@ -89,9 +105,7 @@ const LandingPage = () => {
               <Typography variant="h6" component="h3">
                 Feature 1
               </Typography>
-              <Typography variant="body1">
-                Description of feature 1.
-              </Typography>
+              <Typography variant="body1">Description of feature 1.</Typography>
             </Paper>
           </Grid>
           <Grid item xs={12} md={4}>
@@ -99,9 +113,7 @@ const LandingPage = () => {
               <Typography variant="h6" component="h3">
                 Feature 2
               </Typography>
-              <Typography variant="body1">
-                Description of feature 2.
-              </Typography>
+              <Typography variant="body1">Description of feature 2.</Typography>
             </Paper>
           </Grid>
           <Grid item xs={12} md={4}>
@@ -109,9 +121,7 @@ const LandingPage = () => {
               <Typography variant="h6" component="h3">
                 Feature 3
               </Typography>
-              <Typography variant="body1">
-                Description of feature 3.
-              </Typography>
+              <Typography variant="body1">Description of feature 3.</Typography>
             </Paper>
           </Grid>
         </Grid>

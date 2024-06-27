@@ -1,12 +1,13 @@
 // src/App.jsx
 import React from 'react';
 import LandingPage from '../components/LandingPage';
+import { Container } from '@mui/material';
 
 const App = () => {
   return (
-    <div className="App">
+    <Container sx={{marginBottom: '10vh'}}>
       <LandingPage />
-    </div>
+    </Container>
   );
 }
 

@@ -103,25 +103,25 @@ const LandingPage = () => {
           <Grid item xs={12} md={4}>
             <Paper elevation={3} className={classes.featureItem}>
               <Typography variant="h6" component="h3">
-                Feature 1
+                Skill map
               </Typography>
-              <Typography variant="body1">Description of feature 1.</Typography>
+              <Typography variant="body1">Check out competencies gained in a skill web!.</Typography>
             </Paper>
           </Grid>
           <Grid item xs={12} md={4}>
             <Paper elevation={3} className={classes.featureItem}>
               <Typography variant="h6" component="h3">
-                Feature 2
+                Skill progression
               </Typography>
-              <Typography variant="body1">Description of feature 2.</Typography>
+              <Typography variant="body1">Progression of modules and certifications obtained.</Typography>
             </Paper>
           </Grid>
           <Grid item xs={12} md={4}>
             <Paper elevation={3} className={classes.featureItem}>
               <Typography variant="h6" component="h3">
-                Feature 3
+                AI Resume
               </Typography>
-              <Typography variant="body1">Description of feature 3.</Typography>
+              <Typography variant="body1">Automatically generate resume based on competencies.</Typography>
             </Paper>
           </Grid>
         </Grid>

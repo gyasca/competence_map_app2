@@ -1,17 +1,14 @@
 import React, { useEffect } from 'react';
 import { Container, Box, Paper, Typography, Grid, Button, IconButton } from '@mui/material';
 import {
-  DateRange,
   EventAvailable,
-  FlightTakeoff,
-  Weekend,
-  EventBusy,
-  LaptopMac,
-  Mail,
-  People,
-  Cake,
-  EmojiPeople,
-  MonetizationOn,
+  TrendingUp,
+  Description,
+  School,
+  AccountBalance,
+  ListAlt,
+  Help,
+  Info,
 } from '@mui/icons-material';
 
 const StudentPortal = () => {
@@ -21,11 +18,11 @@ const StudentPortal = () => {
 
   // Dummy data for indicators
   const indicators = [
-    { label: 'Present', count: 10, color: 'green' },
-    { label: 'Absent', count: 2, color: 'red' },
-    { label: 'Weekend', count: 1, color: 'brown' },
-    { label: 'Leave', count: 3, color: 'orange' },
-    { label: 'Visit', count: 5, color: 'blue' },
+    { label: 'Certifications Obtained', count: 5, color: 'green' },
+    { label: 'Modules Completed', count: 15, color: 'blue' },
+    { label: 'Current GPA', count: 3.8, color: 'purple' },
+    { label: 'Credits Completed', count: '70/118', color: 'orange' },
+    { label: 'CCA Points', count: 25, color: 'brown' },
   ];
 
   return (
@@ -34,7 +31,7 @@ const StudentPortal = () => {
         {/* First Paper Component */}
         <Paper elevation={0} style={{ padding: '20px', backgroundColor: '#d5e3eb' }}>
           <Typography variant="h6" gutterBottom>
-            <DateRange /> {new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })},{' '}
+            <EventAvailable /> {new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })},{' '}
             {new Date().toLocaleDateString('en-US', { weekday: 'long' })}
           </Typography>
         </Paper>
@@ -60,86 +57,63 @@ const StudentPortal = () => {
           <Grid container spacing={2}>
             <Grid item xs={4}>
               <IconButton>
-                <EventAvailable fontSize="large" />
+                <TrendingUp fontSize="large" />
               </IconButton>
-              <Typography variant="subtitle1">Attendance</Typography>
+              <Typography variant="subtitle1">Skill Map</Typography>
             </Grid>
             <Grid item xs={4}>
               <IconButton>
-                <FlightTakeoff fontSize="large" />
+                <Description fontSize="large" />
               </IconButton>
-              <Typography variant="subtitle1">Late/Early</Typography>
+              <Typography variant="subtitle1">Module Progression</Typography>
             </Grid>
             <Grid item xs={4}>
               <IconButton>
-                <Weekend fontSize="large" />
+                <Description fontSize="large" />
               </IconButton>
-              <Typography variant="subtitle1">Leave</Typography>
+              <Typography variant="subtitle1">Resume</Typography>
             </Grid>
             <Grid item xs={4}>
               <IconButton>
-                <LaptopMac fontSize="large" />
+                <School fontSize="large" />
               </IconButton>
-              <Typography variant="subtitle1">Visit</Typography>
+              <Typography variant="subtitle1">Student Portal</Typography>
             </Grid>
             <Grid item xs={4}>
               <IconButton>
-                <Mail fontSize="large" />
+                <AccountBalance fontSize="large" />
               </IconButton>
-              <Typography variant="subtitle1">Inbox</Typography>
+              <Typography variant="subtitle1">CCC Transcript</Typography>
             </Grid>
             <Grid item xs={4}>
               <IconButton>
-                <People fontSize="large" />
+                <TrendingUp fontSize="large" />
               </IconButton>
-              <Typography variant="subtitle1">People</Typography>
+              <Typography variant="subtitle1">Grade Point Average</Typography>
             </Grid>
             <Grid item xs={4}>
               <IconButton>
-                <Cake fontSize="large" />
+                <ListAlt fontSize="large" />
               </IconButton>
-              <Typography variant="subtitle1">Birthday</Typography>
+              <Typography variant="subtitle1">Certification List</Typography>
             </Grid>
             <Grid item xs={4}>
               <IconButton>
-                <EmojiPeople fontSize="large" />
+                <Help fontSize="large" />
               </IconButton>
-              <Typography variant="subtitle1">Study</Typography>
+              <Typography variant="subtitle1">SIT Help Desk</Typography>
             </Grid>
             <Grid item xs={4}>
               <IconButton>
-                <MonetizationOn fontSize="large" />
+                <Info fontSize="large" />
               </IconButton>
-              <Typography variant="subtitle1">Payslip</Typography>
+              <Typography variant="subtitle1">About Me</Typography>
             </Grid>
           </Grid>
         </Paper>
       </Box>
+    </Container>
+  );
+};
 
-      {/* <Box marginBottom="20px">
-        <Paper elevation={0} style={{ padding: '10px', textAlign: 'center', backgroundColor: 'lightgoldenrodyellow' }}>
-          <Grid container spacing={2} justifyContent="center">
-            <Grid item>
-              <Button variant="contained" color="primary" sx={{ width: '150px' }}>Home</Button>
-            </Grid>
-            <Grid item>
-              <Button variant="contained" color="primary" sx={{ width: '150px' }}>Holidays</Button>
-            </Grid>
-            <Grid item>
-                <Button variant="contained" color="primary" sx={{ width: '150px' }}>Submit Attendance</Button>
-                </Grid>
-                <Grid item>
-                  <Button variant="contained" color="primary" sx={{ width: '150px' }}>Recent</Button>
-                </Grid>
-                <Grid item>
-                  <Button variant="contained" color="primary" sx={{ width: '150px' }}>Contacts</Button>
-                </Grid>
-              </Grid>
-            </Paper>
-          </Box> */}
-        </Container>
-      );
-    };
-    
-    export default StudentPortal;
-    
+export default StudentPortal;

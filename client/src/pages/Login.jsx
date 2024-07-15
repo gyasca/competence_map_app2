@@ -17,6 +17,7 @@ import { UserContext } from "../main";
 import { jwtDecode } from "jwt-decode";
 import { validateUser } from "../functions/user";
 import { useSnackbar } from "notistack";
+import { GoogleLogin } from "@react-oauth/google";
 
 // import directus instance (made possilbe by npm i @directus/sdk)
 import directus from "../directus";
@@ -37,6 +38,32 @@ function Login() {
     }
   }, []);
 
+  const handleGoogleLogin = async (credentialResponse) => {
+    try {
+      const decoded = jwtDecode(credentialResponse.credential);
+      console.log(decoded);
+
+      const res = await http.post("/user/googlelogin", {
+        token: credentialResponse.credential,
+      });
+
+      if (res.data && res.data.accessToken) {
+        localStorage.setItem("accessToken", res.data.accessToken);
+        setUser(res.data.user);
+        navigate("/");
+      } else {
+        toast.error("Failed to login with Google");
+      }
+    } catch (error) {
+      console.error("Google login error:", error);
+      if (error.response && error.response.data) {
+        toast.error(error.response.data.message || "An error occurred during Google login");
+      } else {
+        toast.error("An error occurred during Google login");
+      }
+    }
+  };
+
   const formik = useFormik({
     initialValues: {
       email: "",
@@ -55,15 +82,15 @@ function Login() {
       data.email = data.email.trim().toLowerCase();
       data.password = data.password.trim();
       http
-        .post("/auth/login", data)
+        .post("/user/login", data)
         .then((res) => {
-          if (res.data.data && res.data.data.access_token) {
-            const accessToken = res.data.data.access_token;
+          if (res.data) {
+            const accessToken = res.data.accessToken;
             localStorage.setItem("accessToken", accessToken);
 
             // Decode the access token to get the user ID
             const decodedToken = jwtDecode(accessToken);
-            const userId = decodedToken.id;
+            const userId = decodedToken.adminNumber;
             console.log(
               "Successfully authenticated, accessToken:",
               accessToken
@@ -83,10 +110,10 @@ function Login() {
             if (storedAccessToken) {
               // Fetch user details using API call
               http
-                .get(`/users/me`)
+                .get(`/user/${decodedToken.adminNumber}`)
                 .then((userRes) => {
-                  console.log("Response from /users/me:", userRes);
-                  const userData = userRes.data.data;
+                  console.log("Response from /users/adminNumber:", userRes);
+                  const userData = userRes.data;
                   console.log("User data to set into user:", userData);
                   setUser(userData);
                   // console.log("User data successfully set into user:", user);
@@ -107,7 +134,8 @@ function Login() {
         })
         .catch((err) => {
           console.error("Error logging in:", err);
-          toast.error(`Error logging in: ${err.message}`);
+          // toast.error(`Error logging in: ${err.message}`);
+          toast.error("Email or password is incorrect");
         });
 
       //   try {
@@ -189,6 +217,24 @@ function Login() {
       <Typography variant="h5" sx={{ my: 2 }}>
         Sign in to NYP Competence Map Software Account
       </Typography>
+      <Box
+        sx={{
+          maxWidth: "500px",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+        }}
+      >
+        <GoogleLogin
+          onSuccess={handleGoogleLogin}
+          onError={() => {
+            console.log("Login Failed");
+            toast.error("Google login failed");
+          }}
+        />
+        <Typography variant="body2" sx={{ mt: 2 }}>OR</Typography>
+      </Box>
+
       <Box
         component="form"
         sx={{ maxWidth: "500px" }}

@@ -1,4 +1,4 @@
-import { useState, useContext } from "react";
+import { useState, useContext, useEffect } from "react";
 import { Avatar, Box, IconButton, List, ListItem, ListItemIcon, ListItemText, ListItemButton, Popover, Divider, Typography } from "@mui/material"
 import { Link, useNavigate } from "react-router-dom"
 import ProfilePicture from "./ProfilePicture";
@@ -13,7 +13,7 @@ import SupportIcon from '@mui/icons-material/Support';
 import { enqueueSnackbar } from "notistack";
 
 export function NavbarProfile() {
-    const { user, setUser } = useContext(UserContext);
+    const { user, setUser, updateUser } = useContext(UserContext);
     const [isPopoverOpen, setIsPopoverOpen] = useState(false)
     const [anchorEl, setAnchorEl] = useState(null)
     const navigate = useNavigate()
@@ -31,6 +31,11 @@ export function NavbarProfile() {
         enqueueSnackbar("Successfully logged out", { variant: "success" })
         navigate("/")
     }
+
+    useEffect(() => {
+        updateUser();
+    }, []);
+
 
     return (
         <>

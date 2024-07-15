@@ -4,7 +4,6 @@ import NotFound from '../errors/NotFound'
 import AdminPanelLanding from "./AdminPanelLanding";
 import ViewEmployees from "./ViewEmployees";
 import EditEmployee from "./EditEmployee";
-import Register from './Register';
 import ViewLeave from './ViewLeave';
 import { UserContext } from "../../main";
 import { useSnackbar } from 'notistack'

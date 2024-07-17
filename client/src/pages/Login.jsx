@@ -90,7 +90,7 @@ function Login() {
 
             // Decode the access token to get the user ID
             const decodedToken = jwtDecode(accessToken);
-            const userId = decodedToken.adminNumber;
+            const userId = decodedToken.userId;
             console.log(
               "Successfully authenticated, accessToken:",
               accessToken
@@ -110,9 +110,9 @@ function Login() {
             if (storedAccessToken) {
               // Fetch user details using API call
               http
-                .get(`/user/${decodedToken.adminNumber}`)
+                .get(`/user/${decodedToken.userId}`)
                 .then((userRes) => {
-                  console.log("Response from /users/adminNumber:", userRes);
+                  console.log("Response from /users/userId:", userRes);
                   const userData = userRes.data;
                   console.log("User data to set into user:", userData);
                   setUser(userData);

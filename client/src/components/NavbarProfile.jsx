@@ -73,18 +73,18 @@ export function NavbarProfile() {
                         </ListItemButton>
                     </ListItem>
                   
-                    { user.account_type == "hr" && 
-                    <ListItem key={"Admin Panel"} disablePadding>
-                        <ListItemButton component={Link} to="/admin/panel" onClick={() => setIsPopoverOpen(false)}>
+                    { user.role == "staff" && 
+                    <ListItem key={"Staff Panel"} disablePadding>
+                        <ListItemButton component={Link} to="/admin/home" onClick={() => setIsPopoverOpen(false)}>
                             <ListItemIcon><AdminPanelSettingsIcon /></ListItemIcon>
-                            <ListItemText primary={"HR Panel"} />
+                            <ListItemText primary={"Staff Panel"} />
                         </ListItemButton>
                     </ListItem> }
-                    { user.account_type == "hr" && 
-                    <ListItem key={"Register new employee"} disablePadding>
+                    { user.role == "staff" && 
+                    <ListItem key={"Register students"} disablePadding>
                         <ListItemButton component={Link} to="/admin/register" onClick={() => setIsPopoverOpen(false)}>
                             <ListItemIcon><BadgeIcon /></ListItemIcon>
-                            <ListItemText primary={"Register new employee"} />
+                            <ListItemText primary={"Register students"} />
                         </ListItemButton>
                     </ListItem> }
                     <ListItem key={"Support"} disablePadding>

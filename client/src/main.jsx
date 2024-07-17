@@ -132,7 +132,7 @@ function MainApp() {
         const token = localStorage.getItem("accessToken");
         if (token) {
           const decoded = jwtDecode(token);
-          const response = await http.get(`/user/${decoded.adminNumber}`);
+          const response = await http.get(`/user/${decoded.userId}`);
           // set user context with retrieved user data
           console.log("response from main, line 133:", response);
           setUser(response.data.user);
@@ -157,7 +157,7 @@ function MainApp() {
       const token = localStorage.getItem("accessToken");
       if (token) {
         const decoded = jwtDecode(token);
-        const response = await http.get(`/user/${decoded.adminNumber}`);
+        const response = await http.get(`/user/${decoded.userId}`);
         setUser(response.data.user);
       }
     } catch (error) {

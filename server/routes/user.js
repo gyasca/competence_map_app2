@@ -2,9 +2,10 @@ const express = require("express");
 const router = express.Router();
 const bcrypt = require("bcrypt");
 const { User } = require("../models");
+const { Op } = require("sequelize");  // Add this import
 const yup = require("yup");
 const { sign } = require("jsonwebtoken");
-const { OAuth2Client } = require('google-auth-library');
+const { OAuth2Client } = require("google-auth-library");
 require("dotenv").config();
 const { validateToken, validateAdmin } = require("../middlewares/auth");
 
@@ -195,34 +196,121 @@ router.post("/staffregister", async (req, res) => {
   }
 });
 
+// Bulk Register Users
+router.post("/bulk-register", validateToken, validateAdmin, async (req, res) => {
+  const users = req.body.users;
+
+  if (!Array.isArray(users) || users.length === 0) {
+    return res.status(400).json({ message: "Invalid input: Expected an array of users" });
+  }
+
+  const studentSchema = yup.object().shape({
+    adminNumber: yup.string().trim().required("Admin number is required"),
+    email: yup.string().trim().email().required("Email is required"),
+    password: yup.string().trim().min(8).required("Password is required"),
+    name: yup.string().trim().required("Name is required"),
+    role: yup.string().trim().equals(["student"]).required("Role must be student"),
+    profilePictureFilePath: yup.string().trim(),
+    course: yup.string().trim().required("Course is required"),
+    yearJoined: yup.number().required("Year joined is required"),
+  });
+
+  const staffSchema = yup.object().shape({
+    staffId: yup.string().trim().required("Staff ID is required"),
+    email: yup.string().trim().email().required("Email is required"),
+    password: yup.string().trim().min(8).required("Password is required"),
+    name: yup.string().trim().required("Name is required"),
+    role: yup.string().trim().equals(["staff"]).required("Role must be staff"),
+    profilePictureFilePath: yup.string().trim(),
+    department: yup.string().trim().required("Department is required"),
+    position: yup.string().trim().required("Position is required"),
+  });
+
+  const results = {
+    success: [],
+    errors: []
+  };
+
+  for (const userData of users) {
+    try {
+      let validatedData;
+      if (userData.role === 'student') {
+        validatedData = await studentSchema.validate(userData, { abortEarly: false });
+      } else if (userData.role === 'staff') {
+        validatedData = await staffSchema.validate(userData, { abortEarly: false });
+      } else {
+        throw new Error("Invalid role specified");
+      }
+      
+      // Check if user already exists
+      const existingUser = await User.findOne({
+        where: { 
+          [Op.or]: [
+            { email: validatedData.email },
+            ...(validatedData.adminNumber ? [{ adminNumber: validatedData.adminNumber }] : []),
+            ...(validatedData.staffId ? [{ staffId: validatedData.staffId }] : [])
+          ]
+        }
+      });
+
+      if (existingUser) {
+        results.errors.push({ email: validatedData.email, error: "User already exists" });
+        continue;
+      }
+
+      // Hash password
+      validatedData.password = await bcrypt.hash(validatedData.password, 10);
+
+      // Create user
+      const newUser = await User.create(validatedData);
+      results.success.push({ email: newUser.email, id: newUser.id });
+    } catch (error) {
+      if (error instanceof yup.ValidationError) {
+        results.errors.push({ email: userData.email, error: error.errors });
+      } else {
+        results.errors.push({ email: userData.email, error: error.message });
+      }
+    }
+  }
+
+  res.json(results);
+});
+
 // Auth User (Login)
 router.post("/login", async (req, res) => {
   let data = req.body;
   // Trim string values
   data.email = data.email.trim().toLowerCase();
   data.password = data.password.trim();
+
   // Check email and password
   let errorMsg = "Email or password is not correct.";
   let user = await User.findOne({
     where: { email: data.email },
+    attributes: { exclude: ["password"] },
   });
+
   if (!user) {
-    res.status(404).json({ message: errorMsg });
-    return;
+    return res.status(404).json({ message: errorMsg });
   }
-  let match = await bcrypt.compare(data.password, user.password);
+
+  // Fetch the user again with password to compare
+  let userWithPassword = await User.findOne({
+    where: { email: data.email },
+    attributes: ["password"],
+  });
+
+  let match = await bcrypt.compare(data.password, userWithPassword.password);
   if (!match) {
-    res.status(401).json({ message: errorMsg });
-    return;
+    return res.status(401).json({ message: errorMsg });
   }
-  // Return user info
-  let userInfo = {
-    adminNumber: user.adminNumber,
-    email: user.email,
-    name: user.name,
-  };
-  // Create json web token based on user info raw json data
+
+  // Convert Sequelize model to plain object
+  let userInfo = user.get({ plain: true });
+
+  // Create json web token based on user info
   let accessToken = sign(userInfo, process.env.APP_SECRET);
+
   res.json({
     accessToken: accessToken,
     user: userInfo,
@@ -246,22 +334,22 @@ router.post("/googlelogin", async (req, res) => {
     // Check if user exists
     let user = await User.findOne({
       where: { email: email },
-      attributes: { 
-        exclude: ['password', 'adminNumber', 'course', 'yearJoined'] 
-      }
+      attributes: {
+        exclude: ["password", "adminNumber", "course", "yearJoined"],
+      },
     });
 
     if (!user) {
-      return res.status(404).json({ 
+      return res.status(404).json({
         message: "User not found. Please register first.",
-        errorCode: "USER_NOT_FOUND"
+        errorCode: "USER_NOT_FOUND",
       });
     }
 
-    if (user.role !== 'staff') {
-      return res.status(403).json({ 
+    if (user.role !== "staff") {
+      return res.status(403).json({
         message: "Google login is only available for staff accounts.",
-        errorCode: "STAFF_ONLY"
+        errorCode: "STAFF_ONLY",
       });
     }
 
@@ -269,6 +357,8 @@ router.post("/googlelogin", async (req, res) => {
     const accessToken = sign(
       {
         userId: user.userId,
+        staffId: user.staffId,
+        adminNumber: user.adminNumber,
         email: user.email,
         name: user.name,
         role: user.role,
@@ -277,57 +367,120 @@ router.post("/googlelogin", async (req, res) => {
     );
 
     // Log successful login
-    console.log(`Successful Google login: ${user.email} at ${new Date().toISOString()}`);
+    console.log(
+      `Successful Google login: ${user.email} at ${new Date().toISOString()}`
+    );
 
     // Prepare user object for response
     const userResponse = user.get({ plain: true });
 
     res.json({
       accessToken: accessToken,
-      user: userResponse
+      user: userResponse,
     });
   } catch (error) {
     console.error("Error in Google login:", error);
-    res.status(401).json({ 
+    res.status(401).json({
       message: "Invalid Google token",
-      errorCode: "INVALID_TOKEN"
+      errorCode: "INVALID_TOKEN",
     });
   }
 });
 
 // Authenticate user credentials
-router.get("/auth", validateToken, (req, res) => {
-  let userInfo = {
-    adminNumber: req.user.adminNumber,
-    email: req.user.email,
-    name: req.user.name,
-  };
-  res.json({
-    user: userInfo,
-  });
+router.get("/auth", validateToken, async (req, res) => {
+  try {
+    const user = await User.findOne({
+      where: { userId: req.user.userId },
+      attributes: { exclude: ["password"] }
+    });
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Convert Sequelize model to plain object
+    const userInfo = user.get({ plain: true });
+
+    res.json({
+      user: userInfo,
+    });
+  } catch (error) {
+    console.error("Error in /auth route:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
 });
 
-// Get authenticated user's information
-router.get("/:id", validateToken, (req, res) => {
-  let userInfo = {
-    adminNumber: req.user.adminNumber,
-    role: req.user.role,
-    email: req.user.email,
-    name: req.user.name,
-    profilePictureFilePath: req.user.profilePictureFilePath,
-  };
-  res.json({
-    user: userInfo,
-  });
-});
-
-// Get authenticated user's information
+// Get all users
+// This route should be placed before any routes with path parameters
 router.get("/all", validateToken, validateAdmin, async (req, res) => {
   try {
     const users = await User.findAll({
-      attributes: { exclude: ["password"] },
+      attributes: { exclude: ["password"] }
     });
+    if (users.length === 0) {
+      return res.status(404).json({ message: "No users found" });
+    }
     res.json(users);
+  } catch (error) {
+    console.error("Error fetching all users:", error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Get authenticated user's information
+router.get("/:id", validateToken, async (req, res) => {
+  try {
+    const user = await User.findOne({
+      where: { userId: req.params.id },
+      attributes: { exclude: ["password"] }
+    });
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Convert Sequelize model to plain object
+    const userInfo = user.get({ plain: true });
+
+    res.json({
+      user: userInfo,
+    });
+  } catch (error) {
+    console.error("Error in /:id route:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+
+// Update a user
+router.put("/:id", validateToken, validateAdmin, async (req, res) => {
+  const { id } = req.params;
+  try {
+    const [updated] = await User.update(req.body, {
+      where: { userId: id }
+    });
+    if (updated) {
+      const updatedUser = await User.findOne({ where: { userId: id } });
+      return res.json(updatedUser);
+    }
+    throw new Error('User not found');
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Delete a user
+router.delete("/:id", validateToken, validateAdmin, async (req, res) => {
+  const { id } = req.params;
+  try {
+    const deleted = await User.destroy({
+      where: { userId: id }
+    });
+    if (deleted) {
+      return res.status(204).send("User deleted");
+    }
+    throw new Error('User not found');
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

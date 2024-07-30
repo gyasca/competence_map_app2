@@ -14,6 +14,12 @@ import { UserContext } from "../../main";
 import { useSnackbar } from "notistack";
 import { validateAdmin } from "../../functions/user";
 import { Box, List, Divider } from "@mui/material";
+import ViewSpecificUser from "./ViewSpecificUser";
+import CreateModule from "./Module/CreateModule";
+import EditModule from "./Module/EditModule";
+import ViewModules from "./Module/ViewModules";
+import ViewSpecificModule from "./Module/ViewSpecificModule";
+import ManageCompMap from "./Competency/ManageCompMap";
 
 function AdminRoutes() {
   // Routes for admin pages. To add authenication so that only admins can access these pages, add a check for the user's role in the UserContext
@@ -56,7 +62,7 @@ function AdminRoutes() {
         </List>
         <Divider orientation="vertical" flexItem />
       </Box>
-      <Box sx={{ display: "flex", flexGrow: 1, flexWrap: 1 }}>
+      <Box sx={{ display: "flex", flexGrow: 1, flexWrap: 1, overflow: "hidden", marginLeft: "20px", marginRight: "20px" }}>
         <Routes>
           <Route path="*" element={<NotFound />} />
           <Route path={"/home"} element={<AdminPanelLanding />} />
@@ -68,6 +74,17 @@ function AdminRoutes() {
           <Route path="/users/create" element={<CreateUser />} />
           <Route path="/users/bulk-create" element={<BulkCreateUser />} />
           <Route path="/users/edit/:userId" element={<EditUser />} />
+          <Route path="/users/:userId" element={<ViewSpecificUser />} />
+
+          {/* Modules */}
+          <Route path="/modules/create" element={<CreateModule />} />
+          <Route path="/modules" element={<ViewModules />} />
+          <Route path="/modules/edit/:moduleCode" element={<EditModule />} />
+          <Route path="/modules/:moduleCode" element={<ViewSpecificModule />} />
+
+          {/* Competency map */}
+          <Route path="/competency-map/manage" element={<ManageCompMap />} />
+
         </Routes>
       </Box>
     </Box>

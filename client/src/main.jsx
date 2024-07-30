@@ -110,6 +110,9 @@ function MainApp() {
 
   const [userLoading, setUserLoading] = useState(true);
 
+  // Active page global context to store the current page (For navbar item highlight)
+  const [activePage, setActivePage] = useState(null);
+
   useEffect(() => {
     // const checkLoggedInUser = async () => {
     //   try {
@@ -177,6 +180,8 @@ function MainApp() {
           isAdminPage: isAdminPage,
           setIsAdminPage: setIsAdminPage,
           updateUser: updateUser,
+          activePage: activePage,
+          setActivePage: setActivePage
         }}
       >
         <Box sx={{ display: "flex", flexDirection: "column" }}>

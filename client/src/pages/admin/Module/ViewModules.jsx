@@ -1,20 +1,20 @@
-import React from "react";
-import UserList from "../../components/UserList";
 import { Container } from "@mui/material";
+import React from "react";
+import ModuleList from "../../../components/Module/ModuleList";
 
-function ViewUsers() {
+function ViewModules() {
   return (
     <Container
       sx={{
         width: "100%",
         justifyContent: "center",
         alignItems: "center",
-        mt: "4%",
+        mt: "4%"
       }}
     >
-      <UserList />
+      <ModuleList />
     </Container>
   );
 }
 
-export default ViewUsers;
+export default ViewModules;

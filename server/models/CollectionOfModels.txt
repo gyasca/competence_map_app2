@@ -1,0 +1,423 @@
+// models/User.js
+module.exports = (sequelize, DataTypes) => {
+  const User = sequelize.define("User", {
+    userId: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      primaryKey: true,
+    },
+    email: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      unique: true,
+    },
+    password: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    name: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    role: {
+      type: DataTypes.ENUM('student', 'staff'),
+      allowNull: false,
+    },
+    profilePictureFilePath: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    // Student attributes
+    adminNumber: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    course: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    yearJoined: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+    },
+    // Staff attributes
+    staffId: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    department: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    position: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+  });
+
+  User.associate = (models) => {
+    User.hasMany(models.Resume, {
+      foreignKey: "userId",
+      onDelete: "cascade"
+    });
+    User.hasMany(models.StudentModuleEnrollment, {
+      foreignKey: "userId",
+      onDelete: "cascade"
+    });
+    User.hasMany(models.CourseEnrollment, {
+      foreignKey: "userId",
+      onDelete: "cascade"
+    });
+    User.hasMany(models.ObtainedCertification, {
+      foreignKey: "userId",
+      onDelete: "cascade"
+    });
+  };
+
+  return User;
+};
+
+// models/Module.js
+module.exports = (sequelize, DataTypes) => {
+  const Module = sequelize.define("Module", {
+    moduleCode: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      primaryKey: true,
+    },
+    title: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    description: {
+      type: DataTypes.TEXT,
+      allowNull: false,
+    },
+    school: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    credit: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+    domain: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    levelOfStudy: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    certifications: {
+      type: DataTypes.TEXT,
+      allowNull: true,
+      get() {
+        const rawValue = this.getDataValue('certifications');
+        return rawValue ? JSON.parse(rawValue) : [];
+      },
+      set(value) {
+        this.setDataValue('certifications', JSON.stringify(value));
+      }
+    },
+    prevModule: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    nextModule: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    competencyLevel: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+  });
+
+  Module.associate = (models) => {
+    Module.hasMany(models.StudentModuleEnrollment, {
+      foreignKey: "moduleCode",
+      onDelete: "cascade",
+    });
+    Module.hasMany(models.Certificate, {
+      foreignKey: "moduleCode",
+      onDelete: "cascade",
+    });
+    Module.belongsToMany(models.Course, { through: models.CourseModule });
+    Module.hasMany(models.CompetencyMapModule, {
+      foreignKey: "moduleCode",
+      onDelete: "cascade",
+    });
+  };
+
+  return Module;
+};
+
+// models/Course.js
+module.exports = (sequelize, DataTypes) => {
+  const Course = sequelize.define("Course", {
+    courseCode: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      primaryKey: true,
+    },
+    name: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    description: {
+      type: DataTypes.TEXT,
+      allowNull: false,
+    },
+  });
+
+  Course.associate = (models) => {
+    Course.belongsToMany(models.Module, { through: models.CourseModule });
+    Course.hasOne(models.CompetencyMap);
+    Course.hasMany(models.CourseEnrollment);
+  };
+
+  return Course;
+};
+
+// models/CompetencyMap.js
+module.exports = (sequelize, DataTypes) => {
+  const CompetencyMap = sequelize.define("CompetencyMap", {
+    id: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true,
+    },
+    name: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    courseCode: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+  });
+
+  CompetencyMap.associate = (models) => {
+    CompetencyMap.belongsTo(models.Course, { foreignKey: 'courseCode' });
+    CompetencyMap.hasMany(models.CompetencyMapModule);
+  };
+
+  return CompetencyMap;
+};
+
+// models/CompetencyMapModule.js
+Old code:
+module.exports = (sequelize, DataTypes) => {
+  const CompetencyMapModule = sequelize.define("CompetencyMapModule", {
+    id: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true,
+    },
+    xPosition: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+    yPosition: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+  });
+
+  CompetencyMapModule.associate = (models) => {
+    CompetencyMapModule.belongsTo(models.CompetencyMap);
+    CompetencyMapModule.belongsTo(models.Module, { foreignKey: 'moduleCode' });
+  };
+
+  return CompetencyMapModule;
+};
+
+New code:
+module.exports = (sequelize, DataTypes) => {
+    const CompetencyMapModule = sequelize.define("CompetencyMapModule", {
+      id: {
+        type: DataTypes.INTEGER,
+        primaryKey: true,
+        autoIncrement: true,
+      },
+      row: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+      },
+      column: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+      },
+      prevModuleId: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+      },
+      nextModuleId: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+      },
+    });
+  
+    CompetencyMapModule.associate = function(models) {
+      CompetencyMapModule.belongsTo(models.CompetencyMap, {
+        foreignKey: 'competencyMapId',
+        allowNull: false
+      });
+      CompetencyMapModule.belongsTo(models.CourseModule, {
+        foreignKey: 'courseModuleId',
+        allowNull: false
+      });
+      CompetencyMapModule.belongsTo(CompetencyMapModule, {
+        as: 'prevModule',
+        foreignKey: 'prevModuleId'
+      });
+      CompetencyMapModule.belongsTo(CompetencyMapModule, {
+        as: 'nextModule',
+        foreignKey: 'nextModuleId'
+      });
+    };
+  
+    return CompetencyMapModule;
+  };
+
+// models/CourseModule.js
+Old code: 
+module.exports = (sequelize, DataTypes) => {
+  const CourseModule = sequelize.define("CourseModule", {
+    id: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true,
+    },
+  });
+
+  return CourseModule;
+};
+
+New code:
+module.exports = (sequelize, DataTypes) => {
+    const CourseModule = sequelize.define("CourseModule", {
+      id: {
+        type: DataTypes.INTEGER,
+        primaryKey: true,
+        autoIncrement: true,
+      },
+      order: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+      },
+      // You can add other attributes specific to the course-module relationship here
+    });
+  
+    // External attributes that will appear in CourseModule table
+    CourseModule.associate = function(models) {
+      CourseModule.belongsTo(models.Course, {
+        foreignKey: 'courseId',
+        allowNull: false
+      });
+      CourseModule.belongsTo(models.Module, {
+        foreignKey: 'moduleId',
+        allowNull: false
+      });
+      CourseModule.hasMany(models.CompetencyMapModule, {
+        foreignKey: 'courseModuleId'
+      });
+    };
+  
+    return CourseModule;
+  };
+
+// models/CourseEnrollment.js
+module.exports = (sequelize, DataTypes) => {
+  const CourseEnrollment = sequelize.define("CourseEnrollment", {
+    id: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true,
+    },
+    yearOfStudy: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+  });
+
+  CourseEnrollment.associate = (models) => {
+    CourseEnrollment.belongsTo(models.User, { foreignKey: 'userId' });
+    CourseEnrollment.belongsTo(models.Course, { foreignKey: 'courseCode' });
+  };
+
+  return CourseEnrollment;
+};
+
+// models/StudentModuleEnrollment.js
+module.exports = (sequelize, DataTypes) => {
+  const StudentModuleEnrollment = sequelize.define("StudentModuleEnrollment", {
+    id: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true,
+    },
+    status: {
+      type: DataTypes.ENUM('enrolled', 'passed', 'failed'),
+      defaultValue: 'enrolled',
+    },
+  });
+
+  StudentModuleEnrollment.associate = (models) => {
+    StudentModuleEnrollment.belongsTo(models.User, { foreignKey: 'userId' });
+    StudentModuleEnrollment.belongsTo(models.Module, { foreignKey: 'moduleCode' });
+    StudentModuleEnrollment.belongsTo(models.Course, { foreignKey: 'courseCode' });
+  };
+
+  return StudentModuleEnrollment;
+};
+
+// models/Certificate.js
+module.exports = (sequelize, DataTypes) => {
+  const Certificate = sequelize.define("Certificate", {
+    id: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true,
+    },
+    name: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    description: {
+      type: DataTypes.TEXT,
+      allowNull: true,
+    },
+  });
+
+  Certificate.associate = (models) => {
+    Certificate.belongsTo(models.Module, { foreignKey: 'moduleCode' });
+    Certificate.hasMany(models.ObtainedCertification);
+  };
+
+  return Certificate;
+};
+
+// models/ObtainedCertification.js
+module.exports = (sequelize, DataTypes) => {
+  const ObtainedCertification = sequelize.define("ObtainedCertification", {
+    id: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true,
+    },
+    dateObtained: {
+      type: DataTypes.DATE,
+      allowNull: false,
+      defaultValue: DataTypes.NOW,
+    },
+  });
+
+  ObtainedCertification.associate = (models) => {
+    ObtainedCertification.belongsTo(models.User, { foreignKey: 'userId' });
+    ObtainedCertification.belongsTo(models.Certificate);
+  };
+
+  return ObtainedCertification;
+};

@@ -14,8 +14,10 @@ import {
   IconButton,
   InputAdornment,
   Typography,
+  Container,
+  Paper
 } from "@mui/material";
-import { Edit, Delete, Visibility, Search } from "@mui/icons-material";
+import { Edit, Delete, Visibility, Search, Add } from "@mui/icons-material";
 import http from "../http";
 import { useNavigate } from "react-router-dom";
 
@@ -65,20 +67,16 @@ function UserList() {
   };
 
   const columns = [
-    { field: "userId", headerName: "User ID", width: 130 },
-    { field: "name", headerName: "Name", width: 150 },
-    { field: "email", headerName: "Email", width: 200 },
-    { field: "role", headerName: "Role", width: 120 },
-    { field: "adminNumber", headerName: "Admin Number", width: 150 },
-    { field: "course", headerName: "Course", width: 200 },
-    { field: "yearJoined", headerName: "Year Joined", width: 130 },
     {
       field: "actions",
       headerName: "Actions",
       width: 150,
       renderCell: (params) => (
         <>
-          <IconButton onClick={() => handleView(params.row.userId)} size="small">
+          <IconButton
+            onClick={() => handleView(params.row.userId)}
+            size="small"
+          >
             <Visibility />
           </IconButton>
           <IconButton onClick={() => handleEdit(params.row)} size="small">
@@ -90,6 +88,14 @@ function UserList() {
         </>
       ),
     },
+    { field: "userId", headerName: "User ID", width: 130 },
+    { field: "adminNumber", headerName: "Admin Number", width: 150 },
+    { field: "staffId", headerName: "Staff ID", width: 150 },
+    { field: "name", headerName: "Name", width: 150 },
+    { field: "email", headerName: "Email", width: 200 },
+    { field: "role", headerName: "Role", width: 120 },
+    { field: "course", headerName: "Course", width: 200 },
+    { field: "yearJoined", headerName: "Year Joined", width: 130 },
   ];
 
   const filteredUsers = users.filter((user) => {
@@ -108,34 +114,49 @@ function UserList() {
   });
 
   return (
-    <Box sx={{ height: '100%',  overflow: 'hidden' }}>
-      <Typography variant="h4" sx={{ mb: 2 }}>User Management</Typography>
-      <Tabs
-        value={tabValue}
-        onChange={(e, newValue) => setTabValue(newValue)}
-        variant="fullWidth"
-        sx={{ mb: 2 }}
-      >
-        <Tab label="All Users" />
-        <Tab label="Students" />
-        <Tab label="Staff" />
-      </Tabs>
-      <TextField
-        fullWidth
-        variant="outlined"
-        placeholder="Search users..."
-        value={searchTerm}
-        onChange={(e) => setSearchTerm(e.target.value)}
-        sx={{ mb: 2 }}
-        InputProps={{
-          startAdornment: (
-            <InputAdornment position="start">
-              <Search />
-            </InputAdornment>
-          ),
-        }}
-      />
-      <Box sx={{ flexGrow: 1, overflow: 'hidden' }}>
+    <Container>
+      <Typography variant="h4" sx={{ mb: 2 }}>
+        User Management
+      </Typography>
+
+      <Paper elevation={3} sx={{ mt: 5, mb: 5 }}>
+        <Tabs
+          value={tabValue}
+          onChange={(e, newValue) => setTabValue(newValue)}
+          variant="fullWidth"
+          sx={{ padding: 2, margin: 3 }}
+        >
+          <Tab label="All Users" />
+          <Tab label="Students" />
+          <Tab label="Staff" />
+        </Tabs>
+      </Paper>
+
+      <Box sx={{ display: "flex", justifyContent: "space-between", mb: 2 }}>
+        <TextField
+          variant="outlined"
+          placeholder="Search users..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          InputProps={{
+            startAdornment: (
+              <InputAdornment position="start">
+                <Search />
+              </InputAdornment>
+            ),
+          }}
+        />
+
+        <Button
+          variant="contained"
+          startIcon={<Add />}
+          onClick={() => navigate("/admin/users/create")}
+        >
+          Create User
+        </Button>
+      </Box>
+
+      <Box sx={{ flexGrow: 1 }}>
         <DataGrid
           rows={filteredUsers}
           columns={columns}
@@ -151,8 +172,8 @@ function UserList() {
           components={{ Toolbar: GridToolbar }}
           disableSelectionOnClick
           sx={{
-            '& .MuiDataGrid-main': { overflow: 'auto' },
-            '& .MuiDataGrid-virtualScroller': { overflow: 'auto' },
+            "& .MuiDataGrid-main": { overflow: "auto" },
+            "& .MuiDataGrid-virtualScroller": { overflow: "auto" },
           }}
         />
       </Box>
@@ -173,7 +194,9 @@ function UserList() {
             label="Email"
             fullWidth
             value={editUser?.email || ""}
-            onChange={(e) => setEditUser({ ...editUser, email: e.target.value })}
+            onChange={(e) =>
+              setEditUser({ ...editUser, email: e.target.value })
+            }
           />
         </DialogContent>
         <DialogActions>
@@ -196,7 +219,7 @@ function UserList() {
           </Button>
         </DialogActions>
       </Dialog>
-    </Box>
+    </Container>
   );
 }
 

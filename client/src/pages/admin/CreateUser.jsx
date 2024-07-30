@@ -1,58 +1,85 @@
-import React from 'react';
-import { useFormik } from 'formik';
-import * as Yup from 'yup';
-import { Box, Typography, TextField, Button, MenuItem, Snackbar } from '@mui/material';
-import http from '../../http';
-import BulkCreateUser from '../../components/BulkCreateUser';
+import React from "react";
+import { useFormik } from "formik";
+import * as Yup from "yup";
+import {
+  Box,
+  Typography,
+  TextField,
+  Button,
+  MenuItem,
+  Snackbar,
+  Container,
+} from "@mui/material";
+import http from "../../http";
+import BulkCreateUser from "../../components/BulkCreateUser";
+import AdminPageTitle from "../../components/AdminPageTitle";
 
 function CreateUser() {
   const [snackbar, setSnackbar] = React.useState(null);
 
   const validationSchema = Yup.object({
-    name: Yup.string().required('Name is required'),
-    email: Yup.string().email('Invalid email').required('Email is required'),
-    password: Yup.string().min(8, 'Password must be at least 8 characters').required('Password is required'),
-    role: Yup.string().required('Role is required'),
-    staffId: Yup.string().when('role', {
-      is: 'staff',
-      then: Yup.string().required('Staff ID is required for staff'),
+    name: Yup.string().required("Name is required"),
+    email: Yup.string().email("Invalid email").required("Email is required"),
+    password: Yup.string()
+      .min(8, "Password must be at least 8 characters")
+      .required("Password is required"),
+    role: Yup.string().required("Role is required"),
+    staffId: Yup.string().when("role", {
+      is: "staff",
+      then: Yup.string().required("Staff ID is required for staff"),
     }),
-    department: Yup.string().when('role', {
-      is: 'staff',
-      then: Yup.string().required('Department is required for staff'),
+    department: Yup.string().when("role", {
+      is: "staff",
+      then: Yup.string().required("Department is required for staff"),
     }),
-    position: Yup.string().when('role', {
-      is: 'staff',
-      then: Yup.string().required('Position is required for staff'),
+    position: Yup.string().when("role", {
+      is: "staff",
+      then: Yup.string().required("Position is required for staff"),
     }),
   });
 
   const formik = useFormik({
     initialValues: {
-      name: '',
-      email: '',
-      password: '',
-      role: '',
-      staffId: '',
-      department: '',
-      position: '',
+      name: "",
+      email: "",
+      password: "",
+      role: "",
+      staffId: "",
+      department: "",
+      position: "",
     },
     validationSchema: validationSchema,
     onSubmit: async (values) => {
       try {
-        await http.post('/user/register', values);
-        setSnackbar({ message: 'User created successfully', severity: 'success' });
+        await http.post("/user/register", values);
+        setSnackbar({
+          message: "User created successfully",
+          severity: "success",
+        });
         formik.resetForm();
       } catch (error) {
-        setSnackbar({ message: 'Error creating user', severity: 'error' });
+        setSnackbar({ message: "Error creating user", severity: "error" });
       }
     },
   });
 
   return (
-    <Box sx={{ maxWidth: 600, mx: 'auto', mt: 4 }}>
-        <BulkCreateUser />
-      <Typography variant="h4" sx={{ mb: 2 }}>Create User</Typography>
+    <Container
+      sx={{
+        width: "100%",
+        justifyContent: "center",
+        alignItems: "center",
+      }}
+    >
+      <AdminPageTitle
+        title="Create User"
+        subtitle={`Create individually OR create in bulk`}
+        backbutton
+      />
+      <BulkCreateUser />
+      <Typography variant="h4" sx={{ mb: 2 }}>
+        Create users individually
+      </Typography>
       <form onSubmit={formik.handleSubmit}>
         <TextField
           fullWidth
@@ -103,7 +130,7 @@ function CreateUser() {
           <MenuItem value="staff">Staff</MenuItem>
           <MenuItem value="student">Student</MenuItem>
         </TextField>
-        {formik.values.role === 'staff' && (
+        {formik.values.role === "staff" && (
           <>
             <TextField
               fullWidth
@@ -123,7 +150,9 @@ function CreateUser() {
               label="Department"
               value={formik.values.department}
               onChange={formik.handleChange}
-              error={formik.touched.department && Boolean(formik.errors.department)}
+              error={
+                formik.touched.department && Boolean(formik.errors.department)
+              }
               helperText={formik.touched.department && formik.errors.department}
               sx={{ mb: 2 }}
             />
@@ -150,7 +179,7 @@ function CreateUser() {
         onClose={() => setSnackbar(null)}
         message={snackbar?.message}
       />
-    </Box>
+    </Container>
   );
 }
 

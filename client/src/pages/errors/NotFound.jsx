@@ -22,25 +22,13 @@ function NotFound() {
   return (
     <>
       <Container maxWidth="xl" sx={{ marginTop: "1rem" }}>
-        <Card sx={{ maxWidth: 500, margin: "auto" }}>
+        <Card sx={{ maxWidth: 500, margin: "auto", padding: "30px", boxShadow: 3 }}>
           <CardContent>
             <CardTitle icon={<QuestionMarkIcon />} title="Page Not Found" />
             <p>
               The page you are trying to look for is missing or has been moved.
             </p>
           </CardContent>
-          <CardActions>
-            <Button
-              LinkComponent={Link}
-              size="small"
-              variant="text"
-              color="primary"
-              to="/"
-              startIcon={<HomeIcon />}
-            >
-              Return Home
-            </Button>
-          </CardActions>
           {isAdminPage && (
             <CardActions>
               <Button
@@ -55,6 +43,18 @@ function NotFound() {
               </Button>
             </CardActions>
           )}
+          <CardActions>
+            <Button
+              LinkComponent={Link}
+              size="small"
+              variant="text"
+              color="primary"
+              to="/"
+              startIcon={<HomeIcon />}
+            >
+              Return Home
+            </Button>
+          </CardActions>
         </Card>
       </Container>
     </>

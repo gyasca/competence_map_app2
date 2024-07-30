@@ -32,6 +32,7 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: "moduleCode",
       });
     };
+    
   
     return Certificate;
   };

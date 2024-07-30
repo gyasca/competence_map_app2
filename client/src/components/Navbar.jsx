@@ -55,26 +55,43 @@ export function Navbar() {
                 >
                   <MenuIcon />
                 </IconButton>
-                <Box
-                  component="img"
+                <Button
+                  LinkComponent={Link}
+                  to="/"
                   sx={{
-                    height: 50,
-                    width: 100,
-                    padding: "10px",
-                    borderRadius: "15px",
-                    maxHeight: { xs: 233, md: 167 },
-                    maxWidth: { xs: 350, md: 250 },
+                    padding: "0px",
+                    margin: "0px",
                   }}
-                  alt="NYPSIT"
-                  src="/nyplogo.jpeg"
-                />
-                <Typography
-                  variant="h6"
-                  component="div"
-                  sx={{ marginRight: "1rem", fontFamily: "'caveat brush'" }}
                 >
-                  NYP Competence Map App
-                </Typography>
+                  <Box
+                    component="img"
+                    sx={{
+                      height: 50,
+                      width: 100,
+                      padding: "10px",
+                      borderRadius: "15px",
+                      maxHeight: { xs: 233, md: 167 },
+                      maxWidth: { xs: 350, md: 250 },
+                    }}
+                    alt="NYPSIT"
+                    src="/nyplogo.jpeg"
+                  />
+                </Button>
+                <Button
+                  color="inherit"
+                  variant="text"
+                  LinkComponent={Link}
+                  to="/"
+                  sx={{
+                    marginRight: "1rem",
+                    fontFamily: "'caveat brush'",
+                    textTransform: "none",
+                    fontSize: "20px",
+                    padding: "0",
+                  }}
+                >
+                  Competence Map App
+                </Button>
 
                 {/* <Button color="inherit" variant="text" LinkComponent={Link} to="/" sx={{ marginRight: "1rem", fontFamily: "'caveat brush'", textTransform: "none", fontSize: "18px", padding: "0" }}>EnviroGo</Button> */}
                 <Divider
@@ -192,19 +209,28 @@ export function Navbar() {
               >
                 <MenuIcon />
               </IconButton>
-              <Box
-                component="img"
+              <Button
+                LinkComponent={Link}
+                to="/"
                 sx={{
-                  height: 50,
-                  width: 100,
-                  padding: "10px",
-                  borderRadius: "15px",
-                  maxHeight: { xs: 233, md: 167 },
-                  maxWidth: { xs: 350, md: 250 },
+                  padding: "0px",
+                  margin: "0px",
                 }}
-                alt="NYPSIT"
-                src="/nyplogo.jpeg"
-              />
+              >
+                <Box
+                  component="img"
+                  sx={{
+                    height: 50,
+                    width: 100,
+                    padding: "10px",
+                    borderRadius: "15px",
+                    maxHeight: { xs: 233, md: 167 },
+                    maxWidth: { xs: 350, md: 250 },
+                  }}
+                  alt="NYPSIT"
+                  src="/nyplogo.jpeg"
+                />
+              </Button>
               <Button
                 color="inherit"
                 variant="text"
@@ -214,7 +240,7 @@ export function Navbar() {
                   marginRight: "1rem",
                   fontFamily: "'caveat brush'",
                   textTransform: "none",
-                  fontSize: "18px",
+                  fontSize: "20px",
                   padding: "0",
                 }}
               >

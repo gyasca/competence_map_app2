@@ -4,7 +4,6 @@ import {
   Typography,
   Button,
   Snackbar,
-  Container,
   Dialog,
   DialogTitle,
   DialogContent,
@@ -15,10 +14,9 @@ import {
 import { useNavigate } from "react-router-dom";
 import { useDropzone } from "react-dropzone";
 import * as XLSX from "xlsx";
-import http from "../http";
-import AdminPageTitle from "./AdminPageTitle";
+import http from "../../http";
 
-function BulkCreateUser() {
+function BulkCreateModule() {
   const [snackbar, setSnackbar] = useState(null);
   const [loading, setLoading] = useState(false);
   const [errorDialogOpen, setErrorDialogOpen] = useState(false);
@@ -26,12 +24,12 @@ function BulkCreateUser() {
   const [successDialogOpen, setSuccessDialogOpen] = useState(false);
   const navigate = useNavigate();
 
-  const processUsers = async (users) => {
+  const processModules = async (modules) => {
     try {
-      const response = await http.post("/user/bulk-register", { users });
+      const response = await http.post("/module/bulk-create", { modules });
       return response.data;
     } catch (error) {
-      console.error("Error in bulk registration:", error);
+      console.error("Error in bulk module creation:", error);
       throw error;
     }
   };
@@ -49,9 +47,9 @@ function BulkCreateUser() {
       const jsonData = XLSX.utils.sheet_to_json(worksheet);
 
       try {
-        const result = await processUsers(jsonData);
+        const result = await processModules(jsonData);
         setSnackbar({
-          message: `Created ${result.success.length} users. Failed: ${result.errors.length}`,
+          message: `Created ${result.success.length} modules. Failed: ${result.errors.length}`,
           severity: result.errors.length > 0 ? "warning" : "success",
         });
         if (result.errors.length > 0) {
@@ -61,7 +59,7 @@ function BulkCreateUser() {
           setSuccessDialogOpen(true);
         }
       } catch (error) {
-        setSnackbar({ message: "Error processing users", severity: "error" });
+        setSnackbar({ message: "Error processing modules", severity: "error" });
       } finally {
         setLoading(false);
       }
@@ -82,13 +80,12 @@ function BulkCreateUser() {
 
   return (
     <Box sx={{ width: "100%", mx: "auto" }}>
-      <Typography variant="h4" sx={{ mb: 2 }}>
-        Create users in bulk
+      <Typography variant="h6" sx={{ mb: 2 }}>
+        Create modules in bulk
       </Typography>
       <Box
         sx={{
           mx: 0,
-          mb: 10
         }}
       >
         <Box
@@ -126,7 +123,7 @@ function BulkCreateUser() {
         <DialogTitle>Error Details</DialogTitle>
         <DialogContent>
           {errorDetails.map((error, index) => (
-            <Typography key={index}>{`${error.email}: ${
+            <Typography key={index}>{`${error.moduleCode}: ${
               Array.isArray(error.error) ? error.error.join(", ") : error.error
             }`}</Typography>
           ))}
@@ -140,10 +137,10 @@ function BulkCreateUser() {
         open={successDialogOpen}
         onClose={() => setSuccessDialogOpen(false)}
       >
-        <DialogTitle>Users Created Successfully</DialogTitle>
+        <DialogTitle>Modules Created Successfully</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            Would you like to view the users now?
+            Would you like to view the modules now?
           </DialogContentText>
         </DialogContent>
         <DialogActions>
@@ -151,10 +148,10 @@ function BulkCreateUser() {
           <Button
             onClick={() => {
               setSuccessDialogOpen(false);
-              navigate("/admin/users");
+              navigate("/admin/modules");
             }}
           >
-            View Users
+            View Modules
           </Button>
         </DialogActions>
       </Dialog>
@@ -162,4 +159,4 @@ function BulkCreateUser() {
   );
 }
 
-export default BulkCreateUser;
+export default BulkCreateModule;

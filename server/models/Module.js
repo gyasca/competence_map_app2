@@ -40,10 +40,6 @@ module.exports = (sequelize, DataTypes) => {
         this.setDataValue('certifications', JSON.stringify(value));
       }
     },
-    prerequisite: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
     prevModule: {
       type: DataTypes.STRING,
       allowNull: true,
@@ -64,6 +60,11 @@ module.exports = (sequelize, DataTypes) => {
       onDelete: "cascade",
     });
     Module.hasMany(models.Certificate, {
+      foreignKey: "moduleCode",
+      onDelete: "cascade",
+    });
+    Module.belongsToMany(models.Course, { through: models.CourseModule });
+    Module.hasMany(models.CompetencyMapModule, {
       foreignKey: "moduleCode",
       onDelete: "cascade",
     });

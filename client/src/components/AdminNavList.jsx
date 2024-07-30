@@ -2,7 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom'
 import { ListItem, ListItemButton, ListItemIcon, ListItemText, Collapse, List } from '@mui/material'
 import FileCopyIcon from '@mui/icons-material/FileCopy';
-import { Home, People, PersonAdd, School, Assignment, AssignmentTurnedIn, ExpandLess, ExpandMore, DashboardCustomize, Assessment } from '@mui/icons-material';
+import { Home, People, PersonAdd, School, Assignment, AssignmentTurnedIn, ExpandLess, ExpandMore, DashboardCustomize, Assessment, Map } from '@mui/icons-material';
 
 function AdminNavList() {
     const [usersOpen, setUsersOpen] = React.useState(false);
@@ -104,6 +104,12 @@ function AdminNavList() {
                         <ListItemButton component={Link} to="/admin/competencies/create">
                             <ListItemIcon><AssignmentTurnedIn /></ListItemIcon>
                             <ListItemText primary={"Create Competency"} />
+                        </ListItemButton>
+                    </ListItem>
+                    <ListItem key={"CreateCompetencyMap"} disablePadding>
+                        <ListItemButton component={Link} to="/admin/competencies/create-map">
+                            <ListItemIcon><Map /></ListItemIcon>
+                            <ListItemText primary={"Create Competency Map"} />
                         </ListItemButton>
                     </ListItem>
                 </List>

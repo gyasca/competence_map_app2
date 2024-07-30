@@ -1,0 +1,51 @@
+// routes/courseRoutes.js
+const express = require('express');
+const router = express.Router();
+const { validateToken, validateAdmin } = require('../middlewares/auth');
+const courseController = require('../controllers/courseController');
+
+router.get('/all', validateToken, courseController.getAllCourses);
+router.get('/:courseId', validateToken, courseController.getCourse);
+router.post('/create', validateToken, validateAdmin, courseController.createCourse);
+router.put('/:courseId', validateToken, validateAdmin, courseController.updateCourse);
+router.delete('/:courseId', validateToken, validateAdmin, courseController.deleteCourse);
+
+module.exports = router;
+
+// routes/courseModuleRoutes.js
+const express = require('express');
+const router = express.Router();
+const { validateToken, validateAdmin } = require('../middlewares/auth');
+const courseModuleController = require('../controllers/courseModuleController');
+
+router.get('/course/:courseId', validateToken, courseModuleController.getModulesForCourse);
+router.post('/create', validateToken, validateAdmin, courseModuleController.createCourseModule);
+router.put('/:courseModuleId', validateToken, validateAdmin, courseModuleController.updateCourseModule);
+router.delete('/:courseModuleId', validateToken, validateAdmin, courseModuleController.deleteCourseModule);
+
+module.exports = router;
+
+// routes/studentModuleEnrollmentRoutes.js
+const express = require('express');
+const router = express.Router();
+const { validateToken } = require('../middlewares/auth');
+const studentModuleEnrollmentController = require('../controllers/studentModuleEnrollmentController');
+
+router.get('/student/:userId', validateToken, studentModuleEnrollmentController.getEnrollmentsForStudent);
+router.post('/enroll', validateToken, studentModuleEnrollmentController.enrollStudentInModule);
+router.put('/:enrollmentId', validateToken, studentModuleEnrollmentController.updateEnrollmentStatus);
+
+module.exports = router;
+
+// routes/competencyMapRoutes.js
+const express = require('express');
+const router = express.Router();
+const { validateToken, validateAdmin } = require('../middlewares/auth');
+const competencyMapController = require('../controllers/competencyMapController');
+
+router.get('/course/:courseId', validateToken, competencyMapController.getCompetencyMapForCourse);
+router.post('/create', validateToken, validateAdmin, competencyMapController.createCompetencyMap);
+router.put('/:competencyMapId', validateToken, validateAdmin, competencyMapController.updateCompetencyMap);
+router.delete('/:competencyMapId', validateToken, validateAdmin, competencyMapController.deleteCompetencyMap);
+
+module.exports = router;

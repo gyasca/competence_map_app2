@@ -1,13 +1,13 @@
 import React from 'react';
 import { Link } from 'react-router-dom'
 import { ListItem, ListItemButton, ListItemIcon, ListItemText, Collapse, List } from '@mui/material'
-import FileCopyIcon from '@mui/icons-material/FileCopy';
-import { Home, People, PersonAdd, School, Assignment, AssignmentTurnedIn, ExpandLess, ExpandMore, DashboardCustomize, Assessment, Map } from '@mui/icons-material';
+import { Home, People, PersonAdd, School, Assignment, AssignmentTurnedIn, ExpandLess, ExpandMore, DashboardCustomize, Assessment, Map, LibraryBooks, Add } from '@mui/icons-material';
 
 function AdminNavList() {
     const [usersOpen, setUsersOpen] = React.useState(false);
     const [modulesOpen, setModulesOpen] = React.useState(false);
     const [competenciesOpen, setCompetenciesOpen] = React.useState(false);
+    const [coursesOpen, setCoursesOpen] = React.useState(false);
 
     const handleClickUsers = () => {
         setUsersOpen(!usersOpen);
@@ -19,6 +19,10 @@ function AdminNavList() {
 
     const handleClickCompetencies = () => {
         setCompetenciesOpen(!competenciesOpen);
+    };
+
+    const handleClickCourses = () => {
+        setCoursesOpen(!coursesOpen);
     };
 
     return (
@@ -110,6 +114,30 @@ function AdminNavList() {
                         <ListItemButton component={Link} to="/admin/competencies/create-map">
                             <ListItemIcon><Map /></ListItemIcon>
                             <ListItemText primary={"Create Competency Map"} />
+                        </ListItemButton>
+                    </ListItem>
+                </List>
+            </Collapse>
+
+            <ListItem key={"Courses"} disablePadding>
+                <ListItemButton onClick={handleClickCourses}>
+                    <ListItemIcon><LibraryBooks /></ListItemIcon>
+                    <ListItemText primary={"Courses"} />
+                    {coursesOpen ? <ExpandLess /> : <ExpandMore />}
+                </ListItemButton>
+            </ListItem>
+            <Collapse in={coursesOpen} timeout="auto" unmountOnExit>
+                <List component="div" disablePadding>
+                    <ListItem key={"ViewCourses"} disablePadding>
+                        <ListItemButton component={Link} to="/admin/courses">
+                            <ListItemIcon><LibraryBooks /></ListItemIcon>
+                            <ListItemText primary={"View Courses"} />
+                        </ListItemButton>
+                    </ListItem>
+                    <ListItem key={"CreateCourse"} disablePadding>
+                        <ListItemButton component={Link} to="/admin/courses/create">
+                            <ListItemIcon><Add /></ListItemIcon>
+                            <ListItemText primary={"Create Course"} />
                         </ListItemButton>
                     </ListItem>
                 </List>

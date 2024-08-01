@@ -18,7 +18,7 @@ module.exports = (sequelize, DataTypes) => {
 
   CompetencyMap.associate = function (models) {
     CompetencyMap.belongsTo(models.Course, {
-      foreignKey: "courseId",
+      foreignKey: "courseCode",
       as: "course",
     });
     CompetencyMap.hasMany(models.CompetencyMapModule, {

@@ -1,31 +1,52 @@
 module.exports = (sequelize, DataTypes) => {
-    const CourseModule = sequelize.define("CourseModule", {
-      id: {
-        type: DataTypes.INTEGER,
-        primaryKey: true,
-        autoIncrement: true,
-      },
-      order: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-      },
-      // You can add other attributes specific to the course-module relationship here
+  const CourseModule = sequelize.define("CourseModule", {
+    id: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true,
+    },
+    order: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+    levelOfStudy: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    competencyLevel: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+    prevModuleCode: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    nextModuleCode: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    courseCode: {
+      // Add this field
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    moduleCode: {
+      // Add this field
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+  });
+
+  CourseModule.associate = function (models) {
+    CourseModule.belongsTo(models.Course, {
+      foreignKey: "courseCode",
+      targetKey: "courseCode",
     });
-  
-    // External attributes that will appear in CourseModule table
-    CourseModule.associate = function(models) {
-      CourseModule.belongsTo(models.Course, {
-        foreignKey: 'courseId',
-        allowNull: false
-      });
-      CourseModule.belongsTo(models.Module, {
-        foreignKey: 'moduleId',
-        allowNull: false
-      });
-      CourseModule.hasMany(models.CompetencyMapModule, {
-        foreignKey: 'courseModuleId'
-      });
-    };
-  
-    return CourseModule;
+    CourseModule.belongsTo(models.Module, {
+      foreignKey: "moduleCode",
+      targetKey: "moduleCode",
+    });
   };
+
+  return CourseModule;
+};

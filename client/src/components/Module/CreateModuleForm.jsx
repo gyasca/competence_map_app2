@@ -12,11 +12,6 @@ const validationSchema = Yup.object({
   school: Yup.string().required("School is required"),
   credit: Yup.number().required("Credit is required").positive().integer(),
   domain: Yup.string().required("Domain is required"),
-  levelOfStudy: Yup.string().required("Level of Study is required"),
-  competencyLevel: Yup.number()
-    .required("Competency Level is required")
-    .positive()
-    .integer(),
 });
 
 function CreateModuleForm() {
@@ -30,10 +25,8 @@ function CreateModuleForm() {
       school: "",
       credit: "",
       domain: "",
-      levelOfStudy: "",
       prevModule: "",
       nextModule: "",
-      competencyLevel: "",
     },
     validationSchema: validationSchema,
     onSubmit: async (values) => {
@@ -141,23 +134,6 @@ function CreateModuleForm() {
             <Grid item xs={12} sm={6}>
               <TextField
                 fullWidth
-                id="levelOfStudy"
-                name="levelOfStudy"
-                label="Level of Study"
-                value={formik.values.levelOfStudy}
-                onChange={formik.handleChange}
-                error={
-                  formik.touched.levelOfStudy &&
-                  Boolean(formik.errors.levelOfStudy)
-                }
-                helperText={
-                  formik.touched.levelOfStudy && formik.errors.levelOfStudy
-                }
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                fullWidth
                 id="prevModule"
                 name="prevModule"
                 label="Previous Module"
@@ -186,25 +162,6 @@ function CreateModuleForm() {
                 }
                 helperText={
                   formik.touched.nextModule && formik.errors.nextModule
-                }
-              />
-            </Grid>
-            <Grid item xs={12} sm={12}>
-              <TextField
-                fullWidth
-                id="competencyLevel"
-                name="competencyLevel"
-                label="Competency Level"
-                type="number"
-                value={formik.values.competencyLevel}
-                onChange={formik.handleChange}
-                error={
-                  formik.touched.competencyLevel &&
-                  Boolean(formik.errors.competencyLevel)
-                }
-                helperText={
-                  formik.touched.competencyLevel &&
-                  formik.errors.competencyLevel
                 }
               />
             </Grid>

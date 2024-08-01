@@ -112,7 +112,7 @@ function Login() {
               http
                 .get(`/user/${decodedToken.userId}`)
                 .then((userRes) => {
-                  console.log("Response from /users/userId:", userRes);
+                  console.log("Response from /user/userId:", userRes);
                   const userData = userRes.data;
                   console.log("User data to set into user:", userData);
                   setUser(userData);

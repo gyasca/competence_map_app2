@@ -6,6 +6,7 @@ const yup = require("yup");
 
 // Validation schema for course
 const courseSchema = yup.object().shape({
+  courseCode: yup.string().trim().required("Course code is required"),
   name: yup.string().trim().required("Course name is required"),
   description: yup.string().trim().required("Description is required"),
 });
@@ -36,9 +37,9 @@ router.get("/all", validateToken, async (req, res) => {
 });
 
 // Get a specific course
-router.get("/:courseId", validateToken, async (req, res) => {
+router.get("/:courseCode", validateToken, async (req, res) => {
   try {
-    const course = await Course.findByPk(req.params.courseId);
+    const course = await Course.findByPk(req.params.courseCode);
     if (course) {
       res.json(course);
     } else {
@@ -50,14 +51,14 @@ router.get("/:courseId", validateToken, async (req, res) => {
 });
 
 // Update a course (admin only)
-router.put("/:courseId", validateToken, validateAdmin, async (req, res) => {
+router.put("/:courseCode", validateToken, validateAdmin, async (req, res) => {
   try {
     await courseSchema.validate(req.body, { abortEarly: false });
     const [updated] = await Course.update(req.body, {
-      where: { id: req.params.courseId }
+      where: { id: req.params.courseCode },
     });
     if (updated) {
-      const updatedCourse = await Course.findByPk(req.params.courseId);
+      const updatedCourse = await Course.findByPk(req.params.courseCode);
       res.json(updatedCourse);
     } else {
       res.status(404).json({ message: "Course not found" });
@@ -72,19 +73,24 @@ router.put("/:courseId", validateToken, validateAdmin, async (req, res) => {
 });
 
 // Delete a course (admin only)
-router.delete("/:courseId", validateToken, validateAdmin, async (req, res) => {
-  try {
-    const deleted = await Course.destroy({
-      where: { id: req.params.courseId }
-    });
-    if (deleted) {
-      res.status(204).send();
-    } else {
-      res.status(404).json({ message: "Course not found" });
+router.delete(
+  "/:courseCode",
+  validateToken,
+  validateAdmin,
+  async (req, res) => {
+    try {
+      const deleted = await Course.destroy({
+        where: { id: req.params.courseCode },
+      });
+      if (deleted) {
+        res.status(204).send();
+      } else {
+        res.status(404).json({ message: "Course not found" });
+      }
+    } catch (error) {
+      res.status(500).json({ error: error.message });
     }
-  } catch (error) {
-    res.status(500).json({ error: error.message });
   }
-});
+);
 
 module.exports = router;

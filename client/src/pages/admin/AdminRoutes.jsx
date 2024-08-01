@@ -6,9 +6,9 @@ import AdminNavList from "../../components/AdminNavList";
 import ViewEmployees from "./ViewEmployees";
 import EditEmployee from "./EditEmployee";
 import ViewLeave from "./ViewLeave";
-import ViewUsers from './ViewUsers';
-import CreateUser from './CreateUser';
-import EditUser from './EditUser';
+import ViewUsers from "./ViewUsers";
+import CreateUser from "./CreateUser";
+import EditUser from "./EditUser";
 import BulkCreateUser from "../../components/BulkCreateUser";
 import { UserContext } from "../../main";
 import { useSnackbar } from "notistack";
@@ -20,6 +20,11 @@ import EditModule from "./Module/EditModule";
 import ViewModules from "./Module/ViewModules";
 import ViewSpecificModule from "./Module/ViewSpecificModule";
 import ManageCompMap from "./Competency/ManageCompMap";
+
+// Course (CoursModule functionalities are already inbuilt to course-related pages)
+import CreateCourse from "./Course/CreateCourse";
+import ViewCourses from "./Course/ViewCourses";
+import ViewSpecificCourse from "./Course/ViewSpecificCourse";
 
 function AdminRoutes() {
   // Routes for admin pages. To add authenication so that only admins can access these pages, add a check for the user's role in the UserContext
@@ -62,7 +67,16 @@ function AdminRoutes() {
         </List>
         <Divider orientation="vertical" flexItem />
       </Box>
-      <Box sx={{ display: "flex", flexGrow: 1, flexWrap: 1, overflow: "hidden", marginLeft: "20px", marginRight: "20px" }}>
+      <Box
+        sx={{
+          display: "flex",
+          flexGrow: 1,
+          flexWrap: 1,
+          overflow: "hidden",
+          marginLeft: "20px",
+          marginRight: "20px",
+        }}
+      >
         <Routes>
           <Route path="*" element={<NotFound />} />
           <Route path={"/home"} element={<AdminPanelLanding />} />
@@ -76,6 +90,12 @@ function AdminRoutes() {
           <Route path="/users/edit/:userId" element={<EditUser />} />
           <Route path="/users/:userId" element={<ViewSpecificUser />} />
 
+          {/* Courses */}
+          <Route path="/courses/create" element={<CreateCourse />} />
+          <Route path="/courses" element={<ViewCourses />} />
+          {/* <Route path="/courses/edit/:courseModuleCode" element={<E />} /> */}
+          <Route path="/courses/:courseCode" element={<ViewSpecificCourse />} />
+
           {/* Modules */}
           <Route path="/modules/create" element={<CreateModule />} />
           <Route path="/modules" element={<ViewModules />} />
@@ -84,12 +104,9 @@ function AdminRoutes() {
 
           {/* Competency map */}
           <Route path="/competency-map/manage" element={<ManageCompMap />} />
-
         </Routes>
       </Box>
     </Box>
-
-    
   );
 }
 

@@ -18,8 +18,6 @@ const validationSchema = Yup.object({
   school: Yup.string().required("School is required"),
   credit: Yup.number().required("Credit is required").positive().integer(),
   domain: Yup.string().required("Domain is required"),
-  levelOfStudy: Yup.string().required("Level of Study is required"),
-  competencyLevel: Yup.number().required("Competency Level is required").positive().integer(),
 });
 
 function EditModuleForm({ module: propModule, onClose }) {
@@ -53,9 +51,7 @@ function EditModuleForm({ module: propModule, onClose }) {
       school: module.school,
       credit: module.credit,
       domain: module.domain,
-      levelOfStudy: module.levelOfStudy,
       prerequisite: module.prerequisite,
-      competencyLevel: module.competencyLevel,
     } : {
       moduleCode: "",
       title: "",
@@ -63,9 +59,7 @@ function EditModuleForm({ module: propModule, onClose }) {
       school: "",
       credit: "",
       domain: "",
-      levelOfStudy: "",
       prerequisite: "",
-      competencyLevel: "",
     },
     validationSchema: validationSchema,
     onSubmit: async (values) => {
@@ -169,18 +163,6 @@ function EditModuleForm({ module: propModule, onClose }) {
           <Grid item xs={12} sm={6}>
             <TextField
               fullWidth
-              id="levelOfStudy"
-              name="levelOfStudy"
-              label="Level of Study"
-              value={formik.values.levelOfStudy}
-              onChange={formik.handleChange}
-              error={formik.touched.levelOfStudy && Boolean(formik.errors.levelOfStudy)}
-              helperText={formik.touched.levelOfStudy && formik.errors.levelOfStudy}
-            />
-          </Grid>
-          <Grid item xs={12} sm={6}>
-            <TextField
-              fullWidth
               id="prerequisite"
               name="prerequisite"
               label="Prerequisite"
@@ -188,19 +170,6 @@ function EditModuleForm({ module: propModule, onClose }) {
               onChange={formik.handleChange}
               error={formik.touched.prerequisite && Boolean(formik.errors.prerequisite)}
               helperText={formik.touched.prerequisite && formik.errors.prerequisite}
-            />
-          </Grid>
-          <Grid item xs={12} sm={6}>
-            <TextField
-              fullWidth
-              id="competencyLevel"
-              name="competencyLevel"
-              label="Competency Level"
-              type="number"
-              value={formik.values.competencyLevel}
-              onChange={formik.handleChange}
-              error={formik.touched.competencyLevel && Boolean(formik.errors.competencyLevel)}
-              helperText={formik.touched.competencyLevel && formik.errors.competencyLevel}
             />
           </Grid>
         </Grid>

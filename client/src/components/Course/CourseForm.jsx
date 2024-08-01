@@ -4,7 +4,7 @@ import { TextField, Button, Box, Typography } from '@mui/material';
 import http from '../../http';
 
 const CourseForm = () => {
-  const { courseId } = useParams();
+  const { courseCode } = useParams();
   const navigate = useNavigate();
   const [course, setCourse] = useState({
     name: '',
@@ -13,10 +13,10 @@ const CourseForm = () => {
   const [errors, setErrors] = useState({});
 
   useEffect(() => {
-    if (courseId) {
+    if (courseCode) {
       const fetchCourse = async () => {
         try {
-          const response = await http.get(`/courses/${courseId}`);
+          const response = await http.get(`/course/${courseCode}`);
           setCourse(response.data);
         } catch (error) {
           console.error('Error fetching course:', error);
@@ -24,7 +24,7 @@ const CourseForm = () => {
       };
       fetchCourse();
     }
-  }, [courseId]);
+  }, [courseCode]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -38,12 +38,12 @@ const CourseForm = () => {
     e.preventDefault();
     setErrors({});
     try {
-      if (courseId) {
-        await http.put(`/courses/${courseId}`, course);
+      if (courseCode) {
+        await http.put(`/course/${courseCode}`, course);
       } else {
-        await http.post('/courses/create', course);
+        await http.post('/course/create', course);
       }
-      navigate('/courses');
+      navigate('/admin/courses');
     } catch (error) {
       if (error.response && error.response.data && error.response.data.errors) {
         setErrors(error.response.data.errors.reduce((acc, curr) => {
@@ -59,8 +59,19 @@ const CourseForm = () => {
   return (
     <Box component="form" onSubmit={handleSubmit} sx={{ maxWidth: 400, margin: 'auto', mt: 4 }}>
       <Typography variant="h4" gutterBottom>
-        {courseId ? 'Edit Course' : 'Create New Course'}
+        {courseCode ? 'Edit Course' : 'Create New Course'}
       </Typography>
+      <TextField
+        fullWidth
+        margin="normal"
+        label="Course Code"
+        name="courseCode"
+        value={course.courseCode}
+        onChange={handleChange}
+        error={!!errors.courseCode}
+        helperText={errors.courseCode}
+        required
+      />
       <TextField
         fullWidth
         margin="normal"
@@ -86,7 +97,7 @@ const CourseForm = () => {
         required
       />
       <Button type="submit" variant="contained" color="primary" sx={{ mt: 2 }}>
-        {courseId ? 'Update Course' : 'Create Course'}
+        {courseCode ? 'Update Course' : 'Create Course'}
       </Button>
     </Box>
   );

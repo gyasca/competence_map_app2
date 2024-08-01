@@ -25,33 +25,27 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       allowNull: false,
     },
-    levelOfStudy: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
     certifications: {
       type: DataTypes.TEXT,
       allowNull: true,
       get() {
-        const rawValue = this.getDataValue('certifications');
+        const rawValue = this.getDataValue("certifications");
         return rawValue ? JSON.parse(rawValue) : [];
       },
       set(value) {
-        this.setDataValue('certifications', JSON.stringify(value));
-      }
+        this.setDataValue("certifications", JSON.stringify(value));
+      },
     },
-    prevModule: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
-    nextModule: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
-    competencyLevel: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-    },
+    // moved to courseModule model
+    // prevModule: {
+    //   type: DataTypes.STRING,
+    //   allowNull: true,
+    // },
+    // nextModule: {
+    //   type: DataTypes.STRING,
+    //   allowNull: true,
+    // },
+    
   });
 
   Module.associate = (models) => {
@@ -63,7 +57,10 @@ module.exports = (sequelize, DataTypes) => {
       foreignKey: "moduleCode",
       onDelete: "cascade",
     });
-    Module.belongsToMany(models.Course, { through: models.CourseModule });
+    Module.belongsToMany(models.Course, {
+      through: models.CourseModule,
+      foreignKey: "moduleCode",
+    });
     Module.hasMany(models.CompetencyMapModule, {
       foreignKey: "moduleCode",
       onDelete: "cascade",

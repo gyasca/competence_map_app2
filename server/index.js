@@ -28,6 +28,18 @@ app.use("/resume", resumeRoute);
 const enrollmentRoute = require('./routes/enrollment');
 app.use("/enrollment", enrollmentRoute);
 
+// CRUD course
+const courseRoute = require('./routes/course');
+app.use("/course", courseRoute);
+
+// CRUD courseModule
+const courseModuleRoute = require('./routes/courseModule');
+app.use("/courseModule", courseModuleRoute);
+
+// CRUD certification
+const certificateRoute = require('./routes/certificate');
+app.use("/certificate", certificateRoute);
+
 const db = require("./models");
 db.sequelize.sync({ alter: true }).then(() => {
   let port = process.env.APP_PORT;

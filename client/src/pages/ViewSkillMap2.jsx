@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useMemo, useEffect } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import ReactFlow, {
   MiniMap,
   Controls,
@@ -31,14 +31,6 @@ const CurvyButton = styled(Button)(({ theme }) => ({
   margin: theme.spacing(1),
   boxShadow: "0 4px 10px rgba(0, 0, 0, 0.1)",
 }));
-
-
-
-  const blahblah = () => {
-    alert("Hello Christine");
-  };
-
-
 
 const LeftSectionPaper = styled(Paper)(({ theme }) => ({
   borderRadius: "20px",
@@ -278,7 +270,7 @@ const ViewSkillMap2 = () => {
               ))}
             </Box>
             <Box display="flex" justifyContent="center" mt={2}>
-              <Button size="small" onClick={blahblah}>1</Button>
+              <Button size="small">1</Button>
               <Button size="small">2</Button>
               <Button size="small">3</Button>
             </Box>

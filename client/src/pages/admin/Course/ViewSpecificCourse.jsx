@@ -4,6 +4,7 @@ import { Box, Paper, Container } from "@mui/material";
 import SpecificCourseDetails from "../../../components/Course/SpecificCourseDetails";
 import CompetencyMapEditor from "../../../components/Course/CompetencyMapEditor";
 import CareerMap from "../../../components/CareerMap";
+import ReactflowCareerMap from "../../../components/ReactFlowCareerMap";
 
 const ViewSpecificCourse = () => {
   const { courseCode } = useParams();
@@ -19,8 +20,15 @@ const ViewSpecificCourse = () => {
     >
       <SpecificCourseDetails courseCode={courseCode} />
       <br /><br />
+      {/* Not working */}
       {/* <CompetencyMapEditor courseCode={courseCode} /> */}
-      <CareerMap courseCode={courseCode} />
+
+      {/* Working */}
+      {/* Iteration 1 (Proprietory mapping component) */}
+      {/* <CareerMap courseCode={courseCode} /> */}
+
+      {/* Iteration 2 (Packaged mapping component - npm i reactflow) */}
+      <ReactflowCareerMap courseCode={courseCode} />
     </Container>
   );
 };

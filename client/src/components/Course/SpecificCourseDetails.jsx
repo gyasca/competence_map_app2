@@ -59,6 +59,32 @@ function SpecificCourseDetails() {
   return (
     <Box>
       <Grid container spacing={2}>
+      <Grid item xs={12} md={4}>
+          <Paper elevation={3} sx={{ padding: 3, textAlign: "center" }}>
+            <Typography variant="h5" gutterBottom>
+              {course.name}
+            </Typography>
+            <Typography variant="subtitle1" gutterBottom>
+              Course Code: {course.courseCode}
+            </Typography>
+            <Box sx={{ textAlign: "center", mt: 2 }}>
+              <Button
+                variant="contained"
+                onClick={() => navigate(`/admin/courses/edit/${courseCode}`)}
+                sx={{ width: "100%", mb: 1 }}
+              >
+                Edit Course
+              </Button>
+              <Button
+                variant="outlined"
+                onClick={() => navigate("/admin/courses")}
+                sx={{ width: "100%" }}
+              >
+                Back to Course List
+              </Button>
+            </Box>
+          </Paper>
+        </Grid>
         <Grid item xs={12} md={8}>
           <Paper elevation={3} sx={{ padding: 2 }}>
             <Tabs
@@ -97,32 +123,6 @@ function SpecificCourseDetails() {
               <CourseModuleList courseCode={courseCode} />
             </Paper>
           )}
-        </Grid>
-        <Grid item xs={12} md={4}>
-          <Paper elevation={3} sx={{ padding: 3, textAlign: "center" }}>
-            <Typography variant="h5" gutterBottom>
-              {course.name}
-            </Typography>
-            <Typography variant="subtitle1" gutterBottom>
-              Course Code: {course.courseCode}
-            </Typography>
-            <Box sx={{ textAlign: "center", mt: 2 }}>
-              <Button
-                variant="contained"
-                onClick={() => navigate(`/admin/courses/edit/${courseCode}`)}
-                sx={{ width: "100%", mb: 1 }}
-              >
-                Edit Course
-              </Button>
-              <Button
-                variant="outlined"
-                onClick={() => navigate("/admin/courses")}
-                sx={{ width: "100%" }}
-              >
-                Back to Course List
-              </Button>
-            </Box>
-          </Paper>
         </Grid>
       </Grid>
     </Box>

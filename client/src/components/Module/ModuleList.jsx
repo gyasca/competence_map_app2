@@ -12,6 +12,7 @@ import {
   Typography,
   IconButton,
   InputAdornment,
+  Checkbox
 } from "@mui/material";
 import { Edit, Delete, Visibility, Search, Add } from "@mui/icons-material";
 import http from "../../http";
@@ -23,6 +24,7 @@ function ModuleList() {
   const [deleteModule, setDeleteModule] = useState(null);
   const [editModule, setEditModule] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
+  const [selectedModules, setSelectedModules] = useState([]);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -57,7 +59,48 @@ function ModuleList() {
     fetchModules();
   };
 
+  const handleSelectAllClick = () => {
+    if (selectedModules.length === modules.length) {
+      setSelectedModules([]);
+    } else {
+      setSelectedModules(modules.map((module) => module.moduleCode));
+    }
+  };
+
+  const handleCheckboxClick = (moduleCode) => {
+    setSelectedModules((prevSelected) =>
+      prevSelected.includes(moduleCode)
+        ? prevSelected.filter((code) => code !== moduleCode)
+        : [...prevSelected, moduleCode]
+    );
+  };
+
+  const handleDeleteSelected = async () => {
+    try {
+      await Promise.all(
+        selectedModules.map((moduleCode) =>
+          http.delete(`/module/${moduleCode}`)
+        )
+      );
+      setSelectedModules([]);
+      fetchModules();
+    } catch (error) {
+      console.error("Error deleting selected modules:", error);
+    }
+  };
+
   const columns = [
+    {
+      field: "select",
+      headerName: "",
+      width: 50,
+      renderCell: (params) => (
+        <Checkbox
+          checked={selectedModules.includes(params.row.moduleCode)}
+          onChange={() => handleCheckboxClick(params.row.moduleCode)}
+        />
+      ),
+    },
     { field: "moduleCode", headerName: "Module Code", width: 150 },
     { field: "title", headerName: "Title", width: 200 },
     { field: "description", headerName: "Description", width: 300 },
@@ -114,6 +157,22 @@ function ModuleList() {
           onClick={() => navigate("/admin/modules/create")}
         >
           Create Module
+        </Button>
+      </Box>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
+        <Button
+          variant="contained"
+          onClick={handleSelectAllClick}
+        >
+          {selectedModules.length === modules.length ? "Unselect All" : "Select All"}
+        </Button>
+        <Button
+          variant="contained"
+          color="error"
+          onClick={handleDeleteSelected}
+          disabled={selectedModules.length === 0}
+        >
+          Delete Selected
         </Button>
       </Box>
       <Box sx={{ flexGrow: 1, width: '100%', height: 'calc(100% - 130px)', overflow: 'hidden' }}>

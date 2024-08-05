@@ -7,6 +7,7 @@ import Map from './Map'
 import StudentPortal from './StudentPortal'
 import ViewSpecialSkillMap from './ViewSpecialSkillMap'
 import ViewSkillMap from './ViewSkillMap'
+import ViewSkillMap2 from './ViewSkillMap2'
 import Dashboard from './Dashboard'
 import Test1 from './Test1'
 import Register from './Register'
@@ -46,6 +47,7 @@ function UserRoutes() {
             <Route path="/studentportal" element={<StudentPortal />} />
             <Route path="/skillmapspecial" element={<ViewSpecialSkillMap />} />
             <Route path="/skillmap" element={<ViewSkillMap />} />
+            <Route path="/skillmap2" element={<ViewSkillMap2 />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/test1" element={<Test1 />} />
 

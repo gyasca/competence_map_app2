@@ -67,7 +67,7 @@ export function Navbar() {
                     component="img"
                     sx={{
                       height: 50,
-                      width: 100,
+                      width: 50,
                       padding: "10px",
                       borderRadius: "15px",
                       maxHeight: { xs: 233, md: 167 },
@@ -118,69 +118,105 @@ export function Navbar() {
                   </Button>
                 </Stack>
 
-                <Stack
-                  spacing={2}
-                  direction="row"
-                  sx={{ display: ["none", "none", "flex"] }}
-                >
-                  <Button
-                    startIcon={<HomeIcon />}
-                    LinkComponent={Link}
-                    variant="text"
-                    color="inherit"
-                    to="/skillmap"
-                  >
-                    Skill map
-                  </Button>
-                </Stack>
+                {user && (
+                  <>
+                    <Stack
+                      spacing={2}
+                      direction="row"
+                      sx={{ display: ["none", "none", "flex"] }}
+                    >
+                      <Button
+                        startIcon={<HomeIcon />}
+                        LinkComponent={Link}
+                        variant="text"
+                        color="inherit"
+                        to="/skillmap"
+                      >
+                        Skill map
+                      </Button>
+                    </Stack>
 
-                <Stack
-                  spacing={2}
-                  direction="row"
-                  sx={{ display: ["none", "none", "flex"] }}
-                >
-                  <Button
-                    startIcon={<HomeIcon />}
-                    LinkComponent={Link}
-                    variant="text"
-                    color="inherit"
-                    to="/skillmapspecial"
-                  >
-                    Skillmap special
-                  </Button>
-                </Stack>
+                    <Stack
+                      spacing={2}
+                      direction="row"
+                      sx={{ display: ["none", "none", "flex"] }}
+                    >
+                      <Button
+                        startIcon={<HomeIcon />}
+                        LinkComponent={Link}
+                        variant="text"
+                        color="inherit"
+                        to="/skillmap2"
+                      >
+                        Skill map 2
+                      </Button>
+                    </Stack>
 
-                <Stack
-                  spacing={2}
-                  direction="row"
-                  sx={{ display: ["none", "none", "flex"] }}
-                >
-                  <Button
-                    startIcon={<HomeIcon />}
-                    LinkComponent={Link}
-                    variant="text"
-                    color="inherit"
-                    to="/map"
-                  >
-                    Basic modules list
-                  </Button>
-                </Stack>
+                    <Stack
+                      spacing={2}
+                      direction="row"
+                      sx={{ display: ["none", "none", "flex"] }}
+                    >
+                      <Button
+                        startIcon={<HomeIcon />}
+                        LinkComponent={Link}
+                        variant="text"
+                        color="inherit"
+                        to="/test1"
+                      >
+                        Test 1
+                      </Button>
+                    </Stack>
 
-                <Stack
-                  spacing={2}
-                  direction="row"
-                  sx={{ display: ["none", "none", "flex"] }}
-                >
-                  <Button
-                    startIcon={<HomeIcon />}
-                    LinkComponent={Link}
-                    variant="text"
-                    color="inherit"
-                    to="/studentportal"
-                  >
-                    Student portal
-                  </Button>
-                </Stack>
+                    <Stack
+                      spacing={2}
+                      direction="row"
+                      sx={{ display: ["none", "none", "flex"] }}
+                    >
+                      <Button
+                        startIcon={<HomeIcon />}
+                        LinkComponent={Link}
+                        variant="text"
+                        color="inherit"
+                        to="/skillmapspecial"
+                      >
+                        Skillmap special
+                      </Button>
+                    </Stack>
+
+                    <Stack
+                      spacing={2}
+                      direction="row"
+                      sx={{ display: ["none", "none", "flex"] }}
+                    >
+                      <Button
+                        startIcon={<HomeIcon />}
+                        LinkComponent={Link}
+                        variant="text"
+                        color="inherit"
+                        to="/map"
+                      >
+                        Basic modules list
+                      </Button>
+                    </Stack>
+
+                    <Stack
+                      spacing={2}
+                      direction="row"
+                      sx={{ display: ["none", "none", "flex"] }}
+                    >
+                      <Button
+                        startIcon={<HomeIcon />}
+                        LinkComponent={Link}
+                        variant="text"
+                        color="inherit"
+                        to="/studentportal"
+                      >
+                        Student portal
+                      </Button>
+                    </Stack>
+                  </>
+                )}
               </Box>
               {!user && (
                 <Button
@@ -221,7 +257,7 @@ export function Navbar() {
                   component="img"
                   sx={{
                     height: 50,
-                    width: 100,
+                    width: 50,
                     padding: "10px",
                     borderRadius: "15px",
                     maxHeight: { xs: 233, md: 167 },

@@ -119,7 +119,7 @@ function CreateModuleForm() {
                 helperText={formik.touched.credit && formik.errors.credit}
               />
             </Grid>
-            <Grid item xs={12} sm={6}>
+            <Grid item xs={12} sm={12}>
               <TextField
                 fullWidth
                 id="domain"
@@ -131,7 +131,7 @@ function CreateModuleForm() {
                 helperText={formik.touched.domain && formik.errors.domain}
               />
             </Grid>
-            <Grid item xs={12} sm={6}>
+            {/* <Grid item xs={12} sm={6}>
               <TextField
                 fullWidth
                 id="prevModule"
@@ -147,8 +147,8 @@ function CreateModuleForm() {
                   formik.touched.prevModule && formik.errors.prevModule
                 }
               />
-            </Grid>
-            <Grid item xs={12} sm={6}>
+            </Grid> */}
+            {/* <Grid item xs={12} sm={6}>
               <TextField
                 fullWidth
                 id="nextModule"
@@ -164,7 +164,7 @@ function CreateModuleForm() {
                   formik.touched.nextModule && formik.errors.nextModule
                 }
               />
-            </Grid>
+            </Grid> */}
           </Grid>
           <Box sx={{ mt: 2, display: "flex", justifyContent: "flex-end" }}>
             <Button

@@ -70,7 +70,7 @@ function CourseModuleList() {
   const confirmDelete = async () => {
     try {
       await http.delete(
-        `/course/${courseCode}/module/${deleteCourseModule.id}`
+        `/courseModule/course/${courseCode}/module/delete/${deleteCourseModule.id}`
       );
       setDeleteCourseModule(null);
       fetchCourseModules();

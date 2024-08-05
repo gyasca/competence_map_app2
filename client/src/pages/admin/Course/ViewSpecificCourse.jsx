@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import { Box, Paper, Container } from "@mui/material";
 import SpecificCourseDetails from "../../../components/Course/SpecificCourseDetails";
 import CompetencyMapEditor from "../../../components/Course/CompetencyMapEditor";
+import CareerMap from "../../../components/CareerMap";
 
 const ViewSpecificCourse = () => {
   const { courseCode } = useParams();
@@ -18,7 +19,8 @@ const ViewSpecificCourse = () => {
     >
       <SpecificCourseDetails courseCode={courseCode} />
       <br /><br />
-      <CompetencyMapEditor courseCode={courseCode} />
+      {/* <CompetencyMapEditor courseCode={courseCode} /> */}
+      <CareerMap courseCode={courseCode} />
     </Container>
   );
 };

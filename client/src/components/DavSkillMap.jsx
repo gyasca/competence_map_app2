@@ -2,7 +2,7 @@
 import React, { useEffect, useRef } from 'react';
 import * as d3 from 'd3';
 
-const SkillMap = () => {
+const DavSkillMap = () => {
   const svgRef = useRef();
 
   useEffect(() => {
@@ -106,4 +106,4 @@ const SkillMap = () => {
   return <svg ref={svgRef}></svg>;
 };
 
-export default SkillMap;
+export default DavSkillMap;

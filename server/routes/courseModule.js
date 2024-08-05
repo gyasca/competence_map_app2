@@ -58,14 +58,14 @@ router.get("/course/:courseCode/modules", validateToken, async (req, res) => {
 
 // Update a course module (admin only)
 router.put(
-  "/:courseModuleCode",
+  "/course/:courseCode/module/edit/:id",
   validateToken,
   validateAdmin,
   async (req, res) => {
     try {
       await courseModuleSchema.validate(req.body, { abortEarly: false });
       const [updated] = await CourseModule.update(req.body, {
-        where: { id: req.params.courseModuleId },
+        where: { id: req.params.id },
       });
       if (updated) {
         const updatedCourseModule = await CourseModule.findByPk(
@@ -87,7 +87,7 @@ router.put(
 
 // Delete a course module (admin only)
 router.delete(
-  "/:courseModuleCode",
+  "/course/:courseCode/module/delete/:id",
   validateToken,
   validateAdmin,
   async (req, res) => {

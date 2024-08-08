@@ -61,18 +61,18 @@ const CareerMap = ({ courseCode }) => {
   if (loading) return <CircularProgress />;
   if (error) return <Typography color="error">{error}</Typography>;
 
-  const competencyLevels = [...new Set(modules.map(m => m.competencyLevel))].sort((a, b) => a - b);
+  const complexityLevels = [...new Set(modules.map(m => m.complexityLevel))].sort((a, b) => a - b);
 
   return (
     <Container maxWidth="xl" sx={{ marginTop: "2rem" }}>
       <Typography variant="h4" gutterBottom>Skill Map for Course: {courseCode}</Typography>
       <ArcherContainer strokeColor="blue">
         <Grid container spacing={4}>
-          {competencyLevels.map((level) => (
-            <Grid item xs={12 / competencyLevels.length} key={level}>
+          {complexityLevels.map((level) => (
+            <Grid item xs={12 / complexityLevels.length} key={level}>
               <Typography variant="h6" textAlign="center">CL{level}</Typography>
               {modules
-                .filter(module => module.competencyLevel === level)
+                .filter(module => module.complexityLevel === level)
                 .sort((a, b) => a.order - b.order)
                 .map((module) => (
                   <ArcherElement
@@ -101,7 +101,7 @@ const CareerMap = ({ courseCode }) => {
         <DialogContent>
           <Typography><strong>Description:</strong> {selectedModule?.Module.description}</Typography>
           <Typography><strong>Credit:</strong> {selectedModule?.Module.credit}</Typography>
-          <Typography><strong>Competency Level:</strong> {selectedModule?.competencyLevel}</Typography>
+          <Typography><strong>Competency Level:</strong> {selectedModule?.complexityLevel}</Typography>
           <Typography><strong>Order:</strong> {selectedModule?.order}</Typography>
           {selectedModule?.prevModuleCode && (
             <Typography><strong>Previous Module:</strong> {selectedModule.prevModuleCode}</Typography>

@@ -111,7 +111,7 @@ function SpecificModuleDetails() {
                   <InfoBox title="Prerequisite" value={module.prerequisite || "None"} />
                 </Grid>
                 <Grid item xs={6}>
-                  <InfoBox title="Competency Level" value={module.competencyLevel} />
+                  <InfoBox title="Competency Level" value={module.complexityLevel} />
                 </Grid>
               </Grid>
             </Paper>

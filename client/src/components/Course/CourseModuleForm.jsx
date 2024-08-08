@@ -14,19 +14,22 @@ import {
   ListItemText,
   ListItemIcon,
   Paper,
+  IconButton,
 } from "@mui/material";
+import AddIcon from "@mui/icons-material/Add";
+import DeleteIcon from "@mui/icons-material/Delete";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import http from "../../http";
 
 const validationSchema = Yup.object({
   moduleCode: Yup.object().nullable().required("Module is required"),
-  prevModuleCode: Yup.object().nullable(),
-  nextModuleCode: Yup.object().nullable(),
+  prevModuleCodes: Yup.array().of(Yup.object().nullable()),
+  nextModuleCodes: Yup.array().of(Yup.object().nullable()),
   order: Yup.number().required("Order is required"),
   levelOfStudy: Yup.string().required("Level of Study is required"),
-  competencyLevel: Yup.number()
-    .required("Competency Level is required")
+  complexityLevel: Yup.number()
+    .required("Complexity Level is required")
     .positive()
     .integer(),
 });
@@ -72,11 +75,11 @@ function CourseModuleForm({
     initialValues: {
       courseCode: courseCode,
       moduleCode: null,
-      prevModuleCode: null,
-      nextModuleCode: null,
+      prevModuleCodes: [],
+      nextModuleCodes: [],
       order: "",
       levelOfStudy: "",
-      competencyLevel: "",
+      complexityLevel: "",
     },
     validationSchema: validationSchema,
     enableReinitialize: true,
@@ -85,10 +88,14 @@ function CourseModuleForm({
         const payload = {
           ...values,
           moduleCode: values.moduleCode?.moduleCode,
-          prevModuleCode: values.prevModuleCode?.Module?.moduleCode,
-          nextModuleCode: values.nextModuleCode?.Module?.moduleCode,
+          prevModuleCodes: values.prevModuleCodes.map(
+            (mod) => mod?.Module?.moduleCode
+          ),
+          nextModuleCodes: values.nextModuleCodes.map(
+            (mod) => mod?.Module?.moduleCode
+          ),
           order: parseInt(values.order, 10),
-          competencyLevel: parseInt(values.competencyLevel, 10),
+          complexityLevel: parseInt(values.complexityLevel, 10),
         };
         let response;
         if (isEditMode) {
@@ -122,34 +129,36 @@ function CourseModuleForm({
       const selectedModule = availableModules.find(
         (m) => m.moduleCode === courseModuleToEdit.moduleCode
       );
-      const prevModule = courseModules.find(
-        (m) => m.Module.moduleCode === courseModuleToEdit.prevModuleCode
+      const prevModules = courseModuleToEdit.prevModuleCodes.map((code) =>
+        courseModules.find((m) => m.Module.moduleCode === code)
       );
-      const nextModule = courseModules.find(
-        (m) => m.Module.moduleCode === courseModuleToEdit.nextModuleCode
+      const nextModules = courseModuleToEdit.nextModuleCodes.map((code) =>
+        courseModules.find((m) => m.Module.moduleCode === code)
       );
 
       formik.setValues({
         courseCode: courseCode,
         moduleCode: selectedModule || null,
-        prevModuleCode: prevModule || null,
-        nextModuleCode: nextModule || null,
+        prevModuleCodes: prevModules.filter(Boolean),
+        nextModuleCodes: nextModules.filter(Boolean),
         order: courseModuleToEdit.order || "",
         levelOfStudy: courseModuleToEdit.levelOfStudy || "",
-        competencyLevel: courseModuleToEdit.competencyLevel || "",
+        complexityLevel: courseModuleToEdit.complexityLevel || "",
       });
     }
   }, [isEditMode, availableModules, courseModules, courseModuleToEdit]);
 
   const handleBulkAdd = async () => {
     try {
-      const promises = selectedModules.map(module =>
+      const promises = selectedModules.map((module) =>
         http.post(`/courseModule/${courseCode}/create`, {
           courseCode,
           moduleCode: module.moduleCode,
           order: 0,
           levelOfStudy: "",
-          competencyLevel: 1,
+          complexityLevel: 1,
+          prevModuleCodes: [],
+          nextModuleCodes: [],
         })
       );
       await Promise.all(promises);
@@ -165,7 +174,9 @@ function CourseModuleForm({
   };
 
   const handleModuleToggle = (module) => {
-    const currentIndex = selectedModules.findIndex(m => m.moduleCode === module.moduleCode);
+    const currentIndex = selectedModules.findIndex(
+      (m) => m.moduleCode === module.moduleCode
+    );
     const newSelectedModules = [...selectedModules];
 
     if (currentIndex === -1) {
@@ -184,15 +195,44 @@ function CourseModuleForm({
     );
   };
 
+  const handleAddPrevModule = () => {
+    formik.setFieldValue("prevModuleCodes", [
+      ...formik.values.prevModuleCodes,
+      null,
+    ]);
+  };
+
+  const handleAddNextModule = () => {
+    formik.setFieldValue("nextModuleCodes", [
+      ...formik.values.nextModuleCodes,
+      null,
+    ]);
+  };
+
+  const handleRemovePrevModule = (index) => {
+    const newPrevModules = [...formik.values.prevModuleCodes];
+    newPrevModules.splice(index, 1);
+    formik.setFieldValue("prevModuleCodes", newPrevModules);
+  };
+
+  const handleRemoveNextModule = (index) => {
+    const newNextModules = [...formik.values.nextModuleCodes];
+    newNextModules.splice(index, 1);
+    formik.setFieldValue("nextModuleCodes", newNextModules);
+  };
+
   return (
-    <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-      <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-        <Tabs value={selectedTab} onChange={(e, newValue) => setSelectedTab(newValue)}>
+    <Box sx={{ height: "100%", display: "flex", flexDirection: "column" }}>
+      <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
+        <Tabs
+          value={selectedTab}
+          onChange={(e, newValue) => setSelectedTab(newValue)}
+        >
           <Tab label={isEditMode ? "Edit Module" : "Add Individual Module"} />
           {!isEditMode && <Tab label="Add Modules in Bulk" />}
         </Tabs>
       </Box>
-      <Paper sx={{ flexGrow: 1, overflow: 'auto', p: 2 }}>
+      <Paper sx={{ flexGrow: 1, overflow: "auto", p: 2 }}>
         {selectedTab === 0 ? (
           <form onSubmit={formik.handleSubmit}>
             <Grid container spacing={2}>
@@ -222,38 +262,70 @@ function CourseModuleForm({
                 />
               </Grid>
               <Grid item xs={12}>
-                <Autocomplete
-                  fullWidth
-                  options={courseModules.filter(
-                    (mod) => mod?.id !== formik.values.nextModuleCode?.id
-                  )}
-                  getOptionLabel={(option) => option?.Module?.title || ""}
-                  filterOptions={filterOptions}
-                  value={formik.values.prevModuleCode}
-                  onChange={(event, newValue) => {
-                    formik.setFieldValue("prevModuleCode", newValue);
-                  }}
-                  renderInput={(params) => (
-                    <TextField {...params} label="Previous Module" />
-                  )}
-                />
+                <Typography variant="subtitle1">Previous Modules</Typography>
+                {formik.values.prevModuleCodes.map((prevModule, index) => (
+                  <Box key={index} display="flex" alignItems="center" mb={1}>
+                    <Autocomplete
+                      fullWidth
+                      options={courseModules}
+                      getOptionLabel={(option) => option?.Module?.title || ""}
+                      filterOptions={filterOptions}
+                      value={prevModule}
+                      onChange={(event, newValue) => {
+                        const newPrevModules = [...formik.values.prevModuleCodes];
+                        newPrevModules[index] = newValue;
+                        formik.setFieldValue("prevModuleCodes", newPrevModules);
+                      }}
+                      renderInput={(params) => (
+                        <TextField {...params} label={`Previous Module ${index + 1}`} />
+                      )}
+                    />
+                    <IconButton onClick={() => handleRemovePrevModule(index)}>
+                      <DeleteIcon />
+                    </IconButton>
+                  </Box>
+                ))}
+                <Button
+                  startIcon={<AddIcon />}
+                  onClick={handleAddPrevModule}
+                  variant="outlined"
+                  sx={{ mt: 1 }}
+                >
+                  Add Prev Module
+                </Button>
               </Grid>
               <Grid item xs={12}>
-                <Autocomplete
-                  fullWidth
-                  options={courseModules.filter(
-                    (mod) => mod?.id !== formik.values.prevModuleCode?.id
-                  )}
-                  getOptionLabel={(option) => option?.Module?.title || ""}
-                  filterOptions={filterOptions}
-                  value={formik.values.nextModuleCode}
-                  onChange={(event, newValue) => {
-                    formik.setFieldValue("nextModuleCode", newValue);
-                  }}
-                  renderInput={(params) => (
-                    <TextField {...params} label="Next Module" />
-                  )}
-                />
+                <Typography variant="subtitle1">Next Modules</Typography>
+                {formik.values.nextModuleCodes.map((nextModule, index) => (
+                  <Box key={index} display="flex" alignItems="center" mb={1}>
+                    <Autocomplete
+                      fullWidth
+                      options={courseModules}
+                      getOptionLabel={(option) => option?.Module?.title || ""}
+                      filterOptions={filterOptions}
+                      value={nextModule}
+                      onChange={(event, newValue) => {
+                        const newNextModules = [...formik.values.nextModuleCodes];
+                        newNextModules[index] = newValue;
+                        formik.setFieldValue("nextModuleCodes", newNextModules);
+                      }}
+                      renderInput={(params) => (
+                        <TextField {...params} label={`Next Module ${index + 1}`} />
+                      )}
+                    />
+                    <IconButton onClick={() => handleRemoveNextModule(index)}>
+                      <DeleteIcon />
+                    </IconButton>
+                  </Box>
+                ))}
+                <Button
+                  startIcon={<AddIcon />}
+                  onClick={handleAddNextModule}
+                  variant="outlined"
+                  sx={{ mt: 1 }}
+                >
+                  Add Next Module
+                </Button>
               </Grid>
               <Grid item xs={12}>
                 <TextField
@@ -287,18 +359,18 @@ function CourseModuleForm({
               <Grid item xs={12} sm={6}>
                 <TextField
                   fullWidth
-                  id="competencyLevel"
-                  name="competencyLevel"
-                  label="Competency Level"
+                  id="complexityLevel"
+                  name="complexityLevel"
+                  label="Complexity Level"
                   type="number"
-                  value={formik.values.competencyLevel}
+                  value={formik.values.complexityLevel}
                   onChange={formik.handleChange}
                   error={
-                    formik.touched.competencyLevel &&
-                    Boolean(formik.errors.competencyLevel)
+                    formik.touched.complexityLevel &&
+                    Boolean(formik.errors.complexityLevel)
                   }
                   helperText={
-                    formik.touched.competencyLevel && formik.errors.competencyLevel
+                    formik.touched.complexityLevel && formik.errors.complexityLevel
                   }
                 />
               </Grid>

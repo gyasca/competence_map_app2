@@ -11,6 +11,7 @@ import ReactFlow, {
   getBezierPath,
 } from "reactflow";
 import "reactflow/dist/style.css";
+import "./CSS/reactflowEdgeStyle.css"
 
 import {
   Container,
@@ -28,6 +29,7 @@ import {
 import { styled } from "@mui/system";
 import http from "../http";
 
+// ... (keep the existing styled components and other constants)
 const CurvyButton = styled(Button)(({ theme }) => ({
   borderRadius: "20px",
   margin: theme.spacing(1),
@@ -61,20 +63,6 @@ const columnLabelStyle = {
   width: 200,
 };
 
-const StyledEdgeButton = {
-  width: "60px",
-  height: "30px",
-  background: "#eee",
-  border: "1px solid #fff",
-  cursor: "pointer",
-  borderRadius: "5px",
-  fontSize: "12px",
-  "&:hover": {
-    background: "#f5f5f5",
-    boxShadow: "none",
-  },
-};
-
 const proOptions = { hideAttribution: true };
 
 const domainColors = {
@@ -106,12 +94,83 @@ const ColumnLabelNode = ({ data }) => {
   return <div style={columnLabelStyle}>{data.label}</div>;
 };
 
-const ReactflowCareerMap = ({ courseCode, onModuleUpdate }) => {
+// Custom edge with delete button
+const CustomEdge = ({
+  id,
+  sourceX,
+  sourceY,
+  targetX,
+  targetY,
+  sourcePosition,
+  targetPosition,
+  style = {},
+  data,
+}) => {
+  const [edgePath, labelX, labelY] = getBezierPath({
+    sourceX,
+    sourceY,
+    sourcePosition,
+    targetX,
+    targetY,
+    targetPosition,
+  });
+
+  return (
+    <>
+      <path
+        id={id}
+        style={style}
+        className="react-flow__edge-path"
+        d={edgePath}
+      />
+      <foreignObject
+        width={80}
+        height={40}
+        x={labelX - 40}
+        y={labelY - 20}
+        className="edgebutton-foreignobject"
+        requiredExtensions="http://www.w3.org/1999/xhtml"
+      >
+        <body>
+          <button
+            className="edgebutton"
+            onClick={(event) => data.onEdgeClick(event, id)}
+          >
+            Delete
+          </button>
+        </body>
+      </foreignObject>
+    </>
+  );
+};
+
+const Copy3ReactflowCareerMap = ({ courseCode, onModuleUpdate }) => {
+  // ... (keep the existing state variables and useEffect)
   const [modules, setModules] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [open, setOpen] = useState(false);
   const [selectedModule, setSelectedModule] = useState(null);
+
+  useEffect(() => {
+    fetchCourseModules();
+  }, [courseCode]);
+
+  const fetchCourseModules = async () => {
+    setLoading(true);
+    try {
+      const response = await http.get(
+        `/courseModule/course/${courseCode}/modules`
+      );
+      console.log("Fetched modules:", response.data);
+      setModules(response.data);
+    } catch (error) {
+      console.error("Error fetching course modules:", error);
+      setError("Failed to fetch course modules. Please try again later.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleClickOpen = useCallback((module) => {
     setSelectedModule(module);
@@ -142,23 +201,16 @@ const ReactflowCareerMap = ({ courseCode, onModuleUpdate }) => {
     // Create nodes for each module
     modules.forEach((module, index) => {
       nodes.push({
-        id: module.id.toString(),
+        id: module.id.toString(), // Convert to string to ensure consistency
         type: "custom",
         data: {
-          ...module,
+          courseModuleId: module.id,
           label: module.Module.title,
+          moduleCode: module.moduleCode,
           domain: module.Module.domain,
           tempComplexityLevel: module.complexityLevel,
-          nextModuleIds: module.nextModuleCodes
-            .map((code) =>
-              modules.find((m) => m.moduleCode === code)?.id.toString()
-            )
-            .filter(Boolean),
-          prevModuleIds: module.prevModuleCodes
-            .map((code) =>
-              modules.find((m) => m.moduleCode === code)?.id.toString()
-            )
-            .filter(Boolean),
+          prevModuleCodes: module.prevModuleCodes,
+          nextModuleCodes: module.nextModuleCodes,
         },
         position: {
           x: (module.complexityLevel - 1) * columnSpacing + 100,
@@ -180,13 +232,14 @@ const ReactflowCareerMap = ({ courseCode, onModuleUpdate }) => {
             id: `e${module.id}-${targetModule.id}`,
             source: module.id.toString(),
             target: targetModule.id.toString(),
-            type: "custom",
+            type: "custom", // Use the custom edge type
             animated: true,
             style: { stroke: "black", strokeWidth: 2 },
             markerEnd: {
               type: MarkerType.ArrowClosed,
               color: "black",
             },
+            data: { onEdgeClick: onEdgeClick }, // Pass the onEdgeClick function
           });
         }
       });
@@ -196,166 +249,6 @@ const ReactflowCareerMap = ({ courseCode, onModuleUpdate }) => {
 
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
-
-  const updateModuleAPI = useCallback(
-    async (
-      courseModuleToBeUpdatedId,
-      newNextModuleIds = null,
-      newPrevModuleIds = null,
-      newComplexityLevel = null,
-      edgeUpdateCheck = null
-    ) => {
-      console.log(
-        "Attempting to update module with ID:",
-        courseModuleToBeUpdatedId
-      );
-
-      console.log("Nodes to find:", nodes);
-      
-      const module = nodes.find(
-        (node) =>
-          node.id === courseModuleToBeUpdatedId.toString() &&
-          node.type === "custom"
-      );
-
-      if (module) {
-        const payload = {
-          id: parseInt(module.id),
-          order: module.data.order,
-          levelOfStudy: module.data.levelOfStudy,
-          complexityLevel:
-            newComplexityLevel !== null
-              ? newComplexityLevel
-              : parseInt(module.data.complexityLevel),
-          prevModuleCodes: newPrevModuleIds
-            ? newPrevModuleIds
-                .map(
-                  (id) =>
-                    nodes.find(
-                      (n) => n.id === id.toString() && n.type === "custom"
-                    )?.data.moduleCode
-                )
-                .filter(Boolean)
-            : module.data.prevModuleCodes,
-          nextModuleCodes: newNextModuleIds
-            ? newNextModuleIds
-                .map(
-                  (id) =>
-                    nodes.find(
-                      (n) => n.id === id.toString() && n.type === "custom"
-                    )?.data.moduleCode
-                )
-                .filter(Boolean)
-            : module.data.nextModuleCodes,
-          courseCode: module.data.courseCode,
-          moduleCode: module.data.moduleCode,
-        };
-
-        console.log("Payload to be sent:", payload);
-
-        try {
-          const response = await http.put(
-            `/courseModule/course/${courseCode}/module/edit/${module.id}`,
-            payload
-          );
-          console.log("Module updated successfully:", response.data);
-        } catch (error) {
-          console.error("Error updating module:", error);
-        }
-      } else {
-        console.error("Module not found for ID:", courseModuleToBeUpdatedId);
-        console.log(
-          "Available node IDs:",
-          nodes.map((n) => `${n.id} (${n.type})`)
-        );
-      }
-    },
-    [nodes, courseCode]
-  );
-
-  const onEdgeClick = useCallback(
-    async (event, edge) => {
-      event.stopPropagation();
-      const sourceId = edge.source;
-      const targetId = edge.target;
-
-      console.log("Edge clicked:", edge);
-      console.log("Source ID:", sourceId);
-      console.log("Target ID:", targetId);
-      console.log("All nodes:", nodes)
-
-      // Update edges state locally
-      setEdges((eds) => eds.filter((e) => e.id !== edge.id));
-
-      // Update nodes state locally and gather the new next/prev module codes
-      setNodes((nds) => {
-        const updatedNodes = nds.map((node) => {
-          if (node.id === sourceId) {
-            return {
-              ...node,
-              data: {
-                ...node.data,
-                nextModuleIds: node.data.nextModuleIds.filter(
-                  (id) => id !== targetId
-                ),
-              },
-            };
-          }
-          if (node.id === targetId) {
-            return {
-              ...node,
-              data: {
-                ...node.data,
-                prevModuleIds: node.data.prevModuleIds.filter(
-                  (id) => id !== sourceId
-                ),
-              },
-            };
-          }
-          return node;
-        });
-
-        // Find the updated nodes
-        const updatedSourceNode = updatedNodes.find(
-          (node) => node.id === sourceId
-        );
-        const updatedTargetNode = updatedNodes.find(
-          (node) => node.id === targetId
-        );
-
-        console.log("Updated source node:", updatedSourceNode);
-        console.log("Updated target node:", updatedTargetNode);
-
-        // Call the API to update the modules
-        if (updatedSourceNode && updatedTargetNode) {
-          const edgeUpdate = true;
-          updateModuleAPI(
-            sourceId,
-            updatedSourceNode.data.nextModuleIds,
-            null,
-            null,
-            edgeUpdate
-          ).catch((error) =>
-            console.error("Error updating source module:", error)
-          );
-          updateModuleAPI(
-            targetId,
-            null,
-            updatedTargetNode.data.prevModuleIds,
-            null,
-            edgeUpdate
-          ).catch((error) =>
-            console.error("Error updating target module:", error)
-          );
-        } else {
-          console.error("Source or target node not found after update");
-        }
-
-        return updatedNodes;
-      });
-    },
-    [setEdges, setNodes, updateModuleAPI]
-  );
 
   const onConnect = useCallback(
     (params) => {
@@ -374,66 +267,123 @@ const ReactflowCareerMap = ({ courseCode, onModuleUpdate }) => {
         animated: true,
         style: { stroke: "black", strokeWidth: 2 },
         markerEnd: {
-          type: MarkerType.Arrow,
+          type: MarkerType.ArrowClosed,
           color: "black",
         },
+        data: { onEdgeClick: onEdgeClick },
       };
-
       setEdges((eds) => addEdge(newEdge, eds));
 
-      setNodes((prevNodes) => {
-        const updatedNodes = prevNodes.map((node) => {
+      // Update prevModuleCodes and nextModuleCodes
+      setNodes((nds) =>
+        nds.map((node) => {
           if (node.id === params.source) {
-            const newNextModuleIds = [
-              ...new Set([...node.data.nextModuleIds, targetNode.id]),
-            ];
             return {
               ...node,
               data: {
                 ...node.data,
-                nextModuleIds: newNextModuleIds,
+                nextModuleCodes: [
+                  ...node.data.nextModuleCodes,
+                  targetNode.data.moduleCode,
+                ],
               },
             };
           }
           if (node.id === params.target) {
-            const newPrevModuleIds = [
-              ...new Set([...node.data.prevModuleIds, sourceNode.id]),
-            ];
             return {
               ...node,
               data: {
                 ...node.data,
-                prevModuleIds: newPrevModuleIds,
+                prevModuleCodes: [
+                  ...node.data.prevModuleCodes,
+                  sourceNode.data.moduleCode,
+                ],
               },
             };
           }
           return node;
-        });
+        })
+      );
 
-        // After updating the nodes, call the API
-        const updatedSourceNode = updatedNodes.find(
-          (node) => node.id === params.source
-        );
-        const updatedTargetNode = updatedNodes.find(
-          (node) => node.id === params.target
-        );
-
-        updateModuleAPI(
-          updatedSourceNode.id,
-          updatedSourceNode.data.nextModuleIds,
-          null
-        );
-        updateModuleAPI(
-          updatedTargetNode.id,
-          null,
-          updatedTargetNode.data.prevModuleIds
-        );
-
-        return updatedNodes;
-      });
+      // Call the API to update the modules
+      updateModuleAPI(sourceNode.id);
+      updateModuleAPI(targetNode.id);
     },
-    [nodes, setEdges, setNodes, updateModuleAPI]
+    [setEdges, setNodes, nodes]
   );
+
+  const onEdgeClick = useCallback(
+    (event, edgeId) => {
+      event.stopPropagation();
+      const [sourceId, targetId] = edgeId.split("-").slice(1);
+
+      setEdges((eds) => eds.filter((e) => e.id !== edgeId));
+      setNodes((nds) =>
+        nds.map((node) => {
+          if (node.id === sourceId) {
+            return {
+              ...node,
+              data: {
+                ...node.data,
+                nextModuleCodes: node.data.nextModuleCodes.filter(
+                  (code) =>
+                    code !== nds.find((n) => n.id === targetId).data.moduleCode
+                ),
+              },
+            };
+          }
+          if (node.id === targetId) {
+            return {
+              ...node,
+              data: {
+                ...node.data,
+                prevModuleCodes: node.data.prevModuleCodes.filter(
+                  (code) =>
+                    code !== nds.find((n) => n.id === sourceId).data.moduleCode
+                ),
+              },
+            };
+          }
+          return node;
+        })
+      );
+
+      // Call the API to update the modules
+      updateModuleAPI(sourceId);
+      updateModuleAPI(targetId);
+    },
+    [setEdges, setNodes]
+  );
+
+  const updateModuleAPI = async (courseModuleToBeUpdatedId) => {
+    const module = nodes.find((node) => node.id === courseModuleToBeUpdatedId);
+    if (module) {
+      const payload = {
+        moduleCode: module.data.moduleCode,
+        prevModuleCodes: module.data.prevModuleCodes,
+        nextModuleCodes: module.data.nextModuleCodes,
+        order: module.data.order,
+        complexityLevel: parseInt(module.data.tempComplexityLevel),
+        courseCode: courseCode,
+        levelOfStudy: module.data.levelOfStudy,
+      };
+
+      console.log("Payload to be sent:", payload);
+
+      try {
+        await http.put(
+          `/courseModule/course/${courseCode}/module/edit/${courseModuleToBeUpdatedId}`,
+          payload
+        );
+        console.log("Module updated successfully:", module.data);
+        onModuleUpdate(module.data);
+      } catch (error) {
+        console.error("Error updating module:", error);
+      }
+    } else {
+      console.error("Module not found for ID:", courseModuleToBeUpdatedId);
+    }
+  };
 
   const onNodeDragStop = useCallback(
     (event, node) => {
@@ -447,68 +397,17 @@ const ReactflowCareerMap = ({ courseCode, onModuleUpdate }) => {
                 data: {
                   ...n.data,
                   tempComplexityLevel: newComplexityLevel,
-                  complexityLevel: newComplexityLevel, // Add this line
                 },
               };
             }
             return n;
           })
         );
-        updateModuleAPI(node.id, null, null, newComplexityLevel); // Pass the new complexity level
+        updateModuleAPI(node.id);
       }
     },
-    [setNodes, updateModuleAPI]
+    [setNodes, courseCode, onModuleUpdate]
   );
-
-  const CustomEdge = ({
-    id,
-    sourceX,
-    sourceY,
-    targetX,
-    targetY,
-    sourcePosition,
-    targetPosition,
-    style = {},
-    source,
-    target,
-  }) => {
-    const [edgePath, labelX, labelY] = getBezierPath({
-      sourceX,
-      sourceY,
-      sourcePosition,
-      targetX,
-      targetY,
-      targetPosition,
-    });
-
-    return (
-      <>
-        <path
-          id={id}
-          style={style}
-          className="react-flow__edge-path"
-          d={edgePath}
-        />
-        <foreignObject
-          width={80}
-          height={40}
-          x={labelX - 40}
-          y={labelY - 20}
-          className="edgebutton-foreignobject"
-          requiredExtensions="http://www.w3.org/1999/xhtml"
-        >
-          <Box>
-            <Button
-              style={StyledEdgeButton}
-              onClick={(event) => onEdgeClick(event, { id, source, target })}
-            >
-              Delete
-            </Button>
-          </Box>
-        </foreignObject>
-      </>
-    );
-  };
 
   const nodeTypes = useMemo(
     () => ({
@@ -526,26 +425,6 @@ const ReactflowCareerMap = ({ courseCode, onModuleUpdate }) => {
   );
 
   useEffect(() => {
-    const fetchCourseModules = async () => {
-      setLoading(true);
-      try {
-        const response = await http.get(
-          `/courseModule/course/${courseCode}/modules`
-        );
-        console.log("Fetched modules:", response.data);
-        setModules(response.data);
-      } catch (error) {
-        console.error("Error fetching course modules:", error);
-        setError("Failed to fetch course modules. Please try again later.");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchCourseModules();
-  }, [courseCode]);
-
-  useEffect(() => {
     if (initialNodes.length > 0) {
       setNodes(initialNodes);
       setEdges(initialEdges);
@@ -557,6 +436,7 @@ const ReactflowCareerMap = ({ courseCode, onModuleUpdate }) => {
 
   return (
     <Container maxWidth="xl" sx={{ marginTop: "2rem", height: "80vh" }}>
+      {/* ... (keep the existing JSX structure) */}
       <Grid container spacing={4} style={{ height: "100%" }}>
         <Grid item xs={12} md={2}>
           <LeftSectionPaper elevation={3}>
@@ -610,14 +490,13 @@ const ReactflowCareerMap = ({ courseCode, onModuleUpdate }) => {
               }}
               nodeTypes={nodeTypes}
               edgeTypes={edgeTypes}
-              onEdgeClick={onEdgeClick}
               connectionLineStyle={{ stroke: "black" }}
               defaultEdgeOptions={{
                 type: "custom",
                 animated: true,
                 style: { stroke: "black", strokeWidth: 2 },
                 markerEnd: {
-                  type: MarkerType.Arrow,
+                  type: MarkerType.ArrowClosed,
                   color: "black",
                 },
               }}
@@ -670,8 +549,9 @@ const ReactflowCareerMap = ({ courseCode, onModuleUpdate }) => {
           </Button>
         </DialogActions>
       </Dialog>
+      {/* ... (keep the existing Dialog component) */}
     </Container>
   );
 };
 
-export default ReactflowCareerMap;
+export default Copy3ReactflowCareerMap;

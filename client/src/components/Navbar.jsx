@@ -229,7 +229,11 @@ export function Navbar() {
                   Login
                 </Button>
               )}
-              {user && <NavbarProfile />}
+              {user && (
+                <>
+                  <NavbarProfile />
+                </>
+              )}
             </Toolbar>
           </AppBar>
         </Container>

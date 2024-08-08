@@ -7,31 +7,31 @@ module.exports = (sequelize, DataTypes) => {
     },
     order: {
       type: DataTypes.INTEGER,
-      allowNull: false,
+      allowNull: true,
     },
     levelOfStudy: {
       type: DataTypes.STRING,
       allowNull: true,
     },
-    competencyLevel: {
+    complexityLevel: {
       type: DataTypes.INTEGER,
       allowNull: false,
     },
-    prevModuleCode: {
-      type: DataTypes.STRING,
+    prevModuleCodes: {
+      type: DataTypes.JSON,
       allowNull: true,
+      defaultValue: [],
     },
-    nextModuleCode: {
-      type: DataTypes.STRING,
+    nextModuleCodes: {
+      type: DataTypes.JSON,
       allowNull: true,
+      defaultValue: [],
     },
     courseCode: {
-      // Add this field
       type: DataTypes.STRING,
       allowNull: false,
     },
     moduleCode: {
-      // Add this field
       type: DataTypes.STRING,
       allowNull: false,
     },

@@ -16,6 +16,7 @@ const ViewSpecificCourse = () => {
         justifyContent: "center",
         alignItems: "center",
         mt: "4%",
+        mb: "4%",
       }}
     >
       <SpecificCourseDetails courseCode={courseCode} />

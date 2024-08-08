@@ -13,6 +13,7 @@ import {
   IconButton,
   InputAdornment,
   CircularProgress,
+  Checkbox,
 } from "@mui/material";
 import { Edit, Delete, Visibility, Search, Add } from "@mui/icons-material";
 import http from "../../http";
@@ -26,6 +27,7 @@ function CourseModuleList() {
   const [deleteCourseModule, setDeleteCourseModule] = useState(null);
   const [editCourseModule, setEditCourseModule] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
+  const [selectedModules, setSelectedModules] = useState([]);
   const [moduleDialogOpen, setModuleDialogOpen] = useState(false);
   const navigate = useNavigate();
 
@@ -36,9 +38,7 @@ function CourseModuleList() {
   const fetchCourseModules = async () => {
     setLoading(true);
     try {
-      const response = await http.get(
-        `/courseModule/course/${courseCode}/modules`
-      );
+      const response = await http.get(`/courseModule/course/${courseCode}/modules`);
       setRawCourseModules(response.data);
     } catch (error) {
       console.error("Error fetching course modules:", error);
@@ -58,20 +58,16 @@ function CourseModuleList() {
     }));
   }, [rawCourseModules]);
 
-  const handleView = (moduleCode) =>
-    navigate(`/admin/courses/${courseCode}/modules/${moduleCode}`);
+  const handleView = (moduleCode) => navigate(`/admin/courses/${courseCode}/modules/${moduleCode}`);
   const handleEdit = (courseModule) => {
     setEditCourseModule(courseModule.rawData);
     setModuleDialogOpen(true);
   };
-  const handleDelete = (courseModule) =>
-    setDeleteCourseModule(courseModule.rawData);
+  const handleDelete = (courseModule) => setDeleteCourseModule(courseModule.rawData);
 
   const confirmDelete = async () => {
     try {
-      await http.delete(
-        `/courseModule/course/${courseCode}/module/delete/${deleteCourseModule.id}`
-      );
+      await http.delete(`/courseModule/course/${courseCode}/module/delete/${deleteCourseModule.id}`);
       setDeleteCourseModule(null);
       fetchCourseModules();
     } catch (error) {
@@ -89,8 +85,48 @@ function CourseModuleList() {
     handleModuleDialogClose();
   };
 
+  const handleSelectAllClick = () => {
+    if (selectedModules.length === processedCourseModules.length) {
+      setSelectedModules([]);
+    } else {
+      setSelectedModules(processedCourseModules.map((module) => module.id));
+    }
+  };
+
+  const handleCheckboxClick = (id) => {
+    setSelectedModules((prevSelected) =>
+      prevSelected.includes(id)
+        ? prevSelected.filter((selectedId) => selectedId !== id)
+        : [...prevSelected, id]
+    );
+  };
+
+  const handleDeleteSelected = async () => {
+    try {
+      await Promise.all(
+        selectedModules.map((id) => http.delete(`/courseModule/course/${courseCode}/module/delete/${id}`))
+      );
+      setSelectedModules([]);
+      fetchCourseModules();
+    } catch (error) {
+      console.error("Error deleting selected modules:", error);
+    }
+  };
+
   const columns = [
-    { field: "id", headerName: "ID", width: 100 },
+    {
+      field: "select",
+      headerName: "",
+      width: 50,
+      renderCell: (params) => (
+        <Checkbox
+          checked={selectedModules.includes(params.row.id)}
+          onChange={() => handleCheckboxClick(params.row.id)}
+        />
+      ),
+    },
+    { field: "id", headerName: "Module ID", width: 150 },
+
     { field: "moduleCode", headerName: "Module Code", width: 150 },
     { field: "title", headerName: "Title", width: 200 },
     { field: "description", headerName: "Description", width: 300 },
@@ -101,10 +137,7 @@ function CourseModuleList() {
       width: 150,
       renderCell: (params) => (
         <>
-          <IconButton
-            onClick={() => handleView(params.row.moduleCode)}
-            size="small"
-          >
+          <IconButton onClick={() => handleView(params.row.moduleCode)} size="small">
             <Visibility />
           </IconButton>
           <IconButton onClick={() => handleEdit(params.row)} size="small">
@@ -162,6 +195,22 @@ function CourseModuleList() {
           onClick={() => setModuleDialogOpen(true)}
         >
           Add Module to Course
+        </Button>
+      </Box>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
+        <Button
+          variant="contained"
+          onClick={handleSelectAllClick}
+        >
+          {selectedModules.length === processedCourseModules.length ? "Unselect All" : "Select All"}
+        </Button>
+        <Button
+          variant="contained"
+          color="error"
+          onClick={handleDeleteSelected}
+          disabled={selectedModules.length === 0}
+        >
+          Delete Selected
         </Button>
       </Box>
       <Box

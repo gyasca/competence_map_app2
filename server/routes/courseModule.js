@@ -8,9 +8,9 @@ const yup = require("yup");
 const courseModuleSchema = yup.object().shape({
   courseCode: yup.string().required("Course code is required"),
   moduleCode: yup.string().required("Module code is required"),
-  order: yup.number().required("Order is required"),
-  prevModuleCode: yup.string().nullable(),
-  nextModuleCode: yup.string().nullable(),
+  order: yup.number(),
+  prevModuleCodes: yup.array().of(yup.string()),
+  nextModuleCodes: yup.array().of(yup.string()),
 });
 
 // Create a new course module (admin only)
@@ -56,6 +56,31 @@ router.get("/course/:courseCode/modules", validateToken, async (req, res) => {
   }
 });
 
+// Get a course module by id
+router.get("/course/module/:id", validateToken, async (req, res) => {
+  try {
+    const courseModule = await CourseModule.findByPk(req.params.id, {
+      include: [
+        {
+          model: Course,
+          attributes: ["courseCode", "name", "description"],
+        },
+        {
+          model: Module,
+          attributes: ["moduleCode", "title", "credit", "description"],
+        },
+      ],
+    });
+    if (courseModule) {
+      res.json(courseModule);
+    } else {
+      res.status(404).json({ message: "Course module not found" });
+    }
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 // Update a course module (admin only)
 router.put(
   "/course/:courseCode/module/edit/:id",
@@ -68,9 +93,7 @@ router.put(
         where: { id: req.params.id },
       });
       if (updated) {
-        const updatedCourseModule = await CourseModule.findByPk(
-          req.params.courseModuleId
-        );
+        const updatedCourseModule = await CourseModule.findByPk(req.params.id);
         res.json(updatedCourseModule);
       } else {
         res.status(404).json({ message: "Course module not found" });
@@ -93,7 +116,7 @@ router.delete(
   async (req, res) => {
     try {
       const deleted = await CourseModule.destroy({
-        where: { id: req.params.courseModuleId },
+        where: { id: req.params.id },
       });
       if (deleted) {
         res.status(204).send();

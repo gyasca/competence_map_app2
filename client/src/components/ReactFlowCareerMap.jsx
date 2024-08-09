@@ -193,6 +193,17 @@ const ReactflowCareerMap = ({ courseCode, onModuleUpdate }) => {
 
     // Create nodes for each module
     modules.forEach((module, index) => {
+      const position = {
+        x:
+          module.positionX !== null
+            ? module.positionX
+            : (module.complexityLevel - 1) * columnSpacing + 100,
+        y:
+          module.positionY !== null
+            ? module.positionY
+            : (index + 1) * (nodeHeight + nodeSpacing),
+      };
+
       nodes.push({
         id: module.id.toString(),
         type: "custom",
@@ -212,10 +223,7 @@ const ReactflowCareerMap = ({ courseCode, onModuleUpdate }) => {
             )
             .filter(Boolean),
         },
-        position: {
-          x: (module.complexityLevel - 1) * columnSpacing + 100,
-          y: (index + 1) * (nodeHeight + nodeSpacing),
-        },
+        position: position,
       });
     });
 
@@ -255,19 +263,14 @@ const ReactflowCareerMap = ({ courseCode, onModuleUpdate }) => {
       newNextModuleIds = null,
       newPrevModuleIds = null,
       newComplexityLevel = null,
+      newPositionX = null,
+      newPositionY = null,
       edgeUpdateCheck = null
     ) => {
-      console.log(
-        "Attempting to update module with ID:",
-        courseModuleToBeUpdatedId
-      );
-
-      console.log("Nodes to find:", nodes);
+      console.log("Attempting to update module with ID:", courseModuleToBeUpdatedId);
 
       const module = nodes.find(
-        (node) =>
-          node.id === courseModuleToBeUpdatedId.toString() &&
-          node.type === "custom"
+        (node) => node.id === courseModuleToBeUpdatedId.toString() && node.type === "custom"
       );
 
       if (module) {
@@ -275,51 +278,34 @@ const ReactflowCareerMap = ({ courseCode, onModuleUpdate }) => {
           id: parseInt(module.id),
           order: module.data.order,
           levelOfStudy: module.data.levelOfStudy,
-          complexityLevel:
-            newComplexityLevel !== null
-              ? newComplexityLevel
-              : parseInt(module.data.complexityLevel),
+          complexityLevel: newComplexityLevel !== null ? newComplexityLevel : parseInt(module.data.complexityLevel),
           prevModuleCodes: newPrevModuleIds
             ? newPrevModuleIds
-                .map(
-                  (id) =>
-                    nodes.find(
-                      (n) => n.id === id.toString() && n.type === "custom"
-                    )?.data.moduleCode
-                )
+                .map((id) => nodes.find((n) => n.id === id.toString() && n.type === "custom")?.data.moduleCode)
                 .filter(Boolean)
             : module.data.prevModuleCodes,
           nextModuleCodes: newNextModuleIds
             ? newNextModuleIds
-                .map(
-                  (id) =>
-                    nodes.find(
-                      (n) => n.id === id.toString() && n.type === "custom"
-                    )?.data.moduleCode
-                )
+                .map((id) => nodes.find((n) => n.id === id.toString() && n.type === "custom")?.data.moduleCode)
                 .filter(Boolean)
             : module.data.nextModuleCodes,
           courseCode: module.data.courseCode,
           moduleCode: module.data.moduleCode,
+          positionX: newPositionX !== null ? newPositionX : module.data.positionX,
+          positionY: newPositionY !== null ? newPositionY : module.data.positionY,
         };
 
         console.log("Payload to be sent:", payload);
 
         try {
-          const response = await http.put(
-            `/courseModule/course/${courseCode}/module/edit/${module.id}`,
-            payload
-          );
+          const response = await http.put(`/courseModule/course/${courseCode}/module/edit/${module.id}`, payload);
           console.log("Module updated successfully:", response.data);
         } catch (error) {
           console.error("Error updating module:", error);
         }
       } else {
         console.error("Module not found for ID:", courseModuleToBeUpdatedId);
-        console.log(
-          "Available node IDs:",
-          nodes.map((n) => `${n.id} (${n.type})`)
-        );
+        console.log("Available node IDs:", nodes.map((n) => `${n.id} (${n.type})`));
       }
     },
     [nodes, courseCode]
@@ -474,7 +460,11 @@ const ReactflowCareerMap = ({ courseCode, onModuleUpdate }) => {
   const onNodeDragStop = useCallback(
     (event, node) => {
       const newComplexityLevel = Math.floor(node.position.x / 300) + 1;
-      if (newComplexityLevel !== node.data.tempComplexityLevel) {
+      if (
+        newComplexityLevel !== node.data.tempComplexityLevel ||
+        node.position.x !== node.data.positionX ||
+        node.position.y !== node.data.positionY
+      ) {
         setNodes((nds) =>
           nds.map((n) => {
             if (n.id === node.id) {
@@ -484,13 +474,22 @@ const ReactflowCareerMap = ({ courseCode, onModuleUpdate }) => {
                   ...n.data,
                   tempComplexityLevel: newComplexityLevel,
                   complexityLevel: newComplexityLevel,
+                  positionX: node.position.x,
+                  positionY: node.position.y,
                 },
               };
             }
             return n;
           })
         );
-        updateModuleAPI(node.id, null, null, newComplexityLevel);
+        updateModuleAPI(
+          node.id,
+          null,
+          null,
+          newComplexityLevel,
+          node.position.x,
+          node.position.y
+        );
       }
     },
     [setNodes, updateModuleAPI]

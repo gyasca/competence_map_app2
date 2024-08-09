@@ -35,6 +35,14 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       allowNull: false,
     },
+    positionX: {
+      type: DataTypes.FLOAT,
+      allowNull: true,
+    },
+    positionY: {
+      type: DataTypes.FLOAT,
+      allowNull: true,
+    },
   });
 
   CourseModule.associate = function (models) {

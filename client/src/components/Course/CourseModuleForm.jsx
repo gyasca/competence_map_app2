@@ -115,6 +115,7 @@ function CourseModuleForm({
         if (onClose) {
           onClose();
         }
+        window.location.reload(); // Refresh the page to activate flow map compoment (ReactflowCareerMap.jsx)
       } catch (error) {
         console.error(
           `Error ${isEditMode ? "updating" : "creating"} course module:`,
@@ -168,6 +169,7 @@ function CourseModuleForm({
       if (onClose) {
         onClose();
       }
+      window.location.reload(); // Refresh the page to activate flow map compoment (ReactflowCareerMap.jsx)
     } catch (error) {
       console.error("Error adding modules in bulk:", error);
     }

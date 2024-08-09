@@ -522,7 +522,7 @@ const Copy4ReactflowCareerMap = ({ courseCode, onModuleUpdate }) => {
     () => ({
       custom: CustomEdge,
     }),
-    []
+    [onEdgeClick]
   );
 
   useEffect(() => {

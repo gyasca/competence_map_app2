@@ -107,7 +107,19 @@ const ColumnLabelNode = ({ data }) => {
 };
 
 // CustomEdge component moved outside the main component
-const CustomEdge = ({ id, sourceX, sourceY, targetX, targetY, sourcePosition, targetPosition, style = {}, source, target, onEdgeClick }) => {
+const CustomEdge = ({
+  id,
+  sourceX,
+  sourceY,
+  targetX,
+  targetY,
+  sourcePosition,
+  targetPosition,
+  style = {},
+  source,
+  target,
+  onEdgeClick,
+}) => {
   const [edgePath, labelX, labelY] = getBezierPath({
     sourceX,
     sourceY,
@@ -317,17 +329,19 @@ const ReactflowCareerMap = ({ courseCode, onModuleUpdate }) => {
     (event, edge) => {
       event.stopPropagation();
       const { source, target, id } = edge;
-  
+
       console.log("Edge clicked:", edge);
       console.log("Source ID:", source);
       console.log("Target ID:", target);
-  
+
       setEdges((eds) => eds.filter((e) => e.id !== id));
-  
+
       setNodes((nds) => {
         const updatedNodes = nds.map((node) => {
           if (node.id === source) {
-            const newNextModuleIds = node.data.nextModuleIds.filter((nid) => nid !== target);
+            const newNextModuleIds = node.data.nextModuleIds.filter(
+              (nid) => nid !== target
+            );
             return {
               ...node,
               data: {
@@ -337,7 +351,9 @@ const ReactflowCareerMap = ({ courseCode, onModuleUpdate }) => {
             };
           }
           if (node.id === target) {
-            const newPrevModuleIds = node.data.prevModuleIds.filter((nid) => nid !== source);
+            const newPrevModuleIds = node.data.prevModuleIds.filter(
+              (nid) => nid !== source
+            );
             return {
               ...node,
               data: {
@@ -348,16 +364,28 @@ const ReactflowCareerMap = ({ courseCode, onModuleUpdate }) => {
           }
           return node;
         });
-  
+
         // Call the API to update the modules
         const sourceNode = updatedNodes.find((n) => n.id === source);
         const targetNode = updatedNodes.find((n) => n.id === target);
-  
+
         if (sourceNode && targetNode) {
-          updateModuleAPI(source, sourceNode.data.nextModuleIds, null, null, true);
-          updateModuleAPI(target, null, targetNode.data.prevModuleIds, null, true);
+          updateModuleAPI(
+            source,
+            sourceNode.data.nextModuleIds,
+            null,
+            null,
+            true
+          );
+          updateModuleAPI(
+            target,
+            null,
+            targetNode.data.prevModuleIds,
+            null,
+            true
+          );
         }
-  
+
         return updatedNodes;
       });
     },

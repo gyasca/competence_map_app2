@@ -70,7 +70,7 @@ function CourseList() {
           <IconButton onClick={() => handleView(params.row.courseCode)} size="small">
             <Visibility />
           </IconButton>
-          <IconButton onClick={() => handleEdit(params.row)} size="small">
+          <IconButton onClick={() => handleEdit(params.row.courseCode)} size="small">
             <Edit />
           </IconButton>
           <IconButton onClick={() => handleDelete(params.row)} size="small">

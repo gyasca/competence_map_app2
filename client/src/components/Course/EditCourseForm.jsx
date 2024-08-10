@@ -43,7 +43,7 @@ function EditCourseForm({ course: propCourse, onClose }) {
   const formik = useFormik({
     enableReinitialize: true,
     initialValues: course ? {
-      id: course.id,
+      courseCode: course.courseCode,
       name: course.name,
       description: course.description,
       school: course.school,
@@ -57,8 +57,9 @@ function EditCourseForm({ course: propCourse, onClose }) {
     },
     validationSchema: validationSchema,
     onSubmit: async (values) => {
+      console.log(values);
       try {
-        await http.put(`/course/${values.id}`, values);
+        await http.put(`/course/${values.courseCode}`, values);
         if (onClose) {
           onClose();
         } else {

@@ -158,7 +158,7 @@ const CustomEdge = ({
   );
 };
 
-const ReactflowCareerMap = ({ courseCode, onModuleUpdate }) => {
+const Copy5ReactflowCareerMap = ({ courseCode, onModuleUpdate }) => {
   const [modules, setModules] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -361,16 +361,12 @@ const ReactflowCareerMap = ({ courseCode, onModuleUpdate }) => {
             sourceNode.data.nextModuleIds,
             null,
             null,
-            null,  
-            null,
-            true,
+            true
           );
           updateModuleAPI(
             target,
             null,
             targetNode.data.prevModuleIds,
-            null,
-            null,
             null,
             true
           );
@@ -610,7 +606,6 @@ const ReactflowCareerMap = ({ courseCode, onModuleUpdate }) => {
                 },
               }}
               fitView
-              fitViewOptions={{ padding: 0.2 }}
               snapToGrid
               snapGrid={[10, 10]}
               proOptions={proOptions}
@@ -663,4 +658,4 @@ const ReactflowCareerMap = ({ courseCode, onModuleUpdate }) => {
   );
 };
 
-export default ReactflowCareerMap;
+export default Copy5ReactflowCareerMap;

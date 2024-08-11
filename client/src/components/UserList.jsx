@@ -15,7 +15,8 @@ import {
   InputAdornment,
   Typography,
   Container,
-  Paper
+  Paper,
+  Checkbox,
 } from "@mui/material";
 import { Edit, Delete, Visibility, Search, Add } from "@mui/icons-material";
 import http from "../http";
@@ -27,6 +28,8 @@ function UserList() {
   const [deleteUser, setDeleteUser] = useState(null);
   const [tabValue, setTabValue] = useState(0);
   const [searchTerm, setSearchTerm] = useState("");
+  const [selectedUsers, setSelectedUsers] = useState([]);
+  const [deleteSelectedDialogOpen, setDeleteSelectedDialogOpen] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -66,7 +69,52 @@ function UserList() {
     }
   };
 
+  const handleSelectAllClick = () => {
+    if (selectedUsers.length === filteredUsers.length) {
+      setSelectedUsers([]);
+    } else {
+      setSelectedUsers(filteredUsers.map((user) => user.userId));
+    }
+  };
+
+  const handleCheckboxClick = (userId) => {
+    setSelectedUsers((prevSelected) =>
+      prevSelected.includes(userId)
+        ? prevSelected.filter((id) => id !== userId)
+        : [...prevSelected, userId]
+    );
+  };
+
+  const handleDeleteSelected = () => {
+    setDeleteSelectedDialogOpen(true);
+  };
+
+  const confirmDeleteSelected = async () => {
+    try {
+      await Promise.all(
+        selectedUsers.map((userId) => http.delete(`/user/${userId}`))
+      );
+      setSelectedUsers([]);
+      fetchUsers();
+    } catch (error) {
+      console.error("Error deleting selected users:", error);
+    } finally {
+      setDeleteSelectedDialogOpen(false);
+    }
+  };
+
   const columns = [
+    {
+      field: "select",
+      headerName: "",
+      width: 50,
+      renderCell: (params) => (
+        <Checkbox
+          checked={selectedUsers.includes(params.row.userId)}
+          onChange={() => handleCheckboxClick(params.row.userId)}
+        />
+      ),
+    },
     {
       field: "actions",
       headerName: "Actions",
@@ -156,6 +204,22 @@ function UserList() {
         </Button>
       </Box>
 
+      <Box sx={{ display: "flex", justifyContent: "space-between", mb: 2 }}>
+        <Button variant="contained" onClick={handleSelectAllClick}>
+          {selectedUsers.length === filteredUsers.length
+            ? "Unselect All"
+            : "Select All"}
+        </Button>
+        <Button
+          variant="contained"
+          color="error"
+          onClick={handleDeleteSelected}
+          disabled={selectedUsers.length === 0}
+        >
+          Delete Selected
+        </Button>
+      </Box>
+
       <Box sx={{ flexGrow: 1, width: '100%', height: '53vh', overflow: 'hidden' }}>
         <DataGrid
           rows={filteredUsers}
@@ -215,6 +279,27 @@ function UserList() {
         <DialogActions>
           <Button onClick={() => setDeleteUser(null)}>Cancel</Button>
           <Button onClick={confirmDelete} color="error">
+            Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog
+        open={deleteSelectedDialogOpen}
+        onClose={() => setDeleteSelectedDialogOpen(false)}
+      >
+        <DialogTitle>Delete Selected Users</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Are you sure you want to delete the selected users? This action
+            cannot be undone.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setDeleteSelectedDialogOpen(false)}>
+            Cancel
+          </Button>
+          <Button onClick={confirmDeleteSelected} color="error">
             Delete
           </Button>
         </DialogActions>

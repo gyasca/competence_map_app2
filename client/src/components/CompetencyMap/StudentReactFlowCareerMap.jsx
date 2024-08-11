@@ -3,7 +3,7 @@ import React, {
   useCallback,
   useMemo,
   useEffect,
-  useContext
+  useContext,
 } from "react";
 import ReactFlow, {
   Controls,
@@ -55,7 +55,7 @@ const customNodeStyle = {
   borderRadius: 5,
   border: "1px solid #ddd",
   width: 200,
-  fontSize: 12,
+  fontSize: 20,
   textAlign: "center",
 };
 
@@ -64,7 +64,7 @@ const columnLabelStyle = {
   backgroundColor: "#083c84",
   borderRadius: "15px",
   textAlign: "center",
-  fontSize: 14,
+  fontSize: 35,
   fontWeight: "bold",
   color: "white",
   width: 200,
@@ -74,11 +74,36 @@ const proOptions = { hideAttribution: true };
 
 // Define a list of 30 distinct colors
 const domainColors = [
-  "#FFE5E5", "#E5FFE5", "#E5E5FF", "#FFFFE5", "#FFE5FF", "#E5FFFF",
-  "#FFF0E5", "#E5FFF0", "#F0E5FF", "#FFFFD4", "#D4FFFF", "#FFD4FF",
-  "#D4FFF0", "#F0FFD4", "#FFD4D4", "#D4D4FF", "#FFEFD4", "#D4FFEF",
-  "#EFD4FF", "#FFFFB3", "#B3FFFF", "#FFB3FF", "#B3FFE5", "#E5FFB3",
-  "#FFB3B3", "#B3B3FF", "#FFE0B3", "#B3FFE0", "#E0B3FF", "#F0F0F0",
+  "#FFE5E5",
+  "#E5FFE5",
+  "#E5E5FF",
+  "#FFFFE5",
+  "#FFE5FF",
+  "#E5FFFF",
+  "#FFF0E5",
+  "#E5FFF0",
+  "#F0E5FF",
+  "#FFFFD4",
+  "#D4FFFF",
+  "#FFD4FF",
+  "#D4FFF0",
+  "#F0FFD4",
+  "#FFD4D4",
+  "#D4D4FF",
+  "#FFEFD4",
+  "#D4FFEF",
+  "#EFD4FF",
+  "#FFFFB3",
+  "#B3FFFF",
+  "#FFB3FF",
+  "#B3FFE5",
+  "#E5FFB3",
+  "#FFB3B3",
+  "#B3B3FF",
+  "#FFE0B3",
+  "#B3FFE0",
+  "#E0B3FF",
+  "#F0F0F0",
 ];
 
 const DomainButton = styled(Button)(({ theme }) => ({
@@ -137,11 +162,14 @@ const StudentReactFlowCareerMap = ({ courseCode }) => {
 
   const { user } = useContext(UserContext);
 
-  const handleClickOpen = useCallback((moduleData) => {
-    setSelectedCourseModule(moduleData);
-    setSelectedModule(modules[moduleData.moduleCode]);
-    setOpen(true);
-  }, [modules]);
+  const handleClickOpen = useCallback(
+    (moduleData) => {
+      setSelectedCourseModule(moduleData);
+      setSelectedModule(modules[moduleData.moduleCode]);
+      setOpen(true);
+    },
+    [modules]
+  );
 
   const handleClose = useCallback(() => {
     setOpen(false);
@@ -211,7 +239,9 @@ const StudentReactFlowCareerMap = ({ courseCode }) => {
     let edges = [];
     courseModules.forEach((courseModule) => {
       courseModule.nextModuleCodes.forEach((nextCode) => {
-        const targetModule = courseModules.find((m) => m.moduleCode === nextCode);
+        const targetModule = courseModules.find(
+          (m) => m.moduleCode === nextCode
+        );
         if (targetModule) {
           edges.push({
             id: `e${courseModule.id}-${targetModule.id}`,
@@ -247,9 +277,11 @@ const StudentReactFlowCareerMap = ({ courseCode }) => {
         // Fetch course details
         const courseResponse = await http.get(`/course/${courseCode}`);
         setCourse(courseResponse.data);
-  
+
         // Fetch course modules
-        const courseModulesResponse = await http.get(`/courseModule/course/${courseCode}/modules`);
+        const courseModulesResponse = await http.get(
+          `/courseModule/course/${courseCode}/modules`
+        );
         setCourseModules(courseModulesResponse.data);
 
         // Fetch all modules
@@ -257,7 +289,9 @@ const StudentReactFlowCareerMap = ({ courseCode }) => {
         const allModules = modulesResponse.data;
 
         // Filter modules to only those in the course and create a lookup object
-        const courseModuleCodes = new Set(courseModulesResponse.data.map(cm => cm.moduleCode));
+        const courseModuleCodes = new Set(
+          courseModulesResponse.data.map((cm) => cm.moduleCode)
+        );
         const filteredModules = allModules.reduce((acc, module) => {
           if (courseModuleCodes.has(module.moduleCode)) {
             acc[module.moduleCode] = module;
@@ -267,7 +301,11 @@ const StudentReactFlowCareerMap = ({ courseCode }) => {
         setModules(filteredModules);
 
         // Extract unique domains
-        const uniqueDomains = [...new Set(Object.values(filteredModules).map(module => module.domain))];
+        const uniqueDomains = [
+          ...new Set(
+            Object.values(filteredModules).map((module) => module.domain)
+          ),
+        ];
         setDomainList(uniqueDomains);
       } catch (error) {
         console.error("Error fetching course data:", error);
@@ -276,7 +314,7 @@ const StudentReactFlowCareerMap = ({ courseCode }) => {
         setLoading(false);
       }
     };
-  
+
     fetchCourseAndModules();
   }, [courseCode]);
 
@@ -297,10 +335,15 @@ const StudentReactFlowCareerMap = ({ courseCode }) => {
   return (
     <Container maxWidth="xl" sx={{ marginTop: "2rem", height: "80vh" }}>
       <Grid container spacing={4} style={{ height: "100%" }}>
-        <Grid item xs={12} md={3} style={{ height: "76%", position: "relative" }}>
+        <Grid
+          item
+          xs={12}
+          md={3}
+          style={{ height: "100%", position: "relative" }}
+        >
           <LeftSectionPaper elevation={3}>
             <Typography variant="h6" gutterBottom>
-              {course?.name} Curriculum
+              <strong>{courseCode}</strong><br></br>{course?.name} Curriculum
             </Typography>
             <Typography variant="subtitle2" gutterBottom>
               Domains:
@@ -394,7 +437,8 @@ const StudentReactFlowCareerMap = ({ courseCode }) => {
             <strong>Domain:</strong> {selectedModule?.domain}
           </Typography>
           <Typography gutterBottom>
-            <strong>Level of Study:</strong> {selectedModule?.levelOfStudy || "None"}
+            <strong>Level of Study:</strong>{" "}
+            {selectedModule?.levelOfStudy || "None"}
           </Typography>
           <Typography gutterBottom>
             <strong>Credit:</strong> {selectedModule?.credit}
@@ -403,10 +447,12 @@ const StudentReactFlowCareerMap = ({ courseCode }) => {
             <strong>School:</strong> {selectedModule?.school}
           </Typography>
           <Typography gutterBottom>
-            <strong>Prerequisite:</strong> {selectedModule?.prerequisite || "None"}
+            <strong>Prerequisite:</strong>{" "}
+            {selectedModule?.prerequisite || "None"}
           </Typography>
           <Typography gutterBottom>
-            <strong>Complexity Level:</strong> {selectedCourseModule?.complexityLevel}
+            <strong>Complexity Level:</strong>{" "}
+            {selectedCourseModule?.complexityLevel}
           </Typography>
           <Typography gutterBottom>
             <strong>Previous Modules:</strong>{" "}
@@ -417,7 +463,10 @@ const StudentReactFlowCareerMap = ({ courseCode }) => {
             {selectedCourseModule?.nextModuleCodes.join(", ") || "None"}
           </Typography>
           <Typography gutterBottom>
-            <strong>Obtainable Certification(s): </strong>{selectedModule?.certifications?.length ? selectedModule.certifications : "None"}
+            <strong>Obtainable Certification(s): </strong>
+            {selectedModule?.certifications?.length
+              ? selectedModule.certifications
+              : "None"}
           </Typography>
         </DialogContent>
         <DialogActions>

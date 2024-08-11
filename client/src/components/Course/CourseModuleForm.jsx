@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import {
   Typography,
   Box,
@@ -71,6 +71,16 @@ function CourseModuleForm({
     }
   };
 
+  // Filter out modules that are already in the course
+  const modulesForBulkAdd = useMemo(() => {
+    const existingModuleCodes = new Set(
+      courseModules.map((cm) => cm.Module.moduleCode)
+    );
+    return availableModules.filter(
+      (module) => !existingModuleCodes.has(module.moduleCode)
+    );
+  }, [availableModules, courseModules]);
+
   const formik = useFormik({
     initialValues: {
       courseCode: courseCode,
@@ -115,7 +125,6 @@ function CourseModuleForm({
         if (onClose) {
           onClose();
         }
-        // window.location.reload(); // Refresh the page to activate flow map compoment (ReactflowCareerMap.jsx)
       } catch (error) {
         console.error(
           `Error ${isEditMode ? "updating" : "creating"} course module:`,
@@ -164,16 +173,16 @@ function CourseModuleForm({
       );
       await Promise.all(promises);
       if (onModuleAdded) {
-        onModuleAdded(); // This will trigger the re-render of ReactflowCareerMap
+        onModuleAdded();
       }
       if (onClose) {
         onClose();
       }
-      // Remove the window.location.reload() line
     } catch (error) {
       console.error("Error adding modules in bulk:", error);
     }
   };
+
   const handleModuleToggle = (module) => {
     const currentIndex = selectedModules.findIndex(
       (m) => m.moduleCode === module.moduleCode
@@ -405,31 +414,37 @@ function CourseModuleForm({
             <Typography variant="h6" gutterBottom>
               Bulk Add Modules
             </Typography>
-            <List sx={{ maxHeight: 400, overflow: "auto" }}>
-              {availableModules.map((module) => (
-                <ListItem
-                  key={module.moduleCode}
-                  dense
-                  button
-                  onClick={() => handleModuleToggle(module)}
-                >
-                  <ListItemIcon>
-                    <Checkbox
-                      edge="start"
-                      checked={selectedModules.some(
-                        (m) => m.moduleCode === module.moduleCode
-                      )}
-                      tabIndex={-1}
-                      disableRipple
+            {modulesForBulkAdd.length > 0 ? (
+              <List sx={{ maxHeight: 400, overflow: "auto" }}>
+                {modulesForBulkAdd.map((module) => (
+                  <ListItem
+                    key={module.moduleCode}
+                    dense
+                    button
+                    onClick={() => handleModuleToggle(module)}
+                  >
+                    <ListItemIcon>
+                      <Checkbox
+                        edge="start"
+                        checked={selectedModules.some(
+                          (m) => m.moduleCode === module.moduleCode
+                        )}
+                        tabIndex={-1}
+                        disableRipple
+                      />
+                    </ListItemIcon>
+                    <ListItemText
+                      primary={module.title}
+                      secondary={module.moduleCode}
                     />
-                  </ListItemIcon>
-                  <ListItemText
-                    primary={module.title}
-                    secondary={module.moduleCode}
-                  />
-                </ListItem>
-              ))}
-            </List>
+                  </ListItem>
+                ))}
+              </List>
+            ) : (
+              <Typography>
+                All available modules are already in this course.
+              </Typography>
+            )}
             <Box sx={{ mt: 2, display: "flex", justifyContent: "flex-end" }}>
               {onClose && (
                 <Button onClick={onClose} sx={{ mr: 1 }}>

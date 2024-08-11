@@ -12,6 +12,7 @@ import {
   Typography,
   IconButton,
   InputAdornment,
+  Checkbox,
 } from "@mui/material";
 import { Edit, Delete, Visibility, Search, Add } from "@mui/icons-material";
 import http from "../../http";
@@ -23,6 +24,8 @@ function CourseList() {
   const [deleteCourse, setDeleteCourse] = useState(null);
   const [editCourse, setEditCourse] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
+  const [selectedCourses, setSelectedCourses] = useState([]);
+  const [deleteSelectedDialogOpen, setDeleteSelectedDialogOpen] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -60,7 +63,54 @@ function CourseList() {
     fetchCourses();
   };
 
+  const handleSelectAllClick = () => {
+    if (selectedCourses.length === filteredCourses.length) {
+      setSelectedCourses([]);
+    } else {
+      setSelectedCourses(filteredCourses.map((course) => course.courseCode));
+    }
+  };
+
+  const handleCheckboxClick = (courseCode) => {
+    setSelectedCourses((prevSelected) =>
+      prevSelected.includes(courseCode)
+        ? prevSelected.filter((code) => code !== courseCode)
+        : [...prevSelected, courseCode]
+    );
+  };
+
+  const handleDeleteSelected = () => {
+    setDeleteSelectedDialogOpen(true);
+  };
+
+  const confirmDeleteSelected = async () => {
+    try {
+      await Promise.all(
+        selectedCourses.map((courseCode) =>
+          http.delete(`/course/${courseCode}`)
+        )
+      );
+      setSelectedCourses([]);
+      fetchCourses();
+    } catch (error) {
+      console.error("Error deleting selected courses:", error);
+    } finally {
+      setDeleteSelectedDialogOpen(false);
+    }
+  };
+
   const columns = [
+    {
+      field: "select",
+      headerName: "",
+      width: 50,
+      renderCell: (params) => (
+        <Checkbox
+          checked={selectedCourses.includes(params.row.courseCode)}
+          onChange={() => handleCheckboxClick(params.row.courseCode)}
+        />
+      ),
+    },
     {
       field: "actions",
       headerName: "Actions",
@@ -132,6 +182,21 @@ function CourseList() {
           Create Course
         </Button>
       </Box>
+      <Box sx={{ display: "flex", justifyContent: "space-between", mb: 2 }}>
+        <Button variant="contained" onClick={handleSelectAllClick}>
+          {selectedCourses.length === filteredCourses.length
+            ? "Unselect All"
+            : "Select All"}
+        </Button>
+        <Button
+          variant="contained"
+          color="error"
+          onClick={handleDeleteSelected}
+          disabled={selectedCourses.length === 0}
+        >
+          Delete Selected
+        </Button>
+      </Box>
       <Box
         sx={{ flexGrow: 1, width: "100%", height: "60vh", overflow: "hidden" }}
       >
@@ -177,6 +242,27 @@ function CourseList() {
             <EditCourseForm courseCode={editCourse} onClose={handleEditClose} />
           )}
         </DialogContent>
+      </Dialog>
+
+      <Dialog
+        open={deleteSelectedDialogOpen}
+        onClose={() => setDeleteSelectedDialogOpen(false)}
+      >
+        <DialogTitle>Delete Selected Courses</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Are you sure you want to delete the selected courses? This action
+            cannot be undone.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setDeleteSelectedDialogOpen(false)}>
+            Cancel
+          </Button>
+          <Button onClick={confirmDeleteSelected} color="error">
+            Delete
+          </Button>
+        </DialogActions>
       </Dialog>
     </Box>
   );

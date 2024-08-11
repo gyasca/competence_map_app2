@@ -25,6 +25,7 @@ function ModuleList() {
   const [editModule, setEditModule] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedModules, setSelectedModules] = useState([]);
+  const [deleteSelectedDialogOpen, setDeleteSelectedDialogOpen] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -75,7 +76,11 @@ function ModuleList() {
     );
   };
 
-  const handleDeleteSelected = async () => {
+  const handleDeleteSelected = () => {
+    setDeleteSelectedDialogOpen(true);
+  };
+
+  const confirmDeleteSelected = async () => {
     try {
       await Promise.all(
         selectedModules.map((moduleCode) =>
@@ -86,6 +91,8 @@ function ModuleList() {
       fetchModules();
     } catch (error) {
       console.error("Error deleting selected modules:", error);
+    } finally {
+      setDeleteSelectedDialogOpen(false);
     }
   };
 
@@ -231,6 +238,27 @@ function ModuleList() {
             <EditModuleForm module={editModule} onClose={handleEditClose} />
           )}
         </DialogContent>
+      </Dialog>
+
+      <Dialog
+        open={deleteSelectedDialogOpen}
+        onClose={() => setDeleteSelectedDialogOpen(false)}
+      >
+        <DialogTitle>Delete Selected Modules</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Are you sure you want to delete the selected modules? This action
+            cannot be undone.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setDeleteSelectedDialogOpen(false)}>
+            Cancel
+          </Button>
+          <Button onClick={confirmDeleteSelected} color="error">
+            Delete
+          </Button>
+        </DialogActions>
       </Dialog>
     </Box>
   );

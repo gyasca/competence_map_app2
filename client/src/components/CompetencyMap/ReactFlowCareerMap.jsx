@@ -48,7 +48,7 @@ const customNodeStyle = {
   borderRadius: 5,
   border: "1px solid #ddd",
   width: 200,
-  fontSize: 12,
+  fontSize: 20,
   textAlign: "center",
 };
 
@@ -57,7 +57,7 @@ const columnLabelStyle = {
   backgroundColor: "#083c84",
   borderRadius: "15px",
   textAlign: "center",
-  fontSize: 14,
+  fontSize: 35,
   fontWeight: "bold",
   color: "white",
   width: 200,
@@ -215,6 +215,7 @@ const edgeTypes = {
 const ReactflowCareerMap = ({ courseCode, updateTrigger }) => {
   const [courseModules, setCourseModules] = useState([]);
   const [modules, setModules] = useState({});
+  const [course, setCourse] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [open, setOpen] = useState(false);
@@ -222,7 +223,7 @@ const ReactflowCareerMap = ({ courseCode, updateTrigger }) => {
   const [selectedModule, setSelectedModule] = useState(null);
   const [domainList, setDomainList] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const domainsPerPage = 12;
+  const domainsPerPage = 10;
 
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
@@ -625,6 +626,10 @@ const ReactflowCareerMap = ({ courseCode, updateTrigger }) => {
     const fetchData = async () => {
       setLoading(true);
       try {
+        // Fetch course details
+        const courseResponse = await http.get(`/course/${courseCode}`);
+        setCourse(courseResponse.data);
+
         // Fetch course modules
         const courseModulesResponse = await http.get(
           `/courseModule/course/${courseCode}/modules`
@@ -687,7 +692,7 @@ const ReactflowCareerMap = ({ courseCode, updateTrigger }) => {
         >
           <LeftSectionPaper elevation={3}>
             <Typography variant="h6" gutterBottom>
-              {courseCode} Curriculum
+              <strong>{courseCode}</strong><br></br>{course?.name} Curriculum
             </Typography>
             <Typography variant="subtitle2" gutterBottom>
               Domains:

@@ -41,7 +41,8 @@ function CourseList() {
   const handleView = (courseCode) => navigate(`/admin/courses/${courseCode}`);
   const handleEdit = (courseCode) => {
     console.log(courseCode);
-    setEditCourse(courseCode);}
+    setEditCourse(courseCode);
+  };
   const handleDelete = (course) => setDeleteCourse(course);
 
   const confirmDelete = async () => {
@@ -60,13 +61,10 @@ function CourseList() {
   };
 
   const columns = [
-    { field: "courseCode", headerName: "Course Code", flex: 1 },
-    { field: "name", headerName: "Name", flex: 3 },
-    { field: "description", headerName: "Description", flex: 4 },
     {
       field: "actions",
       headerName: "Actions",
-      flex: 1,
+      flex: 2,
       renderCell: (params) => (
         <>
           <IconButton
@@ -87,6 +85,9 @@ function CourseList() {
         </>
       ),
     },
+    { field: "courseCode", headerName: "Course Code", flex: 2 },
+    { field: "name", headerName: "Name", flex: 3 },
+    { field: "description", headerName: "Description", flex: 6 },
   ];
 
   const filteredCourses = courses.filter((course) =>

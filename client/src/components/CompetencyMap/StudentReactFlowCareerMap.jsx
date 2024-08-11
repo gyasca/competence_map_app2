@@ -28,6 +28,7 @@ import {
   DialogContent,
   DialogActions,
   CircularProgress,
+  Pagination,
 } from "@mui/material";
 import { styled } from "@mui/system";
 import http from "../../http";
@@ -71,18 +72,29 @@ const columnLabelStyle = {
 
 const proOptions = { hideAttribution: true };
 
-const domainColors = {
-  Programming: "#FFB3BA",
-  "Data Analytics": "#BAFFC9",
-  "Information Security": "#BAE1FF",
-  Business: "#FFFFBA",
-  AI: "#FFD700",
-};
+// Define a list of 30 distinct colors
+const domainColors = [
+  "#FFE5E5", "#E5FFE5", "#E5E5FF", "#FFFFE5", "#FFE5FF", "#E5FFFF",
+  "#FFF0E5", "#E5FFF0", "#F0E5FF", "#FFFFD4", "#D4FFFF", "#FFD4FF",
+  "#D4FFF0", "#F0FFD4", "#FFD4D4", "#D4D4FF", "#FFEFD4", "#D4FFEF",
+  "#EFD4FF", "#FFFFB3", "#B3FFFF", "#FFB3FF", "#B3FFE5", "#E5FFB3",
+  "#FFB3B3", "#B3B3FF", "#FFE0B3", "#B3FFE0", "#E0B3FF", "#F0F0F0",
+];
+
+const DomainButton = styled(Button)(({ theme }) => ({
+  width: "100%",
+  justifyContent: "left",
+  textTransform: "none",
+  marginBottom: theme.spacing(1),
+  padding: theme.spacing(1),
+  fontSize: "0.8rem",
+  borderRadius: "10px",
+}));
 
 const CustomNode = ({ data }) => {
   const nodeStyle = {
     ...customNodeStyle,
-    backgroundColor: domainColors[data.domain] || "#e4f1f5",
+    backgroundColor: data.color || "#e4f1f5",
     borderRadius: "20px",
     border: "1px solid #b5b5b5",
   };
@@ -109,38 +121,43 @@ const nodeTypes = {
 
 const StudentReactFlowCareerMap = ({ courseCode }) => {
   const [courseModules, setCourseModules] = useState([]);
+  const [modules, setModules] = useState({});
   const [course, setCourse] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [open, setOpen] = useState(false);
   const [selectedModule, setSelectedModule] = useState(null);
   const [selectedCourseModule, setSelectedCourseModule] = useState(null);
+  const [domainList, setDomainList] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const domainsPerPage = 8;
 
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
 
   const { user } = useContext(UserContext);
 
-  const handleClickOpen = useCallback(async (moduleData) => {
+  const handleClickOpen = useCallback((moduleData) => {
     setSelectedCourseModule(moduleData);
-    setLoading(true);
-    try {
-      const response = await http.get(`/module/${moduleData.moduleCode}`);
-      setSelectedModule(response.data);
-      setOpen(true);
-    } catch (error) {
-      console.error("Error fetching module details:", error);
-      setError("Failed to fetch module details. Please try again later.");
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+    setSelectedModule(modules[moduleData.moduleCode]);
+    setOpen(true);
+  }, [modules]);
 
   const handleClose = useCallback(() => {
     setOpen(false);
     setSelectedModule(null);
     setSelectedCourseModule(null);
   }, []);
+
+  const getDomainColor = useCallback(
+    (domain) => {
+      const index = domainList.indexOf(domain);
+      return index !== -1
+        ? domainColors[index % domainColors.length]
+        : "#e4f1f5";
+    },
+    [domainList]
+  );
 
   const initialNodes = useMemo(() => {
     let nodes = [];
@@ -159,6 +176,9 @@ const StudentReactFlowCareerMap = ({ courseCode }) => {
     }
 
     courseModules.forEach((courseModule, index) => {
+      const module = modules[courseModule.moduleCode];
+      if (!module) return;
+
       const position = {
         x:
           courseModule.positionX !== null
@@ -175,8 +195,9 @@ const StudentReactFlowCareerMap = ({ courseCode }) => {
         type: "custom",
         data: {
           ...courseModule,
-          title: courseModule.Module.title,
-          domain: courseModule.Module.domain,
+          title: module.title,
+          domain: module.domain,
+          color: getDomainColor(module.domain),
         },
         position: position,
         draggable: false,
@@ -184,7 +205,7 @@ const StudentReactFlowCareerMap = ({ courseCode }) => {
     });
 
     return nodes;
-  }, [courseModules]);
+  }, [courseModules, modules, getDomainColor]);
 
   const initialEdges = useMemo(() => {
     let edges = [];
@@ -210,6 +231,15 @@ const StudentReactFlowCareerMap = ({ courseCode }) => {
     return edges;
   }, [courseModules]);
 
+  const paginatedDomains = useMemo(() => {
+    const startIndex = (currentPage - 1) * domainsPerPage;
+    return domainList.slice(startIndex, startIndex + domainsPerPage);
+  }, [domainList, currentPage]);
+
+  const handlePageChange = (event, value) => {
+    setCurrentPage(value);
+  };
+
   useEffect(() => {
     const fetchCourseAndModules = async () => {
       setLoading(true);
@@ -221,6 +251,24 @@ const StudentReactFlowCareerMap = ({ courseCode }) => {
         // Fetch course modules
         const courseModulesResponse = await http.get(`/courseModule/course/${courseCode}/modules`);
         setCourseModules(courseModulesResponse.data);
+
+        // Fetch all modules
+        const modulesResponse = await http.get("/module/all");
+        const allModules = modulesResponse.data;
+
+        // Filter modules to only those in the course and create a lookup object
+        const courseModuleCodes = new Set(courseModulesResponse.data.map(cm => cm.moduleCode));
+        const filteredModules = allModules.reduce((acc, module) => {
+          if (courseModuleCodes.has(module.moduleCode)) {
+            acc[module.moduleCode] = module;
+          }
+          return acc;
+        }, {});
+        setModules(filteredModules);
+
+        // Extract unique domains
+        const uniqueDomains = [...new Set(Object.values(filteredModules).map(module => module.domain))];
+        setDomainList(uniqueDomains);
       } catch (error) {
         console.error("Error fetching course data:", error);
         setError("Failed to fetch course data. Please try again later.");
@@ -249,30 +297,42 @@ const StudentReactFlowCareerMap = ({ courseCode }) => {
   return (
     <Container maxWidth="xl" sx={{ marginTop: "2rem", height: "80vh" }}>
       <Grid container spacing={4} style={{ height: "100%" }}>
-        <Grid item xs={12} md={2}>
+        <Grid item xs={12} md={3} style={{ height: "76%", position: "relative" }}>
           <LeftSectionPaper elevation={3}>
-            <Typography variant="h5" gutterBottom>
+            <Typography variant="h6" gutterBottom>
               {course?.name} Curriculum
             </Typography>
-            <Box display="flex" flexDirection="column">
-              {Object.entries(domainColors).map(([domain, color], index) => (
-                <CurvyButton
+            <Typography variant="subtitle2" gutterBottom>
+              Domains:
+            </Typography>
+            <Box display="flex" flexDirection="column" mb={2}>
+              {paginatedDomains.map((domain, index) => (
+                <DomainButton
                   key={index}
                   variant="contained"
-                  size="small"
-                  style={{ backgroundColor: color, color: "black" }}
+                  style={{
+                    backgroundColor: getDomainColor(domain),
+                    color: "black",
+                  }}
                 >
                   {domain}
-                </CurvyButton>
+                </DomainButton>
               ))}
             </Box>
+            <Pagination
+              count={Math.ceil(domainList.length / domainsPerPage)}
+              page={currentPage}
+              onChange={handlePageChange}
+              size="small"
+              sx={{ display: "flex", justifyContent: "center" }}
+            />
           </LeftSectionPaper>
         </Grid>
 
         <Grid
           item
           xs={12}
-          md={10}
+          md={9}
           style={{ height: "100%", position: "relative" }}
         >
           <Paper
@@ -290,11 +350,6 @@ const StudentReactFlowCareerMap = ({ courseCode }) => {
               onNodesChange={onNodesChange}
               onEdgesChange={onEdgesChange}
               nodeTypes={nodeTypes}
-              // onNodeClick={(_, node) => {
-              //   if (node.type === "custom") {
-              //     handleClickOpen(node.data.moduleCode);
-              //   }
-              // }}
               onNodeClick={(_, node) => {
                 if (node.type === "custom") {
                   const fullModuleData = courseModules.find(
@@ -360,6 +415,9 @@ const StudentReactFlowCareerMap = ({ courseCode }) => {
           <Typography gutterBottom>
             <strong>Next Modules:</strong>{" "}
             {selectedCourseModule?.nextModuleCodes.join(", ") || "None"}
+          </Typography>
+          <Typography gutterBottom>
+            <strong>Obtainable Certification(s): </strong>{selectedModule?.certifications?.length ? selectedModule.certifications : "None"}
           </Typography>
         </DialogContent>
         <DialogActions>

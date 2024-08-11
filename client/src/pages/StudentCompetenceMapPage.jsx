@@ -4,13 +4,7 @@ import { Container } from "@mui/material";
 
 function StudentCompetenceMapPage() {
   return (
-    <Container
-    sx={{
-      width: "100%",
-      justifyContent: "center",
-      alignItems: "center",
-    }}
-  >
+    <Container maxWidth="xl" sx={{ height: "80vh" }}>
     <StudentReactFlowCareerMap courseCode="C85" />
   </Container>
   )

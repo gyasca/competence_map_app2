@@ -16,7 +16,7 @@ function AdminPanelLanding() {
       }}
     >
       <Typography variant="h3" sx={{ marginBottom: '2rem', textAlign: 'center' }}>
-        Admin Panel
+        Staff Panel
       </Typography>
       <Grid container spacing={2} justifyContent="center">
         <Grid item xs={12} sm={6} md={4}>
@@ -55,6 +55,42 @@ function AdminPanelLanding() {
             Manage Competencies
           </Button>
         </Grid>
+        <Grid item xs={12} sm={6} md={4}>
+          <Button
+            component={Link}
+            to="/admin/courses"
+            variant="contained"
+            color="primary"
+            fullWidth
+            sx={{ height: '100px', fontSize: '1.2rem' }}
+          >
+            Manage Courses
+          </Button>
+        </Grid>
+        {/* <Grid item xs={12} sm={6} md={4}>
+          <Button
+            component={Link}
+            to="/admin/modules"
+            variant="contained"
+            color="primary"
+            fullWidth
+            sx={{ height: '100px', fontSize: '1.2rem' }}
+          >
+            Manage Modules
+          </Button>
+        </Grid>
+        <Grid item xs={12} sm={6} md={4}>
+          <Button
+            component={Link}
+            to="/admin/competencies"
+            variant="contained"
+            color="primary"
+            fullWidth
+            sx={{ height: '100px', fontSize: '1.2rem' }}
+          >
+            Manage Competencies
+          </Button>
+        </Grid> */}
       </Grid>
     </Box>
   );

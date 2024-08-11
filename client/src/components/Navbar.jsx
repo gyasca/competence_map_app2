@@ -19,8 +19,9 @@ import {
 import MenuIcon from "@mui/icons-material/Menu";
 import HomeIcon from "@mui/icons-material/Home";
 import LoginIcon from "@mui/icons-material/Login";
-import AccountTreeIcon from '@mui/icons-material/AccountTree';
-import SchoolIcon from '@mui/icons-material/School';
+import AccountTreeIcon from "@mui/icons-material/AccountTree";
+import SchoolIcon from "@mui/icons-material/School";
+import LogoutIcon from '@mui/icons-material/Logout';
 import { Link } from "react-router-dom";
 import { UserContext } from "../main";
 import { NavbarProfile } from "./NavbarProfile";
@@ -314,8 +315,23 @@ export function Navbar() {
                 component="div"
                 sx={{ marginRight: "1rem" }}
               >
-                Admin Panel
+                Staff Panel
               </Typography>
+              <Divider
+                orientation="vertical"
+                flexItem
+                sx={{ marginRight: "1rem" }}
+              />
+
+              <Button
+                startIcon={<LogoutIcon />}
+                LinkComponent={Link}
+                variant="text"
+                color="inherit"
+                to="/"
+              >
+                Exit Staff Panel
+              </Button>
             </Box>
             {user && <NavbarProfile />}
           </Toolbar>
@@ -354,7 +370,7 @@ export function Navbar() {
       >
         <List sx={{ width: "250px" }}>
           <ListItem key={"Home"}>
-            <Typography fontWeight={700}>Admin Navigation</Typography>
+            <Typography fontWeight={700}>Staff Navigation</Typography>
           </ListItem>
           <Divider sx={{ marginBottom: 1 }} />
           <AdminNavList />

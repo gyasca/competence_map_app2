@@ -66,7 +66,7 @@ function SpecificCourseDetails({ courseCode, onModuleUpdate }) {
   return (
     <Box>
       <Grid container spacing={2}>
-        <Grid item xs={12} md={4}>
+        <Grid item xs={12} md={3}>
           <Paper elevation={3} sx={{ padding: 3, textAlign: "center" }}>
             <Typography variant="h5" gutterBottom>
               {course.name}
@@ -92,7 +92,7 @@ function SpecificCourseDetails({ courseCode, onModuleUpdate }) {
             </Box>
           </Paper>
         </Grid>
-        <Grid item xs={12} md={8}>
+        <Grid item xs={12} md={9}>
           <Paper elevation={3} sx={{ padding: 2 }}>
             <Tabs
               value={activeTab}

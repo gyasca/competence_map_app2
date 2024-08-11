@@ -24,7 +24,6 @@ import {
   DialogContent,
   DialogActions,
   CircularProgress,
-  Pagination,
 } from "@mui/material";
 import { styled } from "@mui/system";
 import http from "../../http";
@@ -79,54 +78,18 @@ const StyledEdgeButton = {
 
 const proOptions = { hideAttribution: true };
 
-// Define a list of 30 distinct colors
-const domainColors = [
-  "#FFE5E5",
-  "#E5FFE5",
-  "#E5E5FF",
-  "#FFFFE5",
-  "#FFE5FF",
-  "#E5FFFF",
-  "#FFF0E5",
-  "#E5FFF0",
-  "#F0E5FF",
-  "#FFFFD4",
-  "#D4FFFF",
-  "#FFD4FF",
-  "#D4FFF0",
-  "#F0FFD4",
-  "#FFD4D4",
-  "#D4D4FF",
-  "#FFEFD4",
-  "#D4FFEF",
-  "#EFD4FF",
-  "#FFFFB3",
-  "#B3FFFF",
-  "#FFB3FF",
-  "#B3FFE5",
-  "#E5FFB3",
-  "#FFB3B3",
-  "#B3B3FF",
-  "#FFE0B3",
-  "#B3FFE0",
-  "#E0B3FF",
-  "#F0F0F0",
-];
-
-const DomainButton = styled(Button)(({ theme }) => ({
-  width: "100%",
-  justifyContent: "left",
-  textTransform: "none",
-  marginBottom: theme.spacing(1),
-  padding: theme.spacing(1),
-  fontSize: "0.8rem",
-  borderRadius: "10px",
-}));
+const domainColors = {
+  Programming: "#FFB3BA",
+  "Data Analytics": "#BAFFC9",
+  "Information Security": "#BAE1FF",
+  Business: "#FFFFBA",
+  AI: "#FFD700",
+};
 
 const CustomNode = ({ data }) => {
   const nodeStyle = {
     ...customNodeStyle,
-    backgroundColor: data.color || "#e4f1f5",
+    backgroundColor: domainColors[data.domain] || "#e4f1f5",
     borderRadius: "20px",
     border: "1px solid #b5b5b5",
   };
@@ -146,90 +109,79 @@ const ColumnLabelNode = ({ data }) => {
   return <div style={columnLabelStyle}>{data.label}</div>;
 };
 
-const CustomEdge = React.memo(
-  ({
-    id,
+// CustomEdge component moved outside the main component
+const CustomEdge = React.memo(({
+  id,
+  sourceX,
+  sourceY,
+  targetX,
+  targetY,
+  sourcePosition,
+  targetPosition,
+  style = {},
+  data,
+}) => {
+  const [edgePath, labelX, labelY] = getBezierPath({
     sourceX,
     sourceY,
+    sourcePosition,
     targetX,
     targetY,
-    sourcePosition,
     targetPosition,
-    style = {},
-    data,
-  }) => {
-    const [edgePath, labelX, labelY] = getBezierPath({
-      sourceX,
-      sourceY,
-      sourcePosition,
-      targetX,
-      targetY,
-      targetPosition,
-    });
+  });
 
-    return (
-      <>
-        <path
-          id={id}
-          style={style}
-          className="react-flow__edge-path"
-          d={edgePath}
-        />
-        <foreignObject
-          width={80}
-          height={40}
-          x={labelX - 40}
-          y={labelY - 20}
-          className="edgebutton-foreignobject"
-          requiredExtensions="http://www.w3.org/1999/xhtml"
-        >
-          <Box>
-            <Button
-              style={StyledEdgeButton}
-              onClick={(event) =>
-                data.onEdgeClick(event, {
-                  id,
-                  source: data.source,
-                  target: data.target,
-                })
-              }
-            >
-              <strong>x</strong>
-            </Button>
-          </Box>
-        </foreignObject>
-      </>
-    );
-  }
-);
+  return (
+    <>
+      <path
+        id={id}
+        style={style}
+        className="react-flow__edge-path"
+        d={edgePath}
+      />
+      <foreignObject
+        width={80}
+        height={40}
+        x={labelX - 40}
+        y={labelY - 20}
+        className="edgebutton-foreignobject"
+        requiredExtensions="http://www.w3.org/1999/xhtml"
+      >
+        <Box>
+          <Button
+            style={StyledEdgeButton}
+            onClick={(event) => data.onEdgeClick(event, { id, source: data.source, target: data.target })}
+          >
+            <strong>x</strong>
+          </Button>
+        </Box>
+      </foreignObject>
+    </>
+  );
+});
 
+// Define nodeTypes outside the component
 const nodeTypes = {
   custom: CustomNode,
   columnLabel: ColumnLabelNode,
 };
 
+// Define edgeTypes outside the component
 const edgeTypes = {
   custom: CustomEdge,
 };
 
-const ReactflowCareerMap = ({ courseCode, updateTrigger }) => {
-  const [courseModules, setCourseModules] = useState([]);
-  const [modules, setModules] = useState({});
+const Copy6ReactflowCareerMap = ({ courseCode, updateTrigger }) => {
+  const [modules, setModules] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [open, setOpen] = useState(false);
-  const [selectedCourseModule, setSelectedCourseModule] = useState(null);
   const [selectedModule, setSelectedModule] = useState(null);
-  const [domainList, setDomainList] = useState([]);
-  const [currentPage, setCurrentPage] = useState(1);
-  const domainsPerPage = 12;
 
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
 
-  const handleClickOpen = useCallback((courseModule) => {
-    setSelectedCourseModule(courseModule);
-    setSelectedModule(modules[courseModule.moduleCode]);
+  const handleClickOpen = useCallback((module) => {
+    setSelectedModule(module);
     setOpen(true);
   }, []);
 
@@ -237,22 +189,13 @@ const ReactflowCareerMap = ({ courseCode, updateTrigger }) => {
     setOpen(false);
   }, []);
 
-  const getDomainColor = useCallback(
-    (domain) => {
-      const index = domainList.indexOf(domain);
-      return index !== -1
-        ? domainColors[index % domainColors.length]
-        : "#e4f1f5";
-    },
-    [domainList]
-  );
-
   const initialNodes = useMemo(() => {
     let nodes = [];
     const columnSpacing = 300;
     const nodeHeight = 80;
     const nodeSpacing = 50;
 
+    // Always create column labels for CL1 to CL5
     for (let i = 1; i <= 5; i++) {
       nodes.push({
         id: `column-CL${i}`,
@@ -263,39 +206,35 @@ const ReactflowCareerMap = ({ courseCode, updateTrigger }) => {
       });
     }
 
-    courseModules.forEach((courseModule, index) => {
-      const module = modules[courseModule.moduleCode];
-      if (!module) return; // Skip if module data is not available
-
+    // Create nodes for each module
+    modules.forEach((module, index) => {
       const position = {
         x:
-          courseModule.positionX !== null
-            ? courseModule.positionX
-            : (courseModule.complexityLevel - 1) * columnSpacing + 100,
+          module.positionX !== null
+            ? module.positionX
+            : (module.complexityLevel - 1) * columnSpacing + 100,
         y:
-          courseModule.positionY !== null
-            ? courseModule.positionY
+          module.positionY !== null
+            ? module.positionY
             : (index + 1) * (nodeHeight + nodeSpacing),
       };
 
       nodes.push({
-        id: courseModule.id.toString(),
+        id: module.id.toString(),
         type: "custom",
         data: {
-          ...courseModule,
-          label: module.title,
-          moduleCode: courseModule.moduleCode,
-          domain: module.domain,
-          color: getDomainColor(module.domain),
-          tempComplexityLevel: courseModule.complexityLevel,
-          nextModuleIds: courseModule.nextModuleCodes
+          ...module,
+          label: module.Module.title,
+          domain: module.Module.domain,
+          tempComplexityLevel: module.complexityLevel,
+          nextModuleIds: module.nextModuleCodes
             .map((code) =>
-              courseModules.find((m) => m.moduleCode === code)?.id.toString()
+              modules.find((m) => m.moduleCode === code)?.id.toString()
             )
             .filter(Boolean),
-          prevModuleIds: courseModule.prevModuleCodes
+          prevModuleIds: module.prevModuleCodes
             .map((code) =>
-              courseModules.find((m) => m.moduleCode === code)?.id.toString()
+              modules.find((m) => m.moduleCode === code)?.id.toString()
             )
             .filter(Boolean),
         },
@@ -304,15 +243,13 @@ const ReactflowCareerMap = ({ courseCode, updateTrigger }) => {
     });
 
     return nodes;
-  }, [courseModules, modules, getDomainColor]);
+  }, [modules]);
 
   const initialEdges = useMemo(() => {
     let edges = [];
-    courseModules.forEach((module) => {
+    modules.forEach((module) => {
       module.nextModuleCodes.forEach((nextCode) => {
-        const targetModule = courseModules.find(
-          (m) => m.moduleCode === nextCode
-        );
+        const targetModule = modules.find((m) => m.moduleCode === nextCode);
         if (targetModule) {
           edges.push({
             id: `e${module.id}-${targetModule.id}`,
@@ -330,7 +267,10 @@ const ReactflowCareerMap = ({ courseCode, updateTrigger }) => {
       });
     });
     return edges;
-  }, [courseModules]);
+  }, [modules]);
+
+  // const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
+  // const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
 
   const updateModuleAPI = useCallback(
     async (
@@ -452,7 +392,7 @@ const ReactflowCareerMap = ({ courseCode, updateTrigger }) => {
           return node;
         });
 
-        // Call the API to update the courseModules
+        // Call the API to update the modules
         const sourceNode = updatedNodes.find((n) => n.id === source);
         const targetNode = updatedNodes.find((n) => n.id === target);
 
@@ -612,59 +552,40 @@ const ReactflowCareerMap = ({ courseCode, updateTrigger }) => {
     [setNodes, updateModuleAPI]
   );
 
-  const paginatedDomains = useMemo(() => {
-    const startIndex = (currentPage - 1) * domainsPerPage;
-    return domainList.slice(startIndex, startIndex + domainsPerPage);
-  }, [domainList, currentPage]);
+  // const nodeTypes = useMemo(
+  //   () => ({
+  //     custom: CustomNode,
+  //     columnLabel: ColumnLabelNode,
+  //   }),
+  //   []
+  // );
 
-  const handlePageChange = (event, value) => {
-    setCurrentPage(value);
-  };
+  // const edgeTypes = useMemo(
+  //   () => ({
+  //     custom: (props) => <CustomEdge {...props} onEdgeClick={onEdgeClick} />,
+  //   }),
+  //   [onEdgeClick]
+  // );
 
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchCourseModules = async () => {
       setLoading(true);
       try {
-        // Fetch course modules
-        const courseModulesResponse = await http.get(
+        const response = await http.get(
           `/courseModule/course/${courseCode}/modules`
         );
-        const fetchedCourseModules = courseModulesResponse.data;
-        setCourseModules(fetchedCourseModules);
-
-        // Fetch all modules
-        const modulesResponse = await http.get("/module/all");
-        const allModules = modulesResponse.data;
-
-        // Filter modules to only those in the course and create a lookup object
-        const courseModuleCodes = new Set(
-          fetchedCourseModules.map((cm) => cm.moduleCode)
-        );
-        const filteredModules = allModules.reduce((acc, module) => {
-          if (courseModuleCodes.has(module.moduleCode)) {
-            acc[module.moduleCode] = module;
-          }
-          return acc;
-        }, {});
-        setModules(filteredModules);
-
-        // Extract unique domains from the filtered modules
-        const uniqueDomains = [
-          ...new Set(
-            Object.values(filteredModules).map((module) => module.domain)
-          ),
-        ];
-        setDomainList(uniqueDomains);
+        console.log("Fetched modules:", response.data);
+        setModules(response.data);
       } catch (error) {
-        console.error("Error fetching data:", error);
-        setError("Failed to fetch data. Please try again later.");
+        console.error("Error fetching course modules:", error);
+        setError("Failed to fetch course modules. Please try again later.");
       } finally {
         setLoading(false);
       }
     };
 
-    fetchData();
-  }, [courseCode, updateTrigger]);
+    fetchCourseModules();
+  }, [courseCode, updateTrigger]); // Add updateTrigger to the dependency array
 
   useEffect(() => {
     if (initialNodes.length > 0) {
@@ -677,58 +598,37 @@ const ReactflowCareerMap = ({ courseCode, updateTrigger }) => {
   if (error) return <Typography color="error">{error}</Typography>;
 
   return (
-    <Box sx={{ mb: 2, height: "80vh" }}>
-      <Grid container spacing={2} style={{ height: "100%" }}>
-        <Grid
-          item
-          xs={12}
-          md={3}
-          style={{ height: "97%", position: "relative" }}
-        >
+    <Container maxWidth="xl" sx={{ marginTop: "2rem", height: "80vh" }}>
+      <Grid container spacing={4} style={{ height: "100%" }}>
+        <Grid item xs={12} md={2}>
           <LeftSectionPaper elevation={3}>
-            <Typography variant="h6" gutterBottom>
-              {courseCode} Curriculum
+            <Typography variant="h5" gutterBottom>
+              DAAA Curriculum
             </Typography>
-            <Typography variant="subtitle2" gutterBottom>
-              Domains:
-            </Typography>
-            <Box display="flex" flexDirection="column" mb={2}>
-              {paginatedDomains.map((domain, index) => (
-                <DomainButton
+            <Box display="flex" flexDirection="column">
+              {Object.entries(domainColors).map(([domain, color], index) => (
+                <CurvyButton
                   key={index}
                   variant="contained"
-                  style={{
-                    backgroundColor:
-                      domainColors[
-                        domainList.indexOf(domain) % domainColors.length
-                      ],
-                    color: "black",
-                  }}
+                  size="small"
+                  style={{ backgroundColor: color, color: "black" }}
                 >
                   {domain}
-                </DomainButton>
+                </CurvyButton>
               ))}
             </Box>
-            <Pagination
-              count={Math.ceil(domainList.length / domainsPerPage)}
-              page={currentPage}
-              onChange={handlePageChange}
-              size="small"
-              sx={{ display: "flex", justifyContent: "center" }}
-            />
           </LeftSectionPaper>
         </Grid>
 
         <Grid
           item
           xs={12}
-          md={9}
+          md={10}
           style={{ height: "100%", position: "relative" }}
         >
           <Paper
             style={{
               height: "100%",
-              width: "100%",
               position: "relative",
               padding: 3,
               boxShadow:
@@ -744,7 +644,7 @@ const ReactflowCareerMap = ({ courseCode, updateTrigger }) => {
               onNodeDragStop={onNodeDragStop}
               onNodeClick={(_, node) => {
                 if (node.type === "custom") {
-                  const fullModuleData = courseModules.find(
+                  const fullModuleData = modules.find(
                     (m) => m.id.toString() === node.id
                   );
                   handleClickOpen(fullModuleData);
@@ -782,49 +682,28 @@ const ReactflowCareerMap = ({ courseCode, updateTrigger }) => {
         aria-describedby="alert-dialog-description"
       >
         <DialogTitle id="alert-dialog-title">
-          {selectedModule?.title}
+          {selectedModule?.Module.title}
         </DialogTitle>
         <DialogContent>
           <Typography gutterBottom>
             <strong>Module Code:</strong> {selectedModule?.moduleCode}
           </Typography>
           <Typography gutterBottom>
-            <strong>Description:</strong> {selectedModule?.description}
+            <strong>Complexity Level:</strong> {selectedModule?.complexityLevel}
           </Typography>
           <Typography gutterBottom>
-            <strong>Domain:</strong> {selectedModule?.domain}
+            <strong>Domain:</strong> {selectedModule?.Module.domain}
           </Typography>
           <Typography gutterBottom>
-            <strong>Level of Study:</strong>{" "}
-            {selectedModule?.levelOfStudy || "None"}
-          </Typography>
-          <Typography gutterBottom>
-            <strong>Credit:</strong> {selectedModule?.credit}
-          </Typography>
-          <Typography gutterBottom>
-            <strong>School:</strong> {selectedModule?.school}
-          </Typography>
-          <Typography gutterBottom>
-            <strong>Prerequisite:</strong>{" "}
-            {selectedModule?.prerequisite || "None"}
-          </Typography>
-          <Typography gutterBottom>
-            <strong>Complexity Level:</strong>{" "}
-            {selectedCourseModule?.complexityLevel}
+            <strong>Level of Study:</strong> {selectedModule?.levelOfStudy}
           </Typography>
           <Typography gutterBottom>
             <strong>Previous Modules:</strong>{" "}
-            {selectedCourseModule?.prevModuleCodes.join(", ") || "None"}
+            {selectedModule?.prevModuleCodes.join(", ") || "None"}
           </Typography>
           <Typography gutterBottom>
             <strong>Next Modules:</strong>{" "}
-            {selectedCourseModule?.nextModuleCodes.join(", ") || "None"}
-          </Typography>
-          <Typography gutterBottom>
-            <strong>Obtainable Certification(s): </strong>
-            {selectedModule?.certifications?.length
-              ? selectedModule.certifications
-              : "None"}
+            {selectedModule?.nextModuleCodes.join(", ") || "None"}
           </Typography>
         </DialogContent>
         <DialogActions>
@@ -833,8 +712,8 @@ const ReactflowCareerMap = ({ courseCode, updateTrigger }) => {
           </Button>
         </DialogActions>
       </Dialog>
-    </Box>
+    </Container>
   );
 };
 
-export default ReactflowCareerMap;
+export default Copy6ReactflowCareerMap;

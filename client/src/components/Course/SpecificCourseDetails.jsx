@@ -10,7 +10,7 @@ import {
   Tabs,
 } from "@mui/material";
 import { useParams, useNavigate } from "react-router-dom";
-import http from '../../http';
+import http from "../../http";
 import CourseModuleList from "./CourseModuleList";
 
 function InfoBox({ title, value }) {
@@ -22,16 +22,23 @@ function InfoBox({ title, value }) {
   );
 }
 
-function SpecificCourseDetails() {
+function SpecificCourseDetails({ courseCode, onModuleUpdate }) {
   const [course, setCourse] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState("1");
-  const { courseCode } = useParams();
+  const [activeTab, setActiveTab] = useState(() => {
+    // Retrieve the active tab from localStorage, or default to "1" if not found
+    return localStorage.getItem(`activeTab_${courseCode}`) || "1";
+  });
   const navigate = useNavigate();
 
   useEffect(() => {
     fetchCourse();
   }, [courseCode]);
+
+  useEffect(() => {
+    // Save the active tab to localStorage whenever it changes
+    localStorage.setItem(`activeTab_${courseCode}`, activeTab);
+  }, [activeTab, courseCode]);
 
   const fetchCourse = async () => {
     try {
@@ -59,7 +66,7 @@ function SpecificCourseDetails() {
   return (
     <Box>
       <Grid container spacing={2}>
-      <Grid item xs={12} md={4}>
+        <Grid item xs={12} md={4}>
           <Paper elevation={3} sx={{ padding: 3, textAlign: "center" }}>
             <Typography variant="h5" gutterBottom>
               {course.name}
@@ -120,7 +127,10 @@ function SpecificCourseDetails() {
               <Typography variant="h6" gutterBottom>
                 Course Modules
               </Typography>
-              <CourseModuleList courseCode={courseCode} />
+              <CourseModuleList
+                courseCode={courseCode}
+                onModuleUpdate={onModuleUpdate}
+              />
             </Paper>
           )}
         </Grid>

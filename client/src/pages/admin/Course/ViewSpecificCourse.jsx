@@ -1,13 +1,16 @@
-import React from "react";
+import React, { useState, useCallback } from "react";
 import { useParams } from "react-router-dom";
 import { Box, Paper, Container } from "@mui/material";
 import SpecificCourseDetails from "../../../components/Course/SpecificCourseDetails";
-import CompetencyMapEditor from "../../../components/Course/CompetencyMapEditor";
-import CareerMap from "../../../components/CareerMap";
 import ReactflowCareerMap from "../../../components/ReactFlowCareerMap";
 
 const ViewSpecificCourse = () => {
   const { courseCode } = useParams();
+  const [updateTrigger, setUpdateTrigger] = useState(0);
+
+  const handleModuleUpdate = useCallback(() => {
+    setUpdateTrigger(prev => prev + 1);
+  }, []);
 
   return (
     <Container
@@ -19,7 +22,7 @@ const ViewSpecificCourse = () => {
         mb: "4%",
       }}
     >
-      <SpecificCourseDetails courseCode={courseCode} />
+      <SpecificCourseDetails courseCode={courseCode} onModuleUpdate={handleModuleUpdate} />
       <br /><br />
       {/* Not working */}
       {/* <CompetencyMapEditor courseCode={courseCode} /> */}
@@ -29,7 +32,10 @@ const ViewSpecificCourse = () => {
       {/* <CareerMap courseCode={courseCode} /> */}
 
       {/* Iteration 2 (Packaged mapping component - npm i reactflow) */}
-      <ReactflowCareerMap courseCode={courseCode} />
+      <ReactflowCareerMap 
+        courseCode={courseCode} 
+        updateTrigger={updateTrigger}
+      />
     </Container>
   );
 };

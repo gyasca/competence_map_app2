@@ -55,7 +55,7 @@ router.put("/:courseCode", validateToken, validateAdmin, async (req, res) => {
   try {
     await courseSchema.validate(req.body, { abortEarly: false });
     const [updated] = await Course.update(req.body, {
-      where: { id: req.params.courseCode },
+      where: { courseCode: req.params.courseCode },
     });
     if (updated) {
       const updatedCourse = await Course.findByPk(req.params.courseCode);
@@ -80,7 +80,7 @@ router.delete(
   async (req, res) => {
     try {
       const deleted = await Course.destroy({
-        where: { id: req.params.courseCode },
+        where: { courseCode: req.params.courseCode },
       });
       if (deleted) {
         res.status(204).send();

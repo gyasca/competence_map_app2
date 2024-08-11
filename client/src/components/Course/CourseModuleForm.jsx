@@ -115,7 +115,7 @@ function CourseModuleForm({
         if (onClose) {
           onClose();
         }
-        window.location.reload(); // Refresh the page to activate flow map compoment (ReactflowCareerMap.jsx)
+        // window.location.reload(); // Refresh the page to activate flow map compoment (ReactflowCareerMap.jsx)
       } catch (error) {
         console.error(
           `Error ${isEditMode ? "updating" : "creating"} course module:`,
@@ -164,17 +164,16 @@ function CourseModuleForm({
       );
       await Promise.all(promises);
       if (onModuleAdded) {
-        onModuleAdded();
+        onModuleAdded(); // This will trigger the re-render of ReactflowCareerMap
       }
       if (onClose) {
         onClose();
       }
-      window.location.reload(); // Refresh the page to activate flow map compoment (ReactflowCareerMap.jsx)
+      // Remove the window.location.reload() line
     } catch (error) {
       console.error("Error adding modules in bulk:", error);
     }
   };
-
   const handleModuleToggle = (module) => {
     const currentIndex = selectedModules.findIndex(
       (m) => m.moduleCode === module.moduleCode
@@ -274,12 +273,17 @@ function CourseModuleForm({
                       filterOptions={filterOptions}
                       value={prevModule}
                       onChange={(event, newValue) => {
-                        const newPrevModules = [...formik.values.prevModuleCodes];
+                        const newPrevModules = [
+                          ...formik.values.prevModuleCodes,
+                        ];
                         newPrevModules[index] = newValue;
                         formik.setFieldValue("prevModuleCodes", newPrevModules);
                       }}
                       renderInput={(params) => (
-                        <TextField {...params} label={`Previous Module ${index + 1}`} />
+                        <TextField
+                          {...params}
+                          label={`Previous Module ${index + 1}`}
+                        />
                       )}
                     />
                     <IconButton onClick={() => handleRemovePrevModule(index)}>
@@ -307,12 +311,17 @@ function CourseModuleForm({
                       filterOptions={filterOptions}
                       value={nextModule}
                       onChange={(event, newValue) => {
-                        const newNextModules = [...formik.values.nextModuleCodes];
+                        const newNextModules = [
+                          ...formik.values.nextModuleCodes,
+                        ];
                         newNextModules[index] = newValue;
                         formik.setFieldValue("nextModuleCodes", newNextModules);
                       }}
                       renderInput={(params) => (
-                        <TextField {...params} label={`Next Module ${index + 1}`} />
+                        <TextField
+                          {...params}
+                          label={`Next Module ${index + 1}`}
+                        />
                       )}
                     />
                     <IconButton onClick={() => handleRemoveNextModule(index)}>
@@ -372,7 +381,8 @@ function CourseModuleForm({
                     Boolean(formik.errors.complexityLevel)
                   }
                   helperText={
-                    formik.touched.complexityLevel && formik.errors.complexityLevel
+                    formik.touched.complexityLevel &&
+                    formik.errors.complexityLevel
                   }
                 />
               </Grid>
@@ -384,7 +394,9 @@ function CourseModuleForm({
                 </Button>
               )}
               <Button type="submit" variant="contained" color="primary">
-                {isEditMode ? "Update Module in Course" : "Add Module to Course"}
+                {isEditMode
+                  ? "Update Module in Course"
+                  : "Add Module to Course"}
               </Button>
             </Box>
           </form>
@@ -393,7 +405,7 @@ function CourseModuleForm({
             <Typography variant="h6" gutterBottom>
               Bulk Add Modules
             </Typography>
-            <List sx={{ maxHeight: 400, overflow: 'auto' }}>
+            <List sx={{ maxHeight: 400, overflow: "auto" }}>
               {availableModules.map((module) => (
                 <ListItem
                   key={module.moduleCode}
@@ -404,12 +416,17 @@ function CourseModuleForm({
                   <ListItemIcon>
                     <Checkbox
                       edge="start"
-                      checked={selectedModules.some(m => m.moduleCode === module.moduleCode)}
+                      checked={selectedModules.some(
+                        (m) => m.moduleCode === module.moduleCode
+                      )}
                       tabIndex={-1}
                       disableRipple
                     />
                   </ListItemIcon>
-                  <ListItemText primary={module.title} secondary={module.moduleCode} />
+                  <ListItemText
+                    primary={module.title}
+                    secondary={module.moduleCode}
+                  />
                 </ListItem>
               ))}
             </List>

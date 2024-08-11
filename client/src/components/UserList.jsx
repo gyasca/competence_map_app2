@@ -156,7 +156,7 @@ function UserList() {
         </Button>
       </Box>
 
-      <Box sx={{ flexGrow: 1 }}>
+      <Box sx={{ flexGrow: 1, width: '100%', height: '53vh', overflow: 'hidden' }}>
         <DataGrid
           rows={filteredUsers}
           columns={columns}

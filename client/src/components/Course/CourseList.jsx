@@ -39,7 +39,9 @@ function CourseList() {
   };
 
   const handleView = (courseCode) => navigate(`/admin/courses/${courseCode}`);
-  const handleEdit = (course) => setEditCourse(course);
+  const handleEdit = (courseCode) => {
+    console.log(courseCode);
+    setEditCourse(courseCode);}
   const handleDelete = (course) => setDeleteCourse(course);
 
   const confirmDelete = async () => {
@@ -67,10 +69,16 @@ function CourseList() {
       flex: 1,
       renderCell: (params) => (
         <>
-          <IconButton onClick={() => handleView(params.row.courseCode)} size="small">
+          <IconButton
+            onClick={() => handleView(params.row.courseCode)}
+            size="small"
+          >
             <Visibility />
           </IconButton>
-          <IconButton onClick={() => handleEdit(params.row.courseCode)} size="small">
+          <IconButton
+            onClick={() => handleEdit(params.row.courseCode)}
+            size="small"
+          >
             <Edit />
           </IconButton>
           <IconButton onClick={() => handleDelete(params.row)} size="small">
@@ -90,9 +98,18 @@ function CourseList() {
   );
 
   return (
-    <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-      <Typography variant="h4" sx={{ mb: 2 }}>Course Management</Typography>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
+    <Box
+      sx={{
+        height: "100%",
+        display: "flex",
+        flexDirection: "column",
+        overflow: "hidden",
+      }}
+    >
+      <Typography variant="h4" sx={{ mb: 2 }}>
+        Course Management
+      </Typography>
+      <Box sx={{ display: "flex", justifyContent: "space-between", mb: 2 }}>
         <TextField
           variant="outlined"
           placeholder="Search courses..."
@@ -114,7 +131,9 @@ function CourseList() {
           Create Course
         </Button>
       </Box>
-      <Box sx={{ flexGrow: 1, width: '100%', height: 'calc(100% - 130px)', overflow: 'hidden' }}>
+      <Box
+        sx={{ flexGrow: 1, width: "100%", height: "60vh", overflow: "hidden" }}
+      >
         <DataGrid
           rows={filteredCourses}
           columns={columns}
@@ -124,8 +143,8 @@ function CourseList() {
           components={{ Toolbar: GridToolbar }}
           disableSelectionOnClick
           sx={{
-            '& .MuiDataGrid-main': { overflow: 'auto' },
-            '& .MuiDataGrid-virtualScroller': { overflow: 'auto' },
+            "& .MuiDataGrid-main": { overflow: "auto" },
+            "& .MuiDataGrid-virtualScroller": { overflow: "auto" },
           }}
         />
       </Box>
@@ -145,14 +164,16 @@ function CourseList() {
         </DialogActions>
       </Dialog>
 
-      <Dialog open={!!editCourse} onClose={handleEditClose} maxWidth="md" fullWidth>
+      <Dialog
+        open={!!editCourse}
+        onClose={handleEditClose}
+        maxWidth="md"
+        fullWidth
+      >
         <DialogTitle>Edit Course</DialogTitle>
         <DialogContent>
           {editCourse && (
-            <EditCourseForm
-              course={editCourse}
-              onClose={handleEditClose}
-            />
+            <EditCourseForm courseCode={editCourse} onClose={handleEditClose} />
           )}
         </DialogContent>
       </Dialog>

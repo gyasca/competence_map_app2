@@ -1,34 +1,25 @@
 import React, { useState, useEffect } from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
-import {
-  Box,
-  Button,
-  TextField,
-  Grid,
-  CircularProgress,
-} from "@mui/material";
-import { useNavigate, useParams } from "react-router-dom";
-import http from '../../http'
+import { Box, Button, TextField, Grid, CircularProgress } from "@mui/material";
+import { useNavigate } from "react-router-dom";
+import http from "../../http";
 
 const validationSchema = Yup.object({
   name: Yup.string().required("Course Name is required"),
   description: Yup.string().required("Description is required"),
-  school: Yup.string().required("School is required"),
-  // Add any other fields specific to your course model
 });
 
-function EditCourseForm({ course: propCourse, onClose }) {
-  const [loading, setLoading] = useState(!propCourse);
+function EditCourseForm({ courseCode, onClose }) {
+  const [loading, setLoading] = useState(true);
+  const [course, setCourse] = useState(null);
   const navigate = useNavigate();
-  const { courseId } = useParams();
-  const [course, setCourse] = useState(propCourse || null);
 
   useEffect(() => {
-    if (!propCourse && courseId) {
+    if (courseCode) {
       const fetchCourse = async () => {
         try {
-          const response = await http.get(`/course/${courseId}`);
+          const response = await http.get(`/course/${courseCode}`);
           setCourse(response.data);
           setLoading(false);
         } catch (error) {
@@ -38,26 +29,24 @@ function EditCourseForm({ course: propCourse, onClose }) {
       };
       fetchCourse();
     }
-  }, [propCourse, courseId]);
+  }, [courseCode]);
 
   const formik = useFormik({
     enableReinitialize: true,
-    initialValues: course ? {
-      courseCode: course.courseCode,
-      name: course.name,
-      description: course.description,
-      school: course.school,
-      // Add any other fields specific to your course model
-    } : {
-      id: "",
-      name: "",
-      description: "",
-      school: "",
-      // Add any other fields specific to your course model
-    },
+    initialValues: course
+      ? {
+          courseCode: course.courseCode,
+          name: course.name,
+          description: course.description,
+        }
+      : {
+          courseCode: "",
+          name: "",
+          description: "",
+        },
     validationSchema: validationSchema,
     onSubmit: async (values) => {
-      console.log(values);
+      console.log("values to be sent:", values);
       try {
         await http.put(`/course/${values.courseCode}`, values);
         if (onClose) {
@@ -101,11 +90,15 @@ function EditCourseForm({ course: propCourse, onClose }) {
               rows={4}
               value={formik.values.description}
               onChange={formik.handleChange}
-              error={formik.touched.description && Boolean(formik.errors.description)}
-              helperText={formik.touched.description && formik.errors.description}
+              error={
+                formik.touched.description && Boolean(formik.errors.description)
+              }
+              helperText={
+                formik.touched.description && formik.errors.description
+              }
             />
           </Grid>
-          <Grid item xs={12}>
+          {/* <Grid item xs={12}>
             <TextField
               fullWidth
               id="school"
@@ -116,13 +109,12 @@ function EditCourseForm({ course: propCourse, onClose }) {
               error={formik.touched.school && Boolean(formik.errors.school)}
               helperText={formik.touched.school && formik.errors.school}
             />
-          </Grid>
-          {/* Add any other fields specific to your course model */}
+          </Grid> */}
         </Grid>
-        <Box sx={{ mt: 2, display: 'flex', justifyContent: 'flex-end' }}>
-          <Button 
-            type="button" 
-            onClick={onClose ? onClose : () => navigate("/admin/courses")} 
+        <Box sx={{ mt: 2, display: "flex", justifyContent: "flex-end" }}>
+          <Button
+            type="button"
+            onClick={onClose ? onClose : () => navigate("/admin/courses")}
             sx={{ mr: 1 }}
           >
             Cancel

@@ -27,6 +27,7 @@ import {
 } from "@mui/material";
 import { styled } from "@mui/system";
 import http from "../http";
+import { BorderColor } from "@mui/icons-material";
 
 const CurvyButton = styled(Button)(({ theme }) => ({
   borderRadius: "20px",
@@ -88,7 +89,9 @@ const domainColors = {
 const CustomNode = ({ data }) => {
   const nodeStyle = {
     ...customNodeStyle,
-    backgroundColor: domainColors[data.domain] || "#ffffff",
+    backgroundColor: domainColors[data.domain] || "#e4f1f5",
+    borderRadius: "20px",
+    border: "1px solid #b5b5b5",
   };
 
   return (
@@ -107,7 +110,7 @@ const ColumnLabelNode = ({ data }) => {
 };
 
 // CustomEdge component moved outside the main component
-const CustomEdge = ({
+const CustomEdge = React.memo(({
   id,
   sourceX,
   sourceY,
@@ -116,9 +119,7 @@ const CustomEdge = ({
   sourcePosition,
   targetPosition,
   style = {},
-  source,
-  target,
-  onEdgeClick,
+  data,
 }) => {
   const [edgePath, labelX, labelY] = getBezierPath({
     sourceX,
@@ -148,7 +149,7 @@ const CustomEdge = ({
         <Box>
           <Button
             style={StyledEdgeButton}
-            onClick={(event) => onEdgeClick(event, { id, source, target })}
+            onClick={(event) => data.onEdgeClick(event, { id, source: data.source, target: data.target })}
           >
             <strong>x</strong>
           </Button>
@@ -156,14 +157,28 @@ const CustomEdge = ({
       </foreignObject>
     </>
   );
+});
+
+// Define nodeTypes outside the component
+const nodeTypes = {
+  custom: CustomNode,
+  columnLabel: ColumnLabelNode,
 };
 
-const ReactflowCareerMap = ({ courseCode, onModuleUpdate }) => {
+// Define edgeTypes outside the component
+const edgeTypes = {
+  custom: CustomEdge,
+};
+
+const ReactflowCareerMap = ({ courseCode, updateTrigger }) => {
   const [modules, setModules] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [open, setOpen] = useState(false);
   const [selectedModule, setSelectedModule] = useState(null);
+
+  const [nodes, setNodes, onNodesChange] = useNodesState([]);
+  const [edges, setEdges, onEdgesChange] = useEdgesState([]);
 
   const handleClickOpen = useCallback((module) => {
     setSelectedModule(module);
@@ -254,8 +269,8 @@ const ReactflowCareerMap = ({ courseCode, onModuleUpdate }) => {
     return edges;
   }, [modules]);
 
-  const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
-  const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
+  // const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
+  // const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
 
   const updateModuleAPI = useCallback(
     async (
@@ -267,10 +282,15 @@ const ReactflowCareerMap = ({ courseCode, onModuleUpdate }) => {
       newPositionY = null,
       edgeUpdateCheck = null
     ) => {
-      console.log("Attempting to update module with ID:", courseModuleToBeUpdatedId);
+      console.log(
+        "Attempting to update module with ID:",
+        courseModuleToBeUpdatedId
+      );
 
       const module = nodes.find(
-        (node) => node.id === courseModuleToBeUpdatedId.toString() && node.type === "custom"
+        (node) =>
+          node.id === courseModuleToBeUpdatedId.toString() &&
+          node.type === "custom"
       );
 
       if (module) {
@@ -278,34 +298,55 @@ const ReactflowCareerMap = ({ courseCode, onModuleUpdate }) => {
           id: parseInt(module.id),
           order: module.data.order,
           levelOfStudy: module.data.levelOfStudy,
-          complexityLevel: newComplexityLevel !== null ? newComplexityLevel : parseInt(module.data.complexityLevel),
+          complexityLevel:
+            newComplexityLevel !== null
+              ? newComplexityLevel
+              : parseInt(module.data.complexityLevel),
           prevModuleCodes: newPrevModuleIds
             ? newPrevModuleIds
-                .map((id) => nodes.find((n) => n.id === id.toString() && n.type === "custom")?.data.moduleCode)
+                .map(
+                  (id) =>
+                    nodes.find(
+                      (n) => n.id === id.toString() && n.type === "custom"
+                    )?.data.moduleCode
+                )
                 .filter(Boolean)
             : module.data.prevModuleCodes,
           nextModuleCodes: newNextModuleIds
             ? newNextModuleIds
-                .map((id) => nodes.find((n) => n.id === id.toString() && n.type === "custom")?.data.moduleCode)
+                .map(
+                  (id) =>
+                    nodes.find(
+                      (n) => n.id === id.toString() && n.type === "custom"
+                    )?.data.moduleCode
+                )
                 .filter(Boolean)
             : module.data.nextModuleCodes,
           courseCode: module.data.courseCode,
           moduleCode: module.data.moduleCode,
-          positionX: newPositionX !== null ? newPositionX : module.data.positionX,
-          positionY: newPositionY !== null ? newPositionY : module.data.positionY,
+          positionX:
+            newPositionX !== null ? newPositionX : module.data.positionX,
+          positionY:
+            newPositionY !== null ? newPositionY : module.data.positionY,
         };
 
         console.log("Payload to be sent:", payload);
 
         try {
-          const response = await http.put(`/courseModule/course/${courseCode}/module/edit/${module.id}`, payload);
+          const response = await http.put(
+            `/courseModule/course/${courseCode}/module/edit/${module.id}`,
+            payload
+          );
           console.log("Module updated successfully:", response.data);
         } catch (error) {
           console.error("Error updating module:", error);
         }
       } else {
         console.error("Module not found for ID:", courseModuleToBeUpdatedId);
-        console.log("Available node IDs:", nodes.map((n) => `${n.id} (${n.type})`));
+        console.log(
+          "Available node IDs:",
+          nodes.map((n) => `${n.id} (${n.type})`)
+        );
       }
     },
     [nodes, courseCode]
@@ -361,9 +402,9 @@ const ReactflowCareerMap = ({ courseCode, onModuleUpdate }) => {
             sourceNode.data.nextModuleIds,
             null,
             null,
-            null,  
             null,
-            true,
+            null,
+            true
           );
           updateModuleAPI(
             target,
@@ -381,6 +422,18 @@ const ReactflowCareerMap = ({ courseCode, onModuleUpdate }) => {
     },
     [updateModuleAPI, setEdges, setNodes]
   );
+
+  const memoizedEdges = useMemo(() => {
+    return edges.map((edge) => ({
+      ...edge,
+      data: {
+        ...edge.data,
+        onEdgeClick,
+        source: edge.source,
+        target: edge.target,
+      },
+    }));
+  }, [edges, onEdgeClick]);
 
   const onConnect = useCallback(
     (params) => {
@@ -499,20 +552,20 @@ const ReactflowCareerMap = ({ courseCode, onModuleUpdate }) => {
     [setNodes, updateModuleAPI]
   );
 
-  const nodeTypes = useMemo(
-    () => ({
-      custom: CustomNode,
-      columnLabel: ColumnLabelNode,
-    }),
-    []
-  );
+  // const nodeTypes = useMemo(
+  //   () => ({
+  //     custom: CustomNode,
+  //     columnLabel: ColumnLabelNode,
+  //   }),
+  //   []
+  // );
 
-  const edgeTypes = useMemo(
-    () => ({
-      custom: (props) => <CustomEdge {...props} onEdgeClick={onEdgeClick} />,
-    }),
-    [onEdgeClick]
-  );
+  // const edgeTypes = useMemo(
+  //   () => ({
+  //     custom: (props) => <CustomEdge {...props} onEdgeClick={onEdgeClick} />,
+  //   }),
+  //   [onEdgeClick]
+  // );
 
   useEffect(() => {
     const fetchCourseModules = async () => {
@@ -532,7 +585,7 @@ const ReactflowCareerMap = ({ courseCode, onModuleUpdate }) => {
     };
 
     fetchCourseModules();
-  }, [courseCode]);
+  }, [courseCode, updateTrigger]); // Add updateTrigger to the dependency array
 
   useEffect(() => {
     if (initialNodes.length > 0) {
@@ -584,7 +637,7 @@ const ReactflowCareerMap = ({ courseCode, onModuleUpdate }) => {
           >
             <ReactFlow
               nodes={nodes}
-              edges={edges}
+              edges={memoizedEdges}
               onNodesChange={onNodesChange}
               onEdgesChange={onEdgesChange}
               onConnect={onConnect}

@@ -89,7 +89,7 @@ function AdminNavList() {
                 </List>
             </Collapse>
 
-            <ListItem key={"Competencies"} disablePadding>
+            {/* <ListItem key={"Competencies"} disablePadding>
                 <ListItemButton onClick={handleClickCompetencies}>
                     <ListItemIcon><DashboardCustomize /></ListItemIcon>
                     <ListItemText primary={"Competencies"} />
@@ -117,7 +117,7 @@ function AdminNavList() {
                         </ListItemButton>
                     </ListItem>
                 </List>
-            </Collapse>
+            </Collapse> */}
 
             <ListItem key={"Courses"} disablePadding>
                 <ListItemButton onClick={handleClickCourses}>

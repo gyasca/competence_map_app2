@@ -12,7 +12,7 @@ import {
   Typography,
   IconButton,
   InputAdornment,
-  Checkbox
+  Checkbox,
 } from "@mui/material";
 import { Edit, Delete, Visibility, Search, Add } from "@mui/icons-material";
 import http from "../../http";
@@ -101,18 +101,16 @@ function ModuleList() {
         />
       ),
     },
-    { field: "moduleCode", headerName: "Module Code", width: 150 },
-    { field: "title", headerName: "Title", width: 200 },
-    { field: "description", headerName: "Description", width: 300 },
-    { field: "credit", headerName: "Credit", width: 100 },
-    { field: "school", headerName: "School", width: 150 },
     {
       field: "actions",
       headerName: "Actions",
       width: 150,
       renderCell: (params) => (
         <>
-          <IconButton onClick={() => handleView(params.row.moduleCode)} size="small">
+          <IconButton
+            onClick={() => handleView(params.row.moduleCode)}
+            size="small"
+          >
             <Visibility />
           </IconButton>
           <IconButton onClick={() => handleEdit(params.row)} size="small">
@@ -124,6 +122,11 @@ function ModuleList() {
         </>
       ),
     },
+    { field: "moduleCode", headerName: "Module Code", width: 150 },
+    { field: "title", headerName: "Title", width: 200 },
+    { field: "description", headerName: "Description", width: 300 },
+    { field: "credit", headerName: "Credit", width: 100 },
+    { field: "school", headerName: "School", width: 150 }
   ];
 
   const filteredModules = modules.filter((module) =>
@@ -135,9 +138,18 @@ function ModuleList() {
   );
 
   return (
-    <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-      <Typography variant="h4" sx={{ mb: 2 }}>Module Management</Typography>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
+    <Box
+      sx={{
+        height: "100%",
+        display: "flex",
+        flexDirection: "column",
+        overflow: "hidden",
+      }}
+    >
+      <Typography variant="h4" sx={{ mb: 2 }}>
+        Module Management
+      </Typography>
+      <Box sx={{ display: "flex", justifyContent: "space-between", mb: 2 }}>
         <TextField
           variant="outlined"
           placeholder="Search modules..."
@@ -159,12 +171,11 @@ function ModuleList() {
           Create Module
         </Button>
       </Box>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
-        <Button
-          variant="contained"
-          onClick={handleSelectAllClick}
-        >
-          {selectedModules.length === modules.length ? "Unselect All" : "Select All"}
+      <Box sx={{ display: "flex", justifyContent: "space-between", mb: 2 }}>
+        <Button variant="contained" onClick={handleSelectAllClick}>
+          {selectedModules.length === modules.length
+            ? "Unselect All"
+            : "Select All"}
         </Button>
         <Button
           variant="contained"
@@ -175,7 +186,9 @@ function ModuleList() {
           Delete Selected
         </Button>
       </Box>
-      <Box sx={{ flexGrow: 1, width: '100%', height: '60vh', overflow: 'hidden' }}>
+      <Box
+        sx={{ flexGrow: 1, width: "100%", height: "60vh", overflow: "hidden" }}
+      >
         <DataGrid
           rows={filteredModules}
           columns={columns}
@@ -185,8 +198,8 @@ function ModuleList() {
           components={{ Toolbar: GridToolbar }}
           disableSelectionOnClick
           sx={{
-            '& .MuiDataGrid-main': { overflow: 'auto' },
-            '& .MuiDataGrid-virtualScroller': { overflow: 'auto' },
+            "& .MuiDataGrid-main": { overflow: "auto" },
+            "& .MuiDataGrid-virtualScroller": { overflow: "auto" },
           }}
         />
       </Box>
@@ -206,14 +219,16 @@ function ModuleList() {
         </DialogActions>
       </Dialog>
 
-      <Dialog open={!!editModule} onClose={handleEditClose} maxWidth="md" fullWidth>
+      <Dialog
+        open={!!editModule}
+        onClose={handleEditClose}
+        maxWidth="md"
+        fullWidth
+      >
         <DialogTitle>Edit Module</DialogTitle>
         <DialogContent>
           {editModule && (
-            <EditModuleForm
-              module={editModule}
-              onClose={handleEditClose}
-            />
+            <EditModuleForm module={editModule} onClose={handleEditClose} />
           )}
         </DialogContent>
       </Dialog>

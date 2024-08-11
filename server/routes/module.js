@@ -33,7 +33,6 @@ router.post("/bulk-create", validateToken, validateAdmin, async (req, res) => {
     credit: yup.number().positive().integer().required("Credit is required"),
     domain: yup.string().trim().required("Domain is required"),
     levelOfStudy: yup.string().trim().required("Level of study is required"),
-    prerequisite: yup.string().trim(),
     competencyLevel: yup
       .number()
       .positive()

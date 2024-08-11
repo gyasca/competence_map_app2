@@ -2,7 +2,7 @@ import React, { useState, useCallback } from "react";
 import { useParams } from "react-router-dom";
 import { Box, Paper, Container } from "@mui/material";
 import SpecificCourseDetails from "../../../components/Course/SpecificCourseDetails";
-import ReactflowCareerMap from "../../../components/ReactFlowCareerMap";
+import ReactflowCareerMap from "../../../components/CompetencyMap/ReactFlowCareerMap";
 
 const ViewSpecificCourse = () => {
   const { courseCode } = useParams();

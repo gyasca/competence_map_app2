@@ -19,7 +19,6 @@ import CreateModule from "./Module/CreateModule";
 import EditModule from "./Module/EditModule";
 import ViewModules from "./Module/ViewModules";
 import ViewSpecificModule from "./Module/ViewSpecificModule";
-import ManageCompMap from "./Competency/ManageCompMap";
 
 // Course (CoursModule functionalities are already inbuilt to course-related pages)
 import CreateCourse from "./Course/CreateCourse";
@@ -102,8 +101,6 @@ function AdminRoutes() {
           <Route path="/modules/edit/:moduleCode" element={<EditModule />} />
           <Route path="/modules/:moduleCode" element={<ViewSpecificModule />} />
 
-          {/* Competency map */}
-          <Route path="/competency-map/manage" element={<ManageCompMap />} />
         </Routes>
       </Box>
     </Box>

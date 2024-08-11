@@ -26,8 +26,7 @@ import {
   CircularProgress,
 } from "@mui/material";
 import { styled } from "@mui/system";
-import http from "../http";
-import { BorderColor } from "@mui/icons-material";
+import http from "../../http";
 
 const CurvyButton = styled(Button)(({ theme }) => ({
   borderRadius: "20px",
@@ -54,11 +53,12 @@ const customNodeStyle = {
 
 const columnLabelStyle = {
   padding: "10px",
-  backgroundColor: "#f0f0f0",
-  borderRadius: "5px",
+  backgroundColor: "#083c84",
+  borderRadius: "15px",
   textAlign: "center",
   fontSize: 14,
   fontWeight: "bold",
+  color: "white",
   width: 200,
 };
 

@@ -11,6 +11,7 @@ import ViewSkillMap2 from './ViewSkillMap2'
 import Dashboard from './Dashboard'
 import Test1 from './Test1'
 import Register from './Register'
+import StudentCompetenceMapPage from './StudentCompetenceMapPage'
 // import Login from './Login'
 // import Register from './Register'
 // import Verify from './Verify'
@@ -27,6 +28,7 @@ import Register from './Register'
 // import Wishlist from './wishlist/ViewWishlist'
 // import About from './About'
 import { UserContext } from '../main'
+
 
 
 function UserRoutes() {
@@ -50,6 +52,9 @@ function UserRoutes() {
             <Route path="/skillmap2" element={<ViewSkillMap2 />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/test1" element={<Test1 />} />
+
+            {/* Final skill map page */}
+            <Route path="/competence-map" element={<StudentCompetenceMapPage />} />
 
 
 

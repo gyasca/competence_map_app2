@@ -210,6 +210,39 @@ const nodeTypes = {
   columnLabel: ColumnLabelNode,
 };
 
+// horizontal scrollable certificate list
+const CertificateScroll = styled(Box)(({ theme }) => ({
+  display: 'flex',
+  overflowX: 'auto',
+  padding: theme.spacing(2),
+  '&::-webkit-scrollbar': {
+    height: '8px',
+  },
+  '&::-webkit-scrollbar-track': {
+    background: '#f1f1f1',
+  },
+  '&::-webkit-scrollbar-thumb': {
+    background: '#888',
+    borderRadius: '4px',
+  },
+  '&::-webkit-scrollbar-thumb:hover': {
+    background: '#555',
+  },
+}));
+
+const CertificateItem = styled(Box)(({ theme }) => ({
+  minWidth: '200px',
+  marginRight: theme.spacing(2),
+  textAlign: 'center',
+}));
+
+const CertificateImage = styled('img')({
+  width: '100%',
+  height: '150px',
+  objectFit: 'cover',
+  borderRadius: '8px',
+});
+
 const StudentReactFlowCareerMap = ({ courseCode }) => {
   const [courseModules, setCourseModules] = useState([]);
   const [modules, setModules] = useState({});

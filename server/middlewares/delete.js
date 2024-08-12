@@ -23,7 +23,9 @@ const createDeleteMiddleware = (folderName, fileName) => {
     } catch (error) {
       console.error("Error deleting file:", error);
       if (error.code === 'ENOENT') {
-        return res.status(404).json({ error: "File not found" });
+        // File doesn't exist, consider it already deleted
+        console.log(`File not found, considered deleted. Don't need to worry about this error.`);
+        res.status(200).json({ message: 'File considered deleted' });
       } else {
         return res.status(500).json({ error: "Failed to delete the file", details: error.message });
       }

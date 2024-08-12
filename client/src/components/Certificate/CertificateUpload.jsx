@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect, useRef } from "react";
 import { useDropzone } from "react-dropzone";
 import { 
   Button, 
@@ -19,12 +19,14 @@ import http from "../../http";
 
 const MAX_FILE_SIZE = 1024 * 1024; // 1MB
 const FOLDER_NAME = "certificates"; // Folder name for certificate uploads
+const FILE_BASE_URL = import.meta.env.VITE_FILE_BASE_URL;
 
 const CertificateUpload = ({ userId, moduleCode, onUploadSuccess, onClose }) => {
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState(null);
   const [title, setTitle] = useState("");
   const [uploadedFile, setUploadedFile] = useState(null);
+  const isSubmittedRef = useRef(false);
 
   const onDrop = useCallback(
     async (acceptedFiles) => {
@@ -56,7 +58,8 @@ const CertificateUpload = ({ userId, moduleCode, onUploadSuccess, onClose }) => 
           console.log("File upload response:", uploadResponse.data);
           setUploadedFile({
             filename: uploadResponse.data.filename,
-            originalname: file.name // Since the server doesn't return originalname, we use the file's name
+            originalname: file.name,
+            previewUrl: URL.createObjectURL(file) // Create a preview URL
           });
           toast.success("File uploaded successfully. Please submit the certificate.");
         } catch (err) {
@@ -89,7 +92,7 @@ const CertificateUpload = ({ userId, moduleCode, onUploadSuccess, onClose }) => 
   });
 
   // Handle file rejections
-  React.useEffect(() => {
+  useEffect(() => {
     fileRejections.forEach(({ file, errors }) => {
       if (errors[0]?.code === "file-too-large") {
         toast.error(`File is larger than 1MB`);
@@ -134,6 +137,7 @@ const CertificateUpload = ({ userId, moduleCode, onUploadSuccess, onClose }) => 
 
       onUploadSuccess(certificateResponse.data);
       toast.success("Certificate submitted successfully!");
+      isSubmittedRef.current = true;
       setTitle("");
       setUploadedFile(null);
     } catch (err) {
@@ -154,6 +158,7 @@ const CertificateUpload = ({ userId, moduleCode, onUploadSuccess, onClose }) => 
     if (uploadedFile) {
       try {
         await http.delete(`/file/delete/folder/${FOLDER_NAME}/file/${uploadedFile.filename}`);
+        URL.revokeObjectURL(uploadedFile.previewUrl); // Revoke the preview URL
         setUploadedFile(null);
         toast.success("File deleted successfully");
       } catch (error) {
@@ -163,13 +168,14 @@ const CertificateUpload = ({ userId, moduleCode, onUploadSuccess, onClose }) => 
     }
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     return () => {
       // Clean up function to delete the uploaded file when the component unmounts
-      if (uploadedFile) {
+      if (uploadedFile && !isSubmittedRef.current) {
         http.delete(`/file/delete/folder/${FOLDER_NAME}/file/${uploadedFile.filename}`)
           .then(() => console.log("Unsent file deleted successfully"))
           .catch((error) => console.error("Error deleting uploaded file:", error));
+        URL.revokeObjectURL(uploadedFile.previewUrl); // Revoke the preview URL
       }
     };
   }, [uploadedFile]);
@@ -188,49 +194,66 @@ const CertificateUpload = ({ userId, moduleCode, onUploadSuccess, onClose }) => 
           onChange={(e) => setTitle(e.target.value)}
           margin="normal"
         />
-        <Box
-          {...getRootProps()}
-          sx={{
-            border: "2px dashed #cccccc",
-            borderRadius: "10px",
-            padding: "20px",
-            textAlign: "center",
-            cursor: "pointer",
-            "&:hover": {
-              backgroundColor: "#f0f0f0",
-            },
-          }}
-        >
-          <input {...getInputProps()} />
-          {uploading ? (
-            <CircularProgress />
-          ) : isDragActive ? (
-            <Typography>Drop the file here ...</Typography>
-          ) : (
-            <Box>
-              <CloudUploadIcon sx={{ fontSize: 48, color: "#999" }} />
-              <Typography>
-                Drag 'n' drop a file here, or click to select a file
-              </Typography>
-              <Typography variant="caption">
-                (Accepted formats: JPEG, PNG, GIF, PDF. Max size: 1MB)
-              </Typography>
-            </Box>
-          )}
-        </Box>
+        {!uploadedFile && (
+          <Box
+            {...getRootProps()}
+            sx={{
+              border: "2px dashed #cccccc",
+              borderRadius: "10px",
+              padding: "20px",
+              textAlign: "center",
+              cursor: "pointer",
+              "&:hover": {
+                backgroundColor: "#f0f0f0",
+              },
+            }}
+          >
+            <input {...getInputProps()} />
+            {uploading ? (
+              <CircularProgress />
+            ) : isDragActive ? (
+              <Typography>Drop the file here ...</Typography>
+            ) : (
+              <Box>
+                <CloudUploadIcon sx={{ fontSize: 48, color: "#999" }} />
+                <Typography>
+                  Drag 'n' drop a file here, or click to select a file
+                </Typography>
+                <Typography variant="caption">
+                  (Accepted formats: JPEG, PNG, GIF, PDF. Max size: 1MB)
+                </Typography>
+              </Box>
+            )}
+          </Box>
+        )}
         {error && (
           <Typography color="error" sx={{ mt: 2 }}>
             {error}
           </Typography>
         )}
         {uploadedFile && (
-          <Box sx={{ mt: 2, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <Typography>
-              File uploaded: {uploadedFile.originalname}
-            </Typography>
-            <IconButton onClick={handleDelete} color="error" size="small">
-              <DeleteIcon />
-            </IconButton>
+          <Box sx={{ mt: 2, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            {uploadedFile.filename.match(/\.(jpeg|jpg|png|gif)$/i) ? (
+              <Box sx={{ width: '100%', maxWidth: 300, height: 200, display: 'flex', justifyContent: 'center', alignItems: 'center', overflow: 'hidden', mb: 2 }}>
+                <img 
+                  src={uploadedFile.previewUrl} 
+                  alt="Uploaded certificate" 
+                  style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }} 
+                />
+              </Box>
+            ) : (
+              <Box sx={{ width: '100%', maxWidth: 300, height: 200, display: 'flex', justifyContent: 'center', alignItems: 'center', bgcolor: '#f0f0f0', mb: 2 }}>
+                <Typography>PDF Preview Not Available</Typography>
+              </Box>
+            )}
+            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
+              <Typography>
+                File uploaded: {uploadedFile.originalname}
+              </Typography>
+              <IconButton onClick={handleDelete} color="error" size="small">
+                <DeleteIcon />
+              </IconButton>
+            </Box>
           </Box>
         )}
       </CardContent>
@@ -241,7 +264,7 @@ const CertificateUpload = ({ userId, moduleCode, onUploadSuccess, onClose }) => 
           variant="contained" 
           disabled={!uploadedFile || uploading}
           fullWidth
-          sx={{borderRadius: "8px 8px 15px 15px"}}
+          sx={{borderRadius: "8px 8px 15px 15px", mb: 2}}
         >
           SUBMIT CERTIFICATE
         </Button>

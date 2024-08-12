@@ -57,7 +57,7 @@ const CourseForm = () => {
   };
 
   return (
-    <Box component="form" onSubmit={handleSubmit} sx={{ maxWidth: 400, margin: 'auto', mt: 4 }}>
+    <Box component="form" onSubmit={handleSubmit} sx={{ margin: 'auto', mt: 4 }}>
       <Typography variant="h4" gutterBottom>
         {courseCode ? 'Edit Course' : 'Create New Course'}
       </Typography>

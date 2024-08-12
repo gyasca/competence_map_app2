@@ -3,10 +3,10 @@ import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import {
   Button,
   Dialog,
-  DialogActions,
+  DialogTitle,
   DialogContent,
   DialogContentText,
-  DialogTitle,
+  DialogActions,
   TextField,
   Box,
   Tab,
@@ -21,6 +21,7 @@ import {
 import { Edit, Delete, Visibility, Search, Add } from "@mui/icons-material";
 import http from "../http";
 import { useNavigate } from "react-router-dom";
+import EditUserForm from "./User/EditUserForm";
 
 function UserList() {
   const [users, setUsers] = useState([]);
@@ -29,11 +30,14 @@ function UserList() {
   const [tabValue, setTabValue] = useState(0);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedUsers, setSelectedUsers] = useState([]);
-  const [deleteSelectedDialogOpen, setDeleteSelectedDialogOpen] = useState(false);
+  const [deleteSelectedDialogOpen, setDeleteSelectedDialogOpen] =
+    useState(false);
+  const [courses, setCourses] = useState([]);
   const navigate = useNavigate();
 
   useEffect(() => {
     fetchUsers();
+    fetchCourses();
   }, []);
 
   const fetchUsers = async () => {
@@ -45,18 +49,22 @@ function UserList() {
     }
   };
 
+  const fetchCourses = async () => {
+    try {
+      const response = await http.get("/course/all");
+      setCourses(response.data);
+    } catch (error) {
+      console.error("Error fetching courses:", error);
+    }
+  };
+
   const handleEdit = (user) => setEditUser(user);
   const handleDelete = (user) => setDeleteUser(user);
   const handleView = (userId) => navigate(`/admin/users/${userId}`);
 
-  const confirmEdit = async () => {
-    try {
-      await http.put(`/user/${editUser.userId}`, editUser);
-      setEditUser(null);
-      fetchUsers();
-    } catch (error) {
-      console.error("Error updating user:", error);
-    }
+  const handleEditComplete = () => {
+    setEditUser(null);
+    fetchUsers(); // Refresh the user list after edit
   };
 
   const confirmDelete = async () => {
@@ -68,7 +76,6 @@ function UserList() {
       console.error("Error deleting user:", error);
     }
   };
-
   const handleSelectAllClick = () => {
     if (selectedUsers.length === filteredUsers.length) {
       setSelectedUsers([]);
@@ -220,7 +227,9 @@ function UserList() {
         </Button>
       </Box>
 
-      <Box sx={{ flexGrow: 1, width: '100%', height: '53vh', overflow: 'hidden' }}>
+      <Box
+        sx={{ flexGrow: 1, width: "100%", height: "53vh", overflow: "hidden" }}
+      >
         <DataGrid
           rows={filteredUsers}
           columns={columns}
@@ -241,32 +250,16 @@ function UserList() {
           }}
         />
       </Box>
-
       <Dialog open={!!editUser} onClose={() => setEditUser(null)}>
         <DialogTitle>Edit User</DialogTitle>
-        <DialogContent>
-          <TextField
-            autoFocus
-            margin="dense"
-            label="Name"
-            fullWidth
-            value={editUser?.name || ""}
-            onChange={(e) => setEditUser({ ...editUser, name: e.target.value })}
+        {editUser && (
+          <EditUserForm
+            user={editUser}
+            courses={courses}
+            onSave={handleEditComplete}
+            onCancel={() => setEditUser(null)}
           />
-          <TextField
-            margin="dense"
-            label="Email"
-            fullWidth
-            value={editUser?.email || ""}
-            onChange={(e) =>
-              setEditUser({ ...editUser, email: e.target.value })
-            }
-          />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setEditUser(null)}>Cancel</Button>
-          <Button onClick={confirmEdit}>Save</Button>
-        </DialogActions>
+        )}
       </Dialog>
 
       <Dialog open={!!deleteUser} onClose={() => setDeleteUser(null)}>

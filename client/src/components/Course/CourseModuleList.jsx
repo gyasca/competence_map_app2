@@ -28,7 +28,7 @@ function CourseModuleList({ courseCode, onModuleUpdate }) {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedModules, setSelectedModules] = useState([]);
   const [moduleDialogOpen, setModuleDialogOpen] = useState(false);
-  const [deleteSelectedDialogOpen, setDeleteSelectedDialogOpen] = useState(false); // New state
+  const [deleteSelectedDialogOpen, setDeleteSelectedDialogOpen] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {

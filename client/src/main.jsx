@@ -49,6 +49,7 @@ let fonts = [
   '"Apple Color Emoji"',
   '"Segoe UI Emoji"',
   '"Segoe UI Symbol"',
+  '"Righteous"',
 ].join(",");
 
 // Theme for the website, configure it here

@@ -75,101 +75,101 @@ const proOptions = { hideAttribution: true };
 
 // Define a list of 100 distinct colors
 const domainColors = [
-  "#FFD1DC",  // light coral pink
-  "#FFCC99",  // light apricot
-  "#B3E5FC",  // light sky blue
-  "#C8E6C9",  // light mint green
-  "#FFECB3",  // light vanilla
-  "#E1BEE7",  // light lavender
-  "#FFE0B2",  // light peach
-  "#B2DFDB",  // light teal
-  "#FFCDD2",  // light blush pink
-  "#DCEDC8",  // light lime
-  "#F8BBD0",  // light pink
-  "#D1C4E9",  // light purple
-  "#FFAB91",  // light salmon
-  "#C5CAE9",  // light periwinkle
-  "#FFCC80",  // light tangerine
-  "#B3E5FC",  // light baby blue
-  "#D7CCC8",  // light mocha
-  "#FFF59D",  // light lemon
-  "#FFE082",  // light marigold
-  "#FFAB91",  // light coral
-  "#B39DDB",  // light wisteria
-  "#FF8A65",  // light terra cotta
-  "#BCAAA4",  // light taupe
-  "#FF7043",  // light burnt orange
-  "#A5D6A7",  // light mint
-  "#FFCCBC",  // light peach cream
-  "#F48FB1",  // light rose pink
-  "#80DEEA",  // light aqua
-  "#FFEB3B",  // light golden yellow
-  "#C6FF00",  // light chartreuse
-  "#FFEBEE",  // light pink blush
-  "#E1F5FE",  // light sky blue
-  "#E0F7FA",  // light turquoise
-  "#F3E5F5",  // light lavender mist
-  "#FFF3E0",  // light cream orange
-  "#E8F5E9",  // light mint
-  "#FFFDE7",  // light buttercream
-  "#EDE7F6",  // light soft violet
-  "#FBE9E7",  // light apricot blush
-  "#FFEBEE",  // light blush rose
-  "#E3F2FD",  // light baby blue
-  "#FCE4EC",  // light pink foam
-  "#E8EAF6",  // light lavender blue
-  "#FFECB3",  // light banana yellow
-  "#FFE082",  // light light orange
-  "#E8F5E9",  // light pale green
-  "#FFEB3B",  // light sunny yellow
-  "#FFF9C4",  // light light yellow
-  "#D7CCC8",  // light beige
-  "#FFCDD2",  // light rosy pink
-  "#C5CAE9",  // light violet blue
-  "#FFE0B2",  // light apricot cream
-  "#FFCC80",  // light pastel orange
-  "#FFAB91",  // light salmon pink
-  "#D1C4E9",  // light purple haze
-  "#B2DFDB",  // light teal mint
-  "#F8BBD0",  // light pink blush
-  "#DCEDC8",  // light lime sherbet
-  "#FBE9E7",  // light coral peach
-  "#E1BEE7",  // light lavender blush
-  "#C8E6C9",  // light mint green
-  "#B3E5FC",  // light sky blue
-  "#FFECB3",  // light vanilla
-  "#FFCCBC",  // light peach cream
-  "#D7CCC8",  // light taupe
-  "#F8BBD0",  // light pink petal
-  "#B2DFDB",  // light sea foam
-  "#E1F5FE",  // light light blue
-  "#C5CAE9",  // light periwinkle
-  "#FFE0B2",  // light peach
-  "#DCEDC8",  // light lime sherbet
-  "#FFF9C4",  // light buttercream
-  "#FFCCBC",  // light coral peach
-  "#FFECB3",  // light lemon chiffon
-  "#FFE082",  // light goldenrod
-  "#FFAB91",  // light salmon
-  "#D1C4E9",  // light wisteria
-  "#C8E6C9",  // light sea mist
-  "#B3E5FC",  // light baby blue
-  "#FFEBEE",  // light pink blush
-  "#E1F5FE",  // light ice blue
-  "#C5CAE9",  // light lilac blue
-  "#FFE0B2",  // light tangerine
-  "#DCEDC8",  // light pale lime
-  "#FFF9C4",  // light ivory yellow
-  "#FFCCBC",  // light apricot
-  "#FFECB3",  // light banana cream
-  "#FFE082",  // light pastel gold
-  "#FFAB91",  // light peach
-  "#D1C4E9",  // light lavender
-  "#C8E6C9",  // light mint green
-  "#B3E5FC",  // light azure
-  "#FFEBEE",  // light soft pink
-  "#E1F5FE",  // light pale blue
-  "#C5CAE9",  // light pale lilac
+  "#FFD1DC", // light coral pink
+  "#FFCC99", // light apricot
+  "#B3E5FC", // light sky blue
+  "#C8E6C9", // light mint green
+  "#FFECB3", // light vanilla
+  "#E1BEE7", // light lavender
+  "#FFE0B2", // light peach
+  "#B2DFDB", // light teal
+  "#FFCDD2", // light blush pink
+  "#DCEDC8", // light lime
+  "#F8BBD0", // light pink
+  "#D1C4E9", // light purple
+  "#FFAB91", // light salmon
+  "#C5CAE9", // light periwinkle
+  "#FFCC80", // light tangerine
+  "#B3E5FC", // light baby blue
+  "#D7CCC8", // light mocha
+  "#FFF59D", // light lemon
+  "#FFE082", // light marigold
+  "#FFAB91", // light coral
+  "#B39DDB", // light wisteria
+  "#FF8A65", // light terra cotta
+  "#BCAAA4", // light taupe
+  "#FF7043", // light burnt orange
+  "#A5D6A7", // light mint
+  "#FFCCBC", // light peach cream
+  "#F48FB1", // light rose pink
+  "#80DEEA", // light aqua
+  "#FFEB3B", // light golden yellow
+  "#C6FF00", // light chartreuse
+  "#FFEBEE", // light pink blush
+  "#E1F5FE", // light sky blue
+  "#E0F7FA", // light turquoise
+  "#F3E5F5", // light lavender mist
+  "#FFF3E0", // light cream orange
+  "#E8F5E9", // light mint
+  "#FFFDE7", // light buttercream
+  "#EDE7F6", // light soft violet
+  "#FBE9E7", // light apricot blush
+  "#FFEBEE", // light blush rose
+  "#E3F2FD", // light baby blue
+  "#FCE4EC", // light pink foam
+  "#E8EAF6", // light lavender blue
+  "#FFECB3", // light banana yellow
+  "#FFE082", // light light orange
+  "#E8F5E9", // light pale green
+  "#FFEB3B", // light sunny yellow
+  "#FFF9C4", // light light yellow
+  "#D7CCC8", // light beige
+  "#FFCDD2", // light rosy pink
+  "#C5CAE9", // light violet blue
+  "#FFE0B2", // light apricot cream
+  "#FFCC80", // light pastel orange
+  "#FFAB91", // light salmon pink
+  "#D1C4E9", // light purple haze
+  "#B2DFDB", // light teal mint
+  "#F8BBD0", // light pink blush
+  "#DCEDC8", // light lime sherbet
+  "#FBE9E7", // light coral peach
+  "#E1BEE7", // light lavender blush
+  "#C8E6C9", // light mint green
+  "#B3E5FC", // light sky blue
+  "#FFECB3", // light vanilla
+  "#FFCCBC", // light peach cream
+  "#D7CCC8", // light taupe
+  "#F8BBD0", // light pink petal
+  "#B2DFDB", // light sea foam
+  "#E1F5FE", // light light blue
+  "#C5CAE9", // light periwinkle
+  "#FFE0B2", // light peach
+  "#DCEDC8", // light lime sherbet
+  "#FFF9C4", // light buttercream
+  "#FFCCBC", // light coral peach
+  "#FFECB3", // light lemon chiffon
+  "#FFE082", // light goldenrod
+  "#FFAB91", // light salmon
+  "#D1C4E9", // light wisteria
+  "#C8E6C9", // light sea mist
+  "#B3E5FC", // light baby blue
+  "#FFEBEE", // light pink blush
+  "#E1F5FE", // light ice blue
+  "#C5CAE9", // light lilac blue
+  "#FFE0B2", // light tangerine
+  "#DCEDC8", // light pale lime
+  "#FFF9C4", // light ivory yellow
+  "#FFCCBC", // light apricot
+  "#FFECB3", // light banana cream
+  "#FFE082", // light pastel gold
+  "#FFAB91", // light peach
+  "#D1C4E9", // light lavender
+  "#C8E6C9", // light mint green
+  "#B3E5FC", // light azure
+  "#FFEBEE", // light soft pink
+  "#E1F5FE", // light pale blue
+  "#C5CAE9", // light pale lilac
 ];
 
 const DomainButton = styled(Button)(({ theme }) => ({
@@ -386,13 +386,17 @@ const StudentReactFlowCareerMap = ({ courseCode }) => {
   }, [courseCode]);
 
   const handleCertificateUpload = useCallback((newCertificate) => {
-    setCertificates((prevCertificates) => [...prevCertificates, newCertificate]);
+    setCertificates((prevCertificates) => [
+      ...prevCertificates,
+      newCertificate,
+    ]);
   }, []);
 
   useEffect(() => {
     const fetchCertificates = async () => {
       try {
-        const response = await http.get(`/certificate/user/${user.id}`);
+        const response = await http.get(`/certificate/user/${user.userId}`);
+        console.log(response.data);
         setCertificates(response.data);
       } catch (error) {
         console.error("Error fetching certificates:", error);
@@ -424,12 +428,14 @@ const StudentReactFlowCareerMap = ({ courseCode }) => {
         <Grid
           item
           xs={12}
-          md={3}
+          md={2.5}
           style={{ height: "100%", position: "relative" }}
         >
           <LeftSectionPaper elevation={3}>
             <Typography variant="h6" gutterBottom>
-              <strong>{courseCode}</strong><br></br>{course?.name} Curriculum
+              <strong>{courseCode}</strong>
+              <br></br>
+              {course?.name} Curriculum
             </Typography>
             <Typography variant="subtitle2" gutterBottom>
               Domains:
@@ -461,7 +467,7 @@ const StudentReactFlowCareerMap = ({ courseCode }) => {
         <Grid
           item
           xs={12}
-          md={9}
+          md={9.5}
           style={{ height: "100%", position: "relative" }}
         >
           <Paper
@@ -569,6 +575,7 @@ const StudentReactFlowCareerMap = ({ courseCode }) => {
           </Box>
           <Box mt={2}>
             <CertificateUpload
+              userId={user?.userId}
               moduleCode={selectedModule?.moduleCode}
               onUploadSuccess={handleCertificateUpload}
             />

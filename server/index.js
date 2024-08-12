@@ -6,6 +6,10 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+// For file upload
+app.use(express.urlencoded({ extended: false }));
+app.use(express.static('public'));
+
 // Simple Route
 app.get("/", (req, res) => {
   res.send("Test backend working");
@@ -39,6 +43,9 @@ app.use("/courseModule", courseModuleRoute);
 // CRUD certification
 const certificateRoute = require('./routes/certificate');
 app.use("/certificate", certificateRoute);
+
+const fileRoute = require('./routes/file');
+app.use("/file", fileRoute);
 
 const db = require("./models");
 db.sequelize.sync({ alter: true }).then(() => {

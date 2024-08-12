@@ -21,7 +21,7 @@ import HomeIcon from "@mui/icons-material/Home";
 import LoginIcon from "@mui/icons-material/Login";
 import AccountTreeIcon from "@mui/icons-material/AccountTree";
 import SchoolIcon from "@mui/icons-material/School";
-import LogoutIcon from '@mui/icons-material/Logout';
+import LogoutIcon from "@mui/icons-material/Logout";
 import { Link } from "react-router-dom";
 import { UserContext } from "../main";
 import { NavbarProfile } from "./NavbarProfile";
@@ -87,13 +87,13 @@ export function Navbar() {
                   to="/"
                   sx={{
                     marginRight: "1rem",
-                    fontFamily: "'caveat brush'",
+                    fontFamily: "'Righteous', cursive",
                     textTransform: "none",
                     fontSize: "20px",
                     padding: "0",
                   }}
                 >
-                  Competence Map App
+                  CM-APP
                 </Button>
 
                 {/* <Button color="inherit" variant="text" LinkComponent={Link} to="/" sx={{ marginRight: "1rem", fontFamily: "'caveat brush'", textTransform: "none", fontSize: "18px", padding: "0" }}>EnviroGo</Button> */}
@@ -297,13 +297,13 @@ export function Navbar() {
                 to="/"
                 sx={{
                   marginRight: "1rem",
-                  fontFamily: "'caveat brush'",
+                  fontFamily: "'Righteous', cursive",
                   textTransform: "none",
                   fontSize: "20px",
                   padding: "0",
                 }}
               >
-                Competence Map App
+                CM-APP
               </Button>
               <Divider
                 orientation="vertical"

@@ -25,8 +25,10 @@ import {
   DialogActions,
   CircularProgress,
   Pagination,
+  IconButton,
 } from "@mui/material";
 import { styled } from "@mui/system";
+import DeleteIcon from "@mui/icons-material/Delete";
 import http from "../../http";
 
 const CurvyButton = styled(Button)(({ theme }) => ({
@@ -64,12 +66,13 @@ const columnLabelStyle = {
 };
 
 const StyledEdgeButton = {
-  width: "30px",
+  width: "10px",
   height: "30px",
   background: "#eee",
   border: "1px solid #fff",
   cursor: "pointer",
   borderRadius: "50px",
+  padding: "0px",
   fontSize: "12px",
   "&:hover": {
     background: "#f5f5f5",
@@ -81,101 +84,101 @@ const proOptions = { hideAttribution: true };
 
 // Define a list of 100 distinct colors
 const domainColors = [
-  "#FFD1DC",  // light coral pink
-  "#FFCC99",  // light apricot
-  "#B3E5FC",  // light sky blue
-  "#C8E6C9",  // light mint green
-  "#FFECB3",  // light vanilla
-  "#E1BEE7",  // light lavender
-  "#FFE0B2",  // light peach
-  "#B2DFDB",  // light teal
-  "#FFCDD2",  // light blush pink
-  "#DCEDC8",  // light lime
-  "#F8BBD0",  // light pink
-  "#D1C4E9",  // light purple
-  "#FFAB91",  // light salmon
-  "#C5CAE9",  // light periwinkle
-  "#FFCC80",  // light tangerine
-  "#B3E5FC",  // light baby blue
-  "#D7CCC8",  // light mocha
-  "#FFF59D",  // light lemon
-  "#FFE082",  // light marigold
-  "#FFAB91",  // light coral
-  "#B39DDB",  // light wisteria
-  "#FF8A65",  // light terra cotta
-  "#BCAAA4",  // light taupe
-  "#FF7043",  // light burnt orange
-  "#A5D6A7",  // light mint
-  "#FFCCBC",  // light peach cream
-  "#F48FB1",  // light rose pink
-  "#80DEEA",  // light aqua
-  "#FFEB3B",  // light golden yellow
-  "#C6FF00",  // light chartreuse
-  "#FFEBEE",  // light pink blush
-  "#E1F5FE",  // light sky blue
-  "#E0F7FA",  // light turquoise
-  "#F3E5F5",  // light lavender mist
-  "#FFF3E0",  // light cream orange
-  "#E8F5E9",  // light mint
-  "#FFFDE7",  // light buttercream
-  "#EDE7F6",  // light soft violet
-  "#FBE9E7",  // light apricot blush
-  "#FFEBEE",  // light blush rose
-  "#E3F2FD",  // light baby blue
-  "#FCE4EC",  // light pink foam
-  "#E8EAF6",  // light lavender blue
-  "#FFECB3",  // light banana yellow
-  "#FFE082",  // light light orange
-  "#E8F5E9",  // light pale green
-  "#FFEB3B",  // light sunny yellow
-  "#FFF9C4",  // light light yellow
-  "#D7CCC8",  // light beige
-  "#FFCDD2",  // light rosy pink
-  "#C5CAE9",  // light violet blue
-  "#FFE0B2",  // light apricot cream
-  "#FFCC80",  // light pastel orange
-  "#FFAB91",  // light salmon pink
-  "#D1C4E9",  // light purple haze
-  "#B2DFDB",  // light teal mint
-  "#F8BBD0",  // light pink blush
-  "#DCEDC8",  // light lime sherbet
-  "#FBE9E7",  // light coral peach
-  "#E1BEE7",  // light lavender blush
-  "#C8E6C9",  // light mint green
-  "#B3E5FC",  // light sky blue
-  "#FFECB3",  // light vanilla
-  "#FFCCBC",  // light peach cream
-  "#D7CCC8",  // light taupe
-  "#F8BBD0",  // light pink petal
-  "#B2DFDB",  // light sea foam
-  "#E1F5FE",  // light light blue
-  "#C5CAE9",  // light periwinkle
-  "#FFE0B2",  // light peach
-  "#DCEDC8",  // light lime sherbet
-  "#FFF9C4",  // light buttercream
-  "#FFCCBC",  // light coral peach
-  "#FFECB3",  // light lemon chiffon
-  "#FFE082",  // light goldenrod
-  "#FFAB91",  // light salmon
-  "#D1C4E9",  // light wisteria
-  "#C8E6C9",  // light sea mist
-  "#B3E5FC",  // light baby blue
-  "#FFEBEE",  // light pink blush
-  "#E1F5FE",  // light ice blue
-  "#C5CAE9",  // light lilac blue
-  "#FFE0B2",  // light tangerine
-  "#DCEDC8",  // light pale lime
-  "#FFF9C4",  // light ivory yellow
-  "#FFCCBC",  // light apricot
-  "#FFECB3",  // light banana cream
-  "#FFE082",  // light pastel gold
-  "#FFAB91",  // light peach
-  "#D1C4E9",  // light lavender
-  "#C8E6C9",  // light mint green
-  "#B3E5FC",  // light azure
-  "#FFEBEE",  // light soft pink
-  "#E1F5FE",  // light pale blue
-  "#C5CAE9",  // light pale lilac
+  "#FFD1DC", // light coral pink
+  "#FFCC99", // light apricot
+  "#B3E5FC", // light sky blue
+  "#C8E6C9", // light mint green
+  "#FFECB3", // light vanilla
+  "#E1BEE7", // light lavender
+  "#FFE0B2", // light peach
+  "#B2DFDB", // light teal
+  "#FFCDD2", // light blush pink
+  "#DCEDC8", // light lime
+  "#F8BBD0", // light pink
+  "#D1C4E9", // light purple
+  "#FFAB91", // light salmon
+  "#C5CAE9", // light periwinkle
+  "#FFCC80", // light tangerine
+  "#B3E5FC", // light baby blue
+  "#D7CCC8", // light mocha
+  "#FFF59D", // light lemon
+  "#FFE082", // light marigold
+  "#FFAB91", // light coral
+  "#B39DDB", // light wisteria
+  "#FF8A65", // light terra cotta
+  "#BCAAA4", // light taupe
+  "#FF7043", // light burnt orange
+  "#A5D6A7", // light mint
+  "#FFCCBC", // light peach cream
+  "#F48FB1", // light rose pink
+  "#80DEEA", // light aqua
+  "#FFEB3B", // light golden yellow
+  "#C6FF00", // light chartreuse
+  "#FFEBEE", // light pink blush
+  "#E1F5FE", // light sky blue
+  "#E0F7FA", // light turquoise
+  "#F3E5F5", // light lavender mist
+  "#FFF3E0", // light cream orange
+  "#E8F5E9", // light mint
+  "#FFFDE7", // light buttercream
+  "#EDE7F6", // light soft violet
+  "#FBE9E7", // light apricot blush
+  "#FFEBEE", // light blush rose
+  "#E3F2FD", // light baby blue
+  "#FCE4EC", // light pink foam
+  "#E8EAF6", // light lavender blue
+  "#FFECB3", // light banana yellow
+  "#FFE082", // light light orange
+  "#E8F5E9", // light pale green
+  "#FFEB3B", // light sunny yellow
+  "#FFF9C4", // light light yellow
+  "#D7CCC8", // light beige
+  "#FFCDD2", // light rosy pink
+  "#C5CAE9", // light violet blue
+  "#FFE0B2", // light apricot cream
+  "#FFCC80", // light pastel orange
+  "#FFAB91", // light salmon pink
+  "#D1C4E9", // light purple haze
+  "#B2DFDB", // light teal mint
+  "#F8BBD0", // light pink blush
+  "#DCEDC8", // light lime sherbet
+  "#FBE9E7", // light coral peach
+  "#E1BEE7", // light lavender blush
+  "#C8E6C9", // light mint green
+  "#B3E5FC", // light sky blue
+  "#FFECB3", // light vanilla
+  "#FFCCBC", // light peach cream
+  "#D7CCC8", // light taupe
+  "#F8BBD0", // light pink petal
+  "#B2DFDB", // light sea foam
+  "#E1F5FE", // light light blue
+  "#C5CAE9", // light periwinkle
+  "#FFE0B2", // light peach
+  "#DCEDC8", // light lime sherbet
+  "#FFF9C4", // light buttercream
+  "#FFCCBC", // light coral peach
+  "#FFECB3", // light lemon chiffon
+  "#FFE082", // light goldenrod
+  "#FFAB91", // light salmon
+  "#D1C4E9", // light wisteria
+  "#C8E6C9", // light sea mist
+  "#B3E5FC", // light baby blue
+  "#FFEBEE", // light pink blush
+  "#E1F5FE", // light ice blue
+  "#C5CAE9", // light lilac blue
+  "#FFE0B2", // light tangerine
+  "#DCEDC8", // light pale lime
+  "#FFF9C4", // light ivory yellow
+  "#FFCCBC", // light apricot
+  "#FFECB3", // light banana cream
+  "#FFE082", // light pastel gold
+  "#FFAB91", // light peach
+  "#D1C4E9", // light lavender
+  "#C8E6C9", // light mint green
+  "#B3E5FC", // light azure
+  "#FFEBEE", // light soft pink
+  "#E1F5FE", // light pale blue
+  "#C5CAE9", // light pale lilac
 ];
 
 const DomainButton = styled(Button)(({ theme }) => ({
@@ -196,13 +199,29 @@ const CustomNode = ({ data }) => {
     border: "1px solid #b5b5b5",
   };
 
+  const handleStyle = {
+    width: "15px",
+    height: "15px",
+    background: "#fff",
+    border: "2px solid grey",
+    cursor: "cell",
+  };
+
   return (
     <div style={nodeStyle}>
-      <Handle type="target" position={Position.Left} />
+      <Handle
+        type="target"
+        position={Position.Left}
+        style={{ ...handleStyle, left: "-9px" }}
+      />
       <div>{data.label}</div>
       <div>{data.moduleCode}</div>
       <div>CL: {data.tempComplexityLevel}</div>
-      <Handle type="source" position={Position.Right} />
+      <Handle
+        type="source"
+        position={Position.Right}
+        style={{ ...handleStyle, right: "-9px" }}
+      />
     </div>
   );
 };
@@ -243,8 +262,8 @@ const CustomEdge = React.memo(
         <foreignObject
           width={80}
           height={40}
-          x={labelX - 40}
-          y={labelY - 20}
+          x={labelX - 32}
+          y={labelY - 17}
           className="edgebutton-foreignobject"
           requiredExtensions="http://www.w3.org/1999/xhtml"
         >
@@ -288,20 +307,45 @@ const ReactflowCareerMap = ({ courseCode, updateTrigger }) => {
   const [selectedModule, setSelectedModule] = useState(null);
   const [domainList, setDomainList] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const domainsPerPage = 10;
 
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
 
-  const handleClickOpen = useCallback((courseModule) => {
-    setSelectedCourseModule(courseModule);
-    setSelectedModule(modules[courseModule.moduleCode]);
-    setOpen(true);
-  }, [modules]);
+  const handleClickOpen = useCallback(
+    (courseModule) => {
+      setSelectedCourseModule(courseModule);
+      setSelectedModule(modules[courseModule.moduleCode]);
+      setOpen(true);
+    },
+    [modules]
+  );
 
   const handleClose = useCallback(() => {
     setOpen(false);
   }, []);
+
+  const handleDeleteClick = () => {
+    setDeleteDialogOpen(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    try {
+      await http.delete(
+        `/courseModule/course/${courseCode}/module/delete/${selectedCourseModule.id}`
+      );
+      setDeleteDialogOpen(false);
+      setOpen(false);
+      // Refresh the course modules
+      const courseModulesResponse = await http.get(
+        `/courseModule/course/${courseCode}/modules`
+      );
+      setCourseModules(courseModulesResponse.data);
+    } catch (error) {
+      console.error("Error deleting course module:", error);
+    }
+  };
 
   const getDomainColor = useCallback(
     (domain) => {
@@ -757,7 +801,9 @@ const ReactflowCareerMap = ({ courseCode, updateTrigger }) => {
         >
           <LeftSectionPaper elevation={3}>
             <Typography variant="h6" gutterBottom>
-              <strong>{courseCode}</strong><br></br>{course?.name} Curriculum
+              <strong>{courseCode}</strong>
+              <br></br>
+              {course?.name} Curriculum
             </Typography>
             <Typography variant="subtitle2" gutterBottom>
               Domains:
@@ -853,6 +899,13 @@ const ReactflowCareerMap = ({ courseCode, updateTrigger }) => {
       >
         <DialogTitle id="alert-dialog-title">
           {selectedModule?.title}
+          <IconButton
+            aria-label="delete"
+            onClick={handleDeleteClick}
+            sx={{ position: "absolute", right: 8, top: 8, color: "red" }}
+          >
+            <DeleteIcon />
+          </IconButton>
         </DialogTitle>
         <DialogContent>
           <Typography gutterBottom>
@@ -900,6 +953,28 @@ const ReactflowCareerMap = ({ courseCode, updateTrigger }) => {
         <DialogActions>
           <Button onClick={handleClose} color="primary">
             Close
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* // confirm delete dialog */}
+      <Dialog
+        open={deleteDialogOpen}
+        onClose={() => setDeleteDialogOpen(false)}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">Confirm Deletion</DialogTitle>
+        <DialogContent>
+          <Typography>
+            Are you sure you want to delete this module from the course? This
+            action cannot be undone.
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setDeleteDialogOpen(false)}>Cancel</Button>
+          <Button onClick={handleDeleteConfirm} color="error">
+            Delete
           </Button>
         </DialogActions>
       </Dialog>

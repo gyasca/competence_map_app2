@@ -22,6 +22,7 @@ import {
   Paper,
   Typography,
   Button,
+  IconButton,
   Box,
   Dialog,
   DialogTitle,
@@ -30,12 +31,15 @@ import {
   CircularProgress,
   Pagination,
 } from "@mui/material";
+import DeleteIcon from '@mui/icons-material/Delete';
 import { styled } from "@mui/system";
 import http from "../../http";
 import { UserContext } from "../../main";
 import { validateUser } from "../../functions/user";
 import { Navigate } from "react-router-dom";
 import CertificateUpload from "../Certificate/CertificateUpload";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const CurvyButton = styled(Button)(({ theme }) => ({
   borderRadius: "20px",
@@ -235,6 +239,7 @@ const CertificateItem = styled(Box)(({ theme }) => ({
   maxWidth: "200px",
   marginRight: theme.spacing(2),
   textAlign: "center",
+  position: "relative",
 }));
 
 const CertificateImage = styled("img")({
@@ -243,6 +248,16 @@ const CertificateImage = styled("img")({
   objectFit: "cover",
   borderRadius: "8px",
 });
+
+const DeleteButton = styled(IconButton)(({ theme }) => ({
+  position: "absolute",
+  top: 0,
+  right: 0,
+  backgroundColor: "rgba(255, 255, 255, 0.7)",
+  "&:hover": {
+    backgroundColor: "rgba(255, 255, 255, 0.9)",
+  },
+}));
 
 const StudentReactFlowCareerMap = ({ courseCode }) => {
   const [courseModules, setCourseModules] = useState([]);
@@ -426,6 +441,32 @@ const StudentReactFlowCareerMap = ({ courseCode }) => {
     ]);
   }, []);
 
+  const handleDeleteCertificate = useCallback(async (certificateId, filePath) => {
+    try {
+      // First, delete the certificate record from the database
+      await http.delete(`/certificate/${certificateId}`);
+      
+      // Then, delete the associated file
+      await http.delete(`/file/delete/folder/certificates/file/${filePath}`);
+      
+      // Update the local state to remove the deleted certificate
+      setCertificates((prevCertificates) =>
+        prevCertificates.filter((cert) => cert.id !== certificateId)
+      );
+      
+      console.log(`Certificate ${certificateId} and associated file deleted successfully`);
+      toast.success("Certificate deleted successfully");
+    } catch (error) {
+      console.error("Error deleting certificate:", error);
+      if (error.response) {
+        console.error("Error response:", error.response.data);
+        toast.error(`Deletion failed: ${error.response.data.message || error.response.data.error || "Unknown error"}`);
+      } else {
+        toast.error("Deletion failed. Please try again.");
+      }
+    }
+  }, []);
+
   // horizontal cert list
   const renderCertificates = useCallback(() => {
     if (!selectedModule) return null;
@@ -452,22 +493,23 @@ const StudentReactFlowCareerMap = ({ courseCode }) => {
               }/uploads/certificates/${cert.filePath}`}
               alt={cert.title}
             />
+            <DeleteButton
+              onClick={() => handleDeleteCertificate(cert.id, cert.filePath)}
+              size="small"
+            >
+              <DeleteIcon />
+            </DeleteButton>
             <Typography variant="subtitle2" noWrap>
               {cert.title}
             </Typography>
             <Typography variant="caption">
               {new Date(cert.createdAt).toLocaleDateString()}
             </Typography>
-            <Typography>
-              {import.meta.env.VITE_FILE_BASE_URL +
-                "/certificates/" +
-                cert.filePath}
-            </Typography>
           </CertificateItem>
         ))}
       </CertificateScroll>
     );
-  }, [selectedModule, certificates]);
+  }, [selectedModule, certificates, handleDeleteCertificate]);
 
   useEffect(() => {
     const fetchCertificates = async () => {
@@ -614,10 +656,6 @@ const StudentReactFlowCareerMap = ({ courseCode }) => {
           </Typography>
           <Typography gutterBottom>
             <strong>School:</strong> {selectedModule?.school}
-          </Typography>
-          <Typography gutterBottom>
-            <strong>Prerequisite:</strong>{" "}
-            {selectedModule?.prerequisite || "None"}
           </Typography>
           <Typography gutterBottom>
             <strong>Complexity Level:</strong>{" "}

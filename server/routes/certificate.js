@@ -114,7 +114,7 @@ router.put("/:id", validateToken, async (req, res) => {
 router.delete("/:id", validateToken, async (req, res) => {
   try {
     const deleted = await Certificate.destroy({
-      where: { id: req.params.id, userId: req.user.id },
+      where: { id: req.params.id },
     });
     if (deleted) {
       res.status(204).send();

@@ -17,7 +17,7 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import http from "../../http";
 
-const MAX_FILE_SIZE = 1024 * 1024; // 1MB
+const MAX_FILE_SIZE = 2048 * 2048; // 1MB
 const FOLDER_NAME = "certificates"; // Folder name for certificate uploads
 const FILE_BASE_URL = import.meta.env.VITE_FILE_BASE_URL;
 
@@ -95,7 +95,7 @@ const CertificateUpload = ({ userId, moduleCode, onUploadSuccess, onClose }) => 
   useEffect(() => {
     fileRejections.forEach(({ file, errors }) => {
       if (errors[0]?.code === "file-too-large") {
-        toast.error(`File is larger than 1MB`);
+        toast.error(`File is larger than 2MB`);
       } else if (errors[0]?.code === "file-invalid-type") {
         toast.error(`File type must be .jpeg, .jpg, .png, .gif, or .pdf`);
       } else {

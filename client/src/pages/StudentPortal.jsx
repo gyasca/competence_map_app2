@@ -109,13 +109,14 @@ const StudentPortal = () => {
             count: `${modulesCompleted}/${totalModules}`,
             color: "#2196F3",
           },
-          { label: "Current GPA", count: gpa, color: "#9C27B0" },
           {
             label: "Credits Completed",
             count: `${creditsCompleted}/${totalCredits}`,
             color: "#FF9800",
           },
-          { label: "CCA Points", count: ccaPoints, color: "#795548" },
+          // { label: "Current GPA", count: gpa, color: "#9C27B0" },
+
+          // { label: "CCA Points", count: ccaPoints, color: "#795548" },
         ]);
         setIsLoading(false);
       } catch (error) {

@@ -55,18 +55,18 @@ module.exports = (sequelize, DataTypes) => {
   });
 
   User.associate = (models) => {
-    User.hasMany(models.Resume, {
-      foreignKey: "userId",
-      onDelete: "cascade"
-    });
-    User.hasMany(models.StudentModuleEnrollment, {
-      foreignKey: "userId",
-      onDelete: "cascade"
-    });
-    User.hasMany(models.CourseEnrollment, {
-      foreignKey: "userId",
-      onDelete: "cascade"
-    });
+    // User.hasMany(models.Resume, {
+    //   foreignKey: "userId",
+    //   onDelete: "cascade"
+    // });
+    // User.hasMany(models.StudentModuleEnrollment, {
+    //   foreignKey: "userId",
+    //   onDelete: "cascade"
+    // });
+    // User.hasMany(models.CourseEnrollment, {
+    //   foreignKey: "userId",
+    //   onDelete: "cascade"
+    // });
     User.hasMany(models.Certificate, {
       foreignKey: "userId",
       onDelete: "cascade"

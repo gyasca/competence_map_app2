@@ -49,10 +49,10 @@ module.exports = (sequelize, DataTypes) => {
   });
 
   Module.associate = (models) => {
-    Module.hasMany(models.StudentModuleEnrollment, {
-      foreignKey: "moduleCode",
-      onDelete: "cascade",
-    });
+    // Module.hasMany(models.StudentModuleEnrollment, {
+    //   foreignKey: "moduleCode",
+    //   onDelete: "cascade",
+    // });
     Module.hasMany(models.Certificate, {
       foreignKey: "moduleCode",
       onDelete: "cascade",
@@ -61,10 +61,10 @@ module.exports = (sequelize, DataTypes) => {
       through: models.CourseModule,
       foreignKey: "moduleCode",
     });
-    Module.hasMany(models.CompetencyMapModule, {
-      foreignKey: "moduleCode",
-      onDelete: "cascade",
-    });
+    // Module.hasMany(models.CompetencyMapModule, {
+    //   foreignKey: "moduleCode",
+    //   onDelete: "cascade",
+    // });
   };
 
   return Module;

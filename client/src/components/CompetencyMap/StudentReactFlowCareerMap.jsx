@@ -578,6 +578,7 @@ const StudentReactFlowCareerMap = ({ courseCode }) => {
               userId={user?.userId}
               moduleCode={selectedModule?.moduleCode}
               onUploadSuccess={handleCertificateUpload}
+              onClose={handleClose}
             />
           </Box>
         </DialogContent>

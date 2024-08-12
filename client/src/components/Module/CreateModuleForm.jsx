@@ -1,8 +1,18 @@
 import React from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
-import { Box, Button, TextField, Typography, Grid, Paper } from "@mui/material";
+import {
+  Box,
+  Button,
+  TextField,
+  Grid,
+  Typography,
+  IconButton,
+  Paper,
+} from "@mui/material";
 import { useNavigate } from "react-router-dom";
+import AddIcon from "@mui/icons-material/Add";
+import DeleteIcon from "@mui/icons-material/Delete";
 import http from "../../http";
 
 const validationSchema = Yup.object({
@@ -12,6 +22,7 @@ const validationSchema = Yup.object({
   school: Yup.string().required("School is required"),
   credit: Yup.number().required("Credit is required").positive().integer(),
   domain: Yup.string().required("Domain is required"),
+  certifications: Yup.array().of(Yup.string()),
 });
 
 function CreateModuleForm() {
@@ -25,8 +36,7 @@ function CreateModuleForm() {
       school: "",
       credit: "",
       domain: "",
-      prevModule: "",
-      nextModule: "",
+      certifications: [],
     },
     validationSchema: validationSchema,
     onSubmit: async (values) => {
@@ -39,10 +49,29 @@ function CreateModuleForm() {
     },
   });
 
+  const handleAddCertification = () => {
+    formik.setFieldValue("certifications", [
+      ...formik.values.certifications,
+      "",
+    ]);
+  };
+
+  const handleRemoveCertification = (index) => {
+    const newCertifications = [...formik.values.certifications];
+    newCertifications.splice(index, 1);
+    formik.setFieldValue("certifications", newCertifications);
+  };
+
+  const handleCertificationChange = (index, value) => {
+    const newCertifications = [...formik.values.certifications];
+    newCertifications[index] = value;
+    formik.setFieldValue("certifications", newCertifications);
+  };
+
   return (
-    <Box sx={{ mx: "auto", mt: 4 }}>
+    <Box sx={{ mx: "auto", mt: 8, mb: 4 }}>
       <Typography variant="h4" gutterBottom>
-        Create New Module
+        Create Individual Module
       </Typography>
       <Paper elevation={3} sx={{ p: 3 }}>
         <form onSubmit={formik.handleSubmit}>
@@ -55,12 +84,8 @@ function CreateModuleForm() {
                 label="Module Code"
                 value={formik.values.moduleCode}
                 onChange={formik.handleChange}
-                error={
-                  formik.touched.moduleCode && Boolean(formik.errors.moduleCode)
-                }
-                helperText={
-                  formik.touched.moduleCode && formik.errors.moduleCode
-                }
+                error={formik.touched.moduleCode && Boolean(formik.errors.moduleCode)}
+                helperText={formik.touched.moduleCode && formik.errors.moduleCode}
               />
             </Grid>
             <Grid item xs={12} sm={6}>
@@ -85,13 +110,8 @@ function CreateModuleForm() {
                 rows={4}
                 value={formik.values.description}
                 onChange={formik.handleChange}
-                error={
-                  formik.touched.description &&
-                  Boolean(formik.errors.description)
-                }
-                helperText={
-                  formik.touched.description && formik.errors.description
-                }
+                error={formik.touched.description && Boolean(formik.errors.description)}
+                helperText={formik.touched.description && formik.errors.description}
               />
             </Grid>
             <Grid item xs={12} sm={6}>
@@ -119,7 +139,7 @@ function CreateModuleForm() {
                 helperText={formik.touched.credit && formik.errors.credit}
               />
             </Grid>
-            <Grid item xs={12} sm={12}>
+            <Grid item xs={12}>
               <TextField
                 fullWidth
                 id="domain"
@@ -131,40 +151,30 @@ function CreateModuleForm() {
                 helperText={formik.touched.domain && formik.errors.domain}
               />
             </Grid>
-            {/* <Grid item xs={12} sm={6}>
-              <TextField
-                fullWidth
-                id="prevModule"
-                name="prevModule"
-                label="Previous Module"
-                value={formik.values.prevModule}
-                onChange={formik.handleChange}
-                error={
-                  formik.touched.prevModule &&
-                  Boolean(formik.errors.prevModule)
-                }
-                helperText={
-                  formik.touched.prevModule && formik.errors.prevModule
-                }
-              />
-            </Grid> */}
-            {/* <Grid item xs={12} sm={6}>
-              <TextField
-                fullWidth
-                id="nextModule"
-                name="nextModule"
-                label="Next Module"
-                value={formik.values.nextModule}
-                onChange={formik.handleChange}
-                error={
-                  formik.touched.nextModule &&
-                  Boolean(formik.errors.nextModule)
-                }
-                helperText={
-                  formik.touched.nextModule && formik.errors.nextModule
-                }
-              />
-            </Grid> */}
+            <Grid item xs={12}>
+              <Typography variant="subtitle1">Certifications</Typography>
+              {formik.values.certifications.map((certification, index) => (
+                <Box key={index} display="flex" alignItems="center" mb={1}>
+                  <TextField
+                    fullWidth
+                    value={certification}
+                    onChange={(e) => handleCertificationChange(index, e.target.value)}
+                    label={`Certification ${index + 1}`}
+                  />
+                  <IconButton onClick={() => handleRemoveCertification(index)}>
+                    <DeleteIcon />
+                  </IconButton>
+                </Box>
+              ))}
+              <Button
+                startIcon={<AddIcon />}
+                onClick={handleAddCertification}
+                variant="outlined"
+                sx={{ mt: 1 }}
+              >
+                Add Certification
+              </Button>
+            </Grid>
           </Grid>
           <Box sx={{ mt: 2, display: "flex", justifyContent: "flex-end" }}>
             <Button

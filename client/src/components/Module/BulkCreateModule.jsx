@@ -80,8 +80,8 @@ function BulkCreateModule() {
 
   return (
     <Box sx={{ width: "100%", mx: "auto" }}>
-      <Typography variant="h6" sx={{ mb: 2 }}>
-        Create modules in bulk
+      <Typography variant="h4" gutterBottom>
+        Add Modules in Bulk (From Excel Spreadsheet File)
       </Typography>
       <Box
         sx={{

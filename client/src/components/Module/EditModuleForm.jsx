@@ -7,8 +7,12 @@ import {
   TextField,
   Grid,
   CircularProgress,
+  Typography,
+  IconButton,
 } from "@mui/material";
 import { useNavigate, useParams } from "react-router-dom";
+import AddIcon from "@mui/icons-material/Add";
+import DeleteIcon from "@mui/icons-material/Delete";
 import http from '../../http';
 
 const validationSchema = Yup.object({
@@ -18,6 +22,7 @@ const validationSchema = Yup.object({
   school: Yup.string().required("School is required"),
   credit: Yup.number().required("Credit is required").positive().integer(),
   domain: Yup.string().required("Domain is required"),
+  certifications: Yup.array().of(Yup.string()),
 });
 
 function EditModuleForm({ module: propModule, onClose }) {
@@ -51,7 +56,7 @@ function EditModuleForm({ module: propModule, onClose }) {
       school: module.school,
       credit: module.credit,
       domain: module.domain,
-      prerequisite: module.prerequisite,
+      certifications: module.certifications || [],
     } : {
       moduleCode: "",
       title: "",
@@ -59,7 +64,7 @@ function EditModuleForm({ module: propModule, onClose }) {
       school: "",
       credit: "",
       domain: "",
-      prerequisite: "",
+      certifications: [],
     },
     validationSchema: validationSchema,
     onSubmit: async (values) => {
@@ -76,14 +81,33 @@ function EditModuleForm({ module: propModule, onClose }) {
     },
   });
 
+  const handleAddCertification = () => {
+    formik.setFieldValue("certifications", [
+      ...formik.values.certifications,
+      "",
+    ]);
+  };
+
+  const handleRemoveCertification = (index) => {
+    const newCertifications = [...formik.values.certifications];
+    newCertifications.splice(index, 1);
+    formik.setFieldValue("certifications", newCertifications);
+  };
+
+  const handleCertificationChange = (index, value) => {
+    const newCertifications = [...formik.values.certifications];
+    newCertifications[index] = value;
+    formik.setFieldValue("certifications", newCertifications);
+  };
+
   if (loading) {
     return <CircularProgress />;
   }
 
   return (
-    <Box sx={{ maxWidth: 800, mx: "auto", mt: 4 }}>
+    <Box sx={{ maxWidth: 800, mx: "auto", mt: 4, height: '100%', display: 'flex', flexDirection: 'column' }}>
       <form onSubmit={formik.handleSubmit}>
-      <Grid container spacing={2}>
+        <Grid container spacing={2}>
           <Grid item xs={12} sm={6}>
             <TextField
               fullWidth
@@ -148,7 +172,7 @@ function EditModuleForm({ module: propModule, onClose }) {
               helperText={formik.touched.credit && formik.errors.credit}
             />
           </Grid>
-          <Grid item xs={12} sm={6}>
+          <Grid item xs={12}>
             <TextField
               fullWidth
               id="domain"
@@ -160,17 +184,29 @@ function EditModuleForm({ module: propModule, onClose }) {
               helperText={formik.touched.domain && formik.errors.domain}
             />
           </Grid>
-          <Grid item xs={12} sm={6}>
-            <TextField
-              fullWidth
-              id="prerequisite"
-              name="prerequisite"
-              label="Prerequisite"
-              value={formik.values.prerequisite}
-              onChange={formik.handleChange}
-              error={formik.touched.prerequisite && Boolean(formik.errors.prerequisite)}
-              helperText={formik.touched.prerequisite && formik.errors.prerequisite}
-            />
+          <Grid item xs={12}>
+            <Typography variant="subtitle1">Certifications</Typography>
+            {formik.values.certifications.map((certification, index) => (
+              <Box key={index} display="flex" alignItems="center" mb={1}>
+                <TextField
+                  fullWidth
+                  value={certification}
+                  onChange={(e) => handleCertificationChange(index, e.target.value)}
+                  label={`Certification ${index + 1}`}
+                />
+                <IconButton onClick={() => handleRemoveCertification(index)}>
+                  <DeleteIcon />
+                </IconButton>
+              </Box>
+            ))}
+            <Button
+              startIcon={<AddIcon />}
+              onClick={handleAddCertification}
+              variant="outlined"
+              sx={{ mt: 1 }}
+            >
+              Add Certification
+            </Button>
           </Grid>
         </Grid>
         <Box sx={{ mt: 2, display: 'flex', justifyContent: 'flex-end' }}>

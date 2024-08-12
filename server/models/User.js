@@ -67,10 +67,15 @@ module.exports = (sequelize, DataTypes) => {
       foreignKey: "userId",
       onDelete: "cascade"
     });
-    User.hasMany(models.ObtainedCertification, {
+    User.hasMany(models.Certificate, {
       foreignKey: "userId",
       onDelete: "cascade"
     });
+    // Deprecated
+    // User.hasMany(models.ObtainedCertification, {
+    //   foreignKey: "userId",
+    //   onDelete: "cascade"
+    // });
   };
 
   return User;

@@ -35,6 +35,7 @@ import http from "../../http";
 import { UserContext } from "../../main";
 import { validateUser } from "../../functions/user";
 import { Navigate } from "react-router-dom";
+import CertificateUpload from "../Certificate/CertificateUpload";
 
 const CurvyButton = styled(Button)(({ theme }) => ({
   borderRadius: "20px",
@@ -220,6 +221,7 @@ const StudentReactFlowCareerMap = ({ courseCode }) => {
   const [selectedCourseModule, setSelectedCourseModule] = useState(null);
   const [domainList, setDomainList] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
+  const [certificates, setCertificates] = useState([]);
   const domainsPerPage = 8;
 
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
@@ -383,6 +385,25 @@ const StudentReactFlowCareerMap = ({ courseCode }) => {
     fetchCourseAndModules();
   }, [courseCode]);
 
+  const handleCertificateUpload = useCallback((newCertificate) => {
+    setCertificates((prevCertificates) => [...prevCertificates, newCertificate]);
+  }, []);
+
+  useEffect(() => {
+    const fetchCertificates = async () => {
+      try {
+        const response = await http.get(`/certificate/user/${user.id}`);
+        setCertificates(response.data);
+      } catch (error) {
+        console.error("Error fetching certificates:", error);
+      }
+    };
+
+    if (user) {
+      fetchCertificates();
+    }
+  }, [user]);
+
   useEffect(() => {
     if (initialNodes.length > 0) {
       setNodes(initialNodes);
@@ -533,6 +554,25 @@ const StudentReactFlowCareerMap = ({ courseCode }) => {
               ? selectedModule.certifications
               : "None"}
           </Typography>
+
+          <Box mt={2}>
+            <Typography variant="h6" gutterBottom>
+              Your Certificates
+            </Typography>
+            {certificates
+              .filter((cert) => cert.moduleCode === selectedModule?.moduleCode)
+              .map((cert) => (
+                <Typography key={cert.id}>
+                  {cert.title} - {new Date(cert.createdAt).toLocaleDateString()}
+                </Typography>
+              ))}
+          </Box>
+          <Box mt={2}>
+            <CertificateUpload
+              moduleCode={selectedModule?.moduleCode}
+              onUploadSuccess={handleCertificateUpload}
+            />
+          </Box>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose} color="primary">

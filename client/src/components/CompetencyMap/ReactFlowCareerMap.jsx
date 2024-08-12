@@ -297,7 +297,7 @@ const ReactflowCareerMap = ({ courseCode, updateTrigger }) => {
     setSelectedCourseModule(courseModule);
     setSelectedModule(modules[courseModule.moduleCode]);
     setOpen(true);
-  }, []);
+  }, [modules]);
 
   const handleClose = useCallback(() => {
     setOpen(false);

@@ -12,10 +12,10 @@ module.exports = (sequelize, DataTypes) => {
       },
     });
   
-    ObtainedCertification.associate = (models) => {
-      ObtainedCertification.belongsTo(models.User, { foreignKey: 'userId' });
-      ObtainedCertification.belongsTo(models.Certificate);
-    };
+    // ObtainedCertification.associate = (models) => {
+    //   ObtainedCertification.belongsTo(models.User, { foreignKey: 'userId' });
+    //   ObtainedCertification.belongsTo(models.Certificate);
+    // };
   
     return ObtainedCertification;
   };

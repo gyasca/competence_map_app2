@@ -155,7 +155,7 @@ const CertificateUpload = ({ userId, moduleCode, onUploadSuccess, onClose }) => 
       try {
         await http.delete(`/file/delete/folder/${FOLDER_NAME}/file/${uploadedFile.filename}`);
         setUploadedFile(null);
-        toast.success("Uploaded file deleted successfully");
+        toast.success("File deleted successfully");
       } catch (error) {
         console.error("Error deleting uploaded file:", error);
         toast.error("Failed to delete uploaded file");
@@ -168,7 +168,7 @@ const CertificateUpload = ({ userId, moduleCode, onUploadSuccess, onClose }) => 
       // Clean up function to delete the uploaded file when the component unmounts
       if (uploadedFile) {
         http.delete(`/file/delete/folder/${FOLDER_NAME}/file/${uploadedFile.filename}`)
-          .then(() => console.log("Uploaded file deleted successfully"))
+          .then(() => console.log("Unsent file deleted successfully"))
           .catch((error) => console.error("Error deleting uploaded file:", error));
       }
     };
@@ -176,7 +176,7 @@ const CertificateUpload = ({ userId, moduleCode, onUploadSuccess, onClose }) => 
 
   return (
     <Card sx={{boxShadow: "rgba(0, 0, 0, 0.05) 0px 6px 24px 0px, rgba(0, 0, 0, 0.08) 0px 0px 0px 1px;", padding: 1}}>
-      <CardContent>
+      <CardContent sx={{mb: 2}}>
         <Typography variant="subtitle1" gutterBottom>
           Upload Certificate
         </Typography>
@@ -241,6 +241,7 @@ const CertificateUpload = ({ userId, moduleCode, onUploadSuccess, onClose }) => 
           variant="contained" 
           disabled={!uploadedFile || uploading}
           fullWidth
+          sx={{borderRadius: "8px 8px 15px 15px"}}
         >
           SUBMIT CERTIFICATE
         </Button>

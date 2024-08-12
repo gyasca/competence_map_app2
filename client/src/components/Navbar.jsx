@@ -22,6 +22,7 @@ import LoginIcon from "@mui/icons-material/Login";
 import AccountTreeIcon from "@mui/icons-material/AccountTree";
 import SchoolIcon from "@mui/icons-material/School";
 import LogoutIcon from "@mui/icons-material/Logout";
+import GradeIcon from '@mui/icons-material/Grade';
 import { Link } from "react-router-dom";
 import { UserContext } from "../main";
 import { NavbarProfile } from "./NavbarProfile";
@@ -218,6 +219,22 @@ export function Navbar() {
                         Basic modules list
                       </Button>
                     </Stack> */}
+
+                    <Stack
+                      spacing={2}
+                      direction="row"
+                      sx={{ display: ["none", "none", "flex"] }}
+                    >
+                      <Button
+                        startIcon={<GradeIcon />}
+                        LinkComponent={Link}
+                        variant="text"
+                        color="inherit"
+                        to="/certificates"
+                      >
+                        Certificates
+                      </Button>
+                    </Stack>
 
                     <Stack
                       spacing={2}

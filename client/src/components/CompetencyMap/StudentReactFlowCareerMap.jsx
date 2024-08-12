@@ -630,6 +630,9 @@ const StudentReactFlowCareerMap = ({ courseCode }) => {
 
   return (
     <Container maxWidth="xl" sx={{ marginTop: "2rem", height: "80vh" }}>
+      <Typography variant="h4" gutterBottom sx={{fontWeight: "bold"}}>
+        My Competence Map
+      </Typography>
       <Grid container spacing={4} style={{ height: "100%" }}>
         <Grid
           item

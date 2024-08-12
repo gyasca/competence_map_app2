@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useContext, useEffect } from "react";
 import {
   Container,
   Box,
@@ -11,6 +11,8 @@ import {
 } from "@mui/material";
 import { makeStyles } from "@mui/styles";
 import HeroText from "./HeroText";
+import { Link } from "react-router-dom";
+import { UserContext } from "../main";
 
 const useStyles = makeStyles((theme) => ({
   hero: {
@@ -61,6 +63,7 @@ const useStyles = makeStyles((theme) => ({
 
 const LandingPage = () => {
   const classes = useStyles();
+  const { user } = useContext(UserContext);
 
   useEffect(() => {
     document.title = "CM App - Competence Mapping";
@@ -81,19 +84,39 @@ const LandingPage = () => {
         <Box className={classes.blurredBackground} /> {/* New element */}
         <Box className={classes.content}>
           <Typography variant="h2" component="h1" gutterBottom>
-            Welcome to NYP CM App
+            Welcome to NYP CM-APP
           </Typography>
           <Typography variant="h5" component="p" gutterBottom>
             Your ultimate competence mapping solution
           </Typography>
-          <Button
-            variant="contained"
-            color="white"
-            sx={{ color: "primary.main" }}
-            size="large"
-          >
-            Get Started
-          </Button>
+          {!user ? (
+            <>
+              <Button
+                component={Link}
+                variant="contained"
+                color="white"
+                sx={{ color: "primary.main" }}
+                size="large"
+                to="/login"
+              >
+                Get Started - Login to CM-APP
+              </Button>
+            </>
+          ) : (
+            <>
+              {/* Render a different button or content if user is logged in */}
+              <Button
+                component={Link}
+                variant="contained"
+                color="white"
+                sx={{ color: "primary.main" }}
+                size="large"
+                to="/studentportal"
+              >
+                Student Portal
+              </Button>
+            </>
+          )}
         </Box>
       </Box>
       {/* End of old hero text and background together */}
@@ -103,17 +126,21 @@ const LandingPage = () => {
           <Grid item xs={12} md={4}>
             <Paper elevation={3} className={classes.featureItem}>
               <Typography variant="h6" component="h3">
-                Skill map
+                Competence map
               </Typography>
-              <Typography variant="body1">Check out competencies gained in a skill web!.</Typography>
+              <Typography variant="body1">
+                Check out competencies gained in a web of modules.
+              </Typography>
             </Paper>
           </Grid>
           <Grid item xs={12} md={4}>
             <Paper elevation={3} className={classes.featureItem}>
               <Typography variant="h6" component="h3">
-                Skill progression
+                Certificate Gallery
               </Typography>
-              <Typography variant="body1">Progression of modules and certifications obtained.</Typography>
+              <Typography variant="body1">
+                Keep track of obtained certificates easily here.
+              </Typography>
             </Paper>
           </Grid>
           <Grid item xs={12} md={4}>
@@ -121,7 +148,9 @@ const LandingPage = () => {
               <Typography variant="h6" component="h3">
                 AI Resume
               </Typography>
-              <Typography variant="body1">Automatically generate resume based on competencies.</Typography>
+              <Typography variant="body1">
+                Automatically generate resume based on competencies.
+              </Typography>
             </Paper>
           </Grid>
         </Grid>

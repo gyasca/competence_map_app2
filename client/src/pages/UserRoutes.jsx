@@ -1,17 +1,18 @@
-import { useContext, useEffect } from 'react'
-import { Route, Routes, Navigate } from 'react-router-dom'
-import NotFound from './errors/NotFound'
-import Home from './Home'
-import Login from './Login'
-import Map from './Map'
-import StudentPortal from './StudentPortal'
-import ViewSpecialSkillMap from './ViewSpecialSkillMap'
-import ViewSkillMap from './ViewSkillMap'
-import ViewSkillMap2 from './ViewSkillMap2'
-import Dashboard from './Dashboard'
-import Test1 from './Test1'
-import Register from './Register'
-import StudentCompetenceMapPage from './StudentCompetenceMapPage'
+import { useContext, useEffect } from "react";
+import { Route, Routes, Navigate } from "react-router-dom";
+import NotFound from "./errors/NotFound";
+import Home from "./Home";
+import Login from "./Login";
+import Map from "./Map";
+import StudentPortal from "./StudentPortal";
+import ViewSpecialSkillMap from "./ViewSpecialSkillMap";
+import ViewSkillMap from "./ViewSkillMap";
+import ViewSkillMap2 from "./ViewSkillMap2";
+import Dashboard from "./Dashboard";
+import Test1 from "./Test1";
+import Register from "./Register";
+import StudentCompetenceMapPage from "./StudentCompetenceMapPage";
+import ViewCertificates from "./ViewCertificates";
 // import Login from './Login'
 // import Register from './Register'
 // import Verify from './Verify'
@@ -27,39 +28,38 @@ import StudentCompetenceMapPage from './StudentCompetenceMapPage'
 // import CartRoutes from './cart/CartRoutes'
 // import Wishlist from './wishlist/ViewWishlist'
 // import About from './About'
-import { UserContext } from '../main'
-
-
+import { UserContext } from "../main";
 
 function UserRoutes() {
-    // Routes for admin pages. To add authenication so that only admins can access these pages, add a check for the user's role in the UserContext
-    const { setIsAdminPage } = useContext(UserContext);
-    const { user } = useContext(UserContext);
+  // Routes for admin pages. To add authenication so that only admins can access these pages, add a check for the user's role in the UserContext
+  const { setIsAdminPage } = useContext(UserContext);
+  const { user } = useContext(UserContext);
 
-    useEffect(() => {
-        setIsAdminPage(false)
-    }, [])
-    return (
-        <Routes>
-            <Route path='*' element={<NotFound />} />
-            <Route path="/" element={<Home />} />
-            <Route path="/register" element={<Register />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/map" element={<Map />} />
-            <Route path="/studentportal" element={<StudentPortal />} />
-            <Route path="/skillmapspecial" element={<ViewSpecialSkillMap />} />
-            <Route path="/skillmap" element={<ViewSkillMap />} />
-            <Route path="/skillmap2" element={<ViewSkillMap2 />} />
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/test1" element={<Test1 />} />
+  useEffect(() => {
+    setIsAdminPage(false);
+  }, []);
+  return (
+    <Routes>
+      <Route path="*" element={<NotFound />} />
+      <Route path="/" element={<Home />} />
+      <Route path="/register" element={<Register />} />
+      <Route path="/login" element={<Login />} />
+      <Route path="/map" element={<Map />} />
+      <Route path="/studentportal" element={<StudentPortal />} />
+      <Route path="/skillmapspecial" element={<ViewSpecialSkillMap />} />
+      <Route path="/skillmap" element={<ViewSkillMap />} />
+      <Route path="/skillmap2" element={<ViewSkillMap2 />} />
+      <Route path="/dashboard" element={<Dashboard />} />
+      <Route path="/test1" element={<Test1 />} />
 
-            {/* Final skill map page */}
-            <Route path="/competence-map" element={<StudentCompetenceMapPage />} />
+      {/* Final skill map page */}
+      <Route path="/competence-map" element={<StudentCompetenceMapPage />} />
 
+      {/* Final skill map page */}
+      <Route path="/certificates" element={<ViewCertificates />} />
 
-
-            {/* <Route path="/register" element={<Register />} /> */}
-            {/* <Route path="/login" element={!user ? <Login /> : <Navigate to={"/"} />} />
+      {/* <Route path="/register" element={<Register />} /> */}
+      {/* <Route path="/login" element={!user ? <Login /> : <Navigate to={"/"} />} />
             <Route path="/register" element={!user ? <Register /> : <Navigate to={"/"} />} />
             <Route path="/test" element={<Test />} />
             <Route path="/verify" element={<Verify />} />
@@ -76,8 +76,8 @@ function UserRoutes() {
             <Route path="/riderequests/*" element={<RiderRoutes />} />
             <Route path="/wishlist" element={<Wishlist/>} />
             <Route path="/about" element={<About />} /> */}
-        </Routes>
-    )
+    </Routes>
+  );
 }
 
-export default UserRoutes
+export default UserRoutes;

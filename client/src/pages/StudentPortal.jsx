@@ -71,20 +71,37 @@ const StudentPortal = () => {
         );
         const userResponse = await http.get(`/user/${user.userId}`);
 
-        const certificatesCount = certificatesResponse.data.length;
-        const modulesCompleted = modulesResponse.data.filter(
-          (module) => module.completed
-        ).length;
-        const totalModules = modulesResponse.data.length;
-        const gpa = userResponse.data.gpa || "N/A";
-        const creditsCompleted = userResponse.data.creditsCompleted || 0;
-        const totalCredits = userResponse.data.totalCredits || 118; // Assuming 118 is the default
-        const ccaPoints = userResponse.data.ccaPoints || 0;
+        const certificates = certificatesResponse.data;
+        const modules = modulesResponse.data;
+        const userData = userResponse.data;
+
+        // Create a set of unique module codes that have certificates
+        const completedModuleCodes = new Set(
+          certificates.map((cert) => cert.moduleCode)
+        );
+
+        // Calculate completed modules and credits
+        let modulesCompleted = completedModuleCodes.size;
+        let creditsCompleted = 0;
+        let totalCredits = 0;
+
+        modules.forEach((module) => {
+          const moduleCredits = parseInt(module.Module.credit) || 0;
+          totalCredits += moduleCredits;
+
+          if (completedModuleCodes.has(module.moduleCode)) {
+            creditsCompleted += moduleCredits;
+          }
+        });
+
+        const totalModules = modules.length;
+        const gpa = userData.gpa || "N/A";
+        const ccaPoints = userData.ccaPoints || 0;
 
         setIndicators([
           {
             label: "Certifications Obtained",
-            count: certificatesCount,
+            count: certificates.length,
             color: "#4CAF50",
           },
           {

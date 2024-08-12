@@ -8,8 +8,7 @@
     "build": "vite build",
     "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
-    "start": "vite",
-    "install": "npm install --legacy-peer-deps"
+    "start": "vite"
   },
   "dependencies": {
     "@directus/sdk": "^15.0.3",

@@ -133,15 +133,16 @@ const StudentPortal = () => {
       link: "/competence-map",
     },
     {
-      icon: <Description fontSize="large" />,
-      label: "Module Progression",
-      link: "/module-progression",
-    },
-    {
       icon: <EmojiEvents fontSize="large" />,
       label: "Certificates",
       link: "/certificates",
     },
+    {
+      icon: <Description fontSize="large" />,
+      label: "Module Progression",
+      link: "/module-progression",
+    },
+
     {
       icon: <Description fontSize="large" />,
       label: "Resume",

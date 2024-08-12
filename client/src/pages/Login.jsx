@@ -50,14 +50,21 @@ function Login() {
       if (res.data && res.data.accessToken) {
         localStorage.setItem("accessToken", res.data.accessToken);
         setUser(res.data.user);
-        navigate("/");
+        // Navigate based on user role
+        if (res.data.user.role === "student") {
+          navigate("/studentportal");
+        } else {
+          navigate("/admin/home");
+        }
       } else {
         toast.error("Failed to login with Google");
       }
     } catch (error) {
       console.error("Google login error:", error);
       if (error.response && error.response.data) {
-        toast.error(error.response.data.message || "An error occurred during Google login");
+        toast.error(
+          error.response.data.message || "An error occurred during Google login"
+        );
       } else {
         toast.error("An error occurred during Google login");
       }
@@ -117,7 +124,11 @@ function Login() {
                   console.log("User data to set into user:", userData);
                   setUser(userData);
                   // console.log("User data successfully set into user:", user);
-                  navigate("/");
+                  if (userData.user.role === "student") {
+                    navigate("/studentportal");
+                  } else {
+                    navigate("/admin/home");
+                  }
                 })
                 .catch((error) => {
                   console.error("Error fetching user data:", error);
@@ -232,7 +243,9 @@ function Login() {
             toast.error("Google login failed");
           }}
         />
-        <Typography variant="body2" sx={{ mt: 2 }}>OR</Typography>
+        <Typography variant="body2" sx={{ mt: 2 }}>
+          OR
+        </Typography>
       </Box>
 
       <Box

@@ -85,7 +85,7 @@ export function NavbarProfile() {
         </Box>
         <Divider sx={{ marginTop: "1rem" }} />
         <List>
-          <ListItem key={"My Profile"} disablePadding>
+          {/* <ListItem key={"My Profile"} disablePadding>
             <ListItemButton
               component={Link}
               to="/profile"
@@ -96,7 +96,7 @@ export function NavbarProfile() {
               </ListItemIcon>
               <ListItemText primary={"My Profile"} />
             </ListItemButton>
-          </ListItem>
+          </ListItem> */}
 
           {user.role == "staff" && (
             <ListItem key={"Staff Panel"} disablePadding>
@@ -126,7 +126,7 @@ export function NavbarProfile() {
               </ListItemButton>
             </ListItem>
           )}
-          <ListItem key={"Support"} disablePadding>
+          {/* <ListItem key={"Support"} disablePadding>
             <ListItemButton
               component={Link}
               to="/support"
@@ -137,7 +137,7 @@ export function NavbarProfile() {
               </ListItemIcon>
               <ListItemText primary={"Support"} />
             </ListItemButton>
-          </ListItem>
+          </ListItem> */}
           <ListItem key={"Logout"} disablePadding>
             <ListItemButton onClick={() => handleLogout()}>
               <ListItemIcon>

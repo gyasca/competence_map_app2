@@ -210,37 +210,38 @@ const nodeTypes = {
   columnLabel: ColumnLabelNode,
 };
 
-// horizontal scrollable certificate list
+//horizontal certificate list
 const CertificateScroll = styled(Box)(({ theme }) => ({
-  display: 'flex',
-  overflowX: 'auto',
+  display: "flex",
+  overflowX: "auto",
   padding: theme.spacing(2),
-  '&::-webkit-scrollbar': {
-    height: '8px',
+  "&::-webkit-scrollbar": {
+    height: "8px",
   },
-  '&::-webkit-scrollbar-track': {
-    background: '#f1f1f1',
+  "&::-webkit-scrollbar-track": {
+    background: "#f1f1f1",
   },
-  '&::-webkit-scrollbar-thumb': {
-    background: '#888',
-    borderRadius: '4px',
+  "&::-webkit-scrollbar-thumb": {
+    background: "#888",
+    borderRadius: "4px",
   },
-  '&::-webkit-scrollbar-thumb:hover': {
-    background: '#555',
+  "&::-webkit-scrollbar-thumb:hover": {
+    background: "#555",
   },
 }));
 
 const CertificateItem = styled(Box)(({ theme }) => ({
-  minWidth: '200px',
+  minWidth: "200px",
+  maxWidth: "200px",
   marginRight: theme.spacing(2),
-  textAlign: 'center',
+  textAlign: "center",
 }));
 
-const CertificateImage = styled('img')({
-  width: '100%',
-  height: '150px',
-  objectFit: 'cover',
-  borderRadius: '8px',
+const CertificateImage = styled("img")({
+  width: "100%",
+  height: "150px",
+  objectFit: "cover",
+  borderRadius: "8px",
 });
 
 const StudentReactFlowCareerMap = ({ courseCode }) => {
@@ -425,6 +426,49 @@ const StudentReactFlowCareerMap = ({ courseCode }) => {
     ]);
   }, []);
 
+  // horizontal cert list
+  const renderCertificates = useCallback(() => {
+    if (!selectedModule) return null;
+
+    const moduleCertificates = certificates.filter(
+      (cert) => cert.moduleCode === selectedModule.moduleCode
+    );
+
+    if (moduleCertificates.length === 0) {
+      return (
+        <Typography variant="body2">
+          No certificates uploaded for this module yet.
+        </Typography>
+      );
+    }
+    // server/public/uploads/certificates/1723456672521H9TZuP71Ef.png
+    return (
+      <CertificateScroll>
+        {moduleCertificates.map((cert) => (
+          <CertificateItem key={cert.id}>
+            <CertificateImage
+              src={`${
+                import.meta.env.VITE_FILE_BASE_URL
+              }/uploads/certificates/${cert.filePath}`}
+              alt={cert.title}
+            />
+            <Typography variant="subtitle2" noWrap>
+              {cert.title}
+            </Typography>
+            <Typography variant="caption">
+              {new Date(cert.createdAt).toLocaleDateString()}
+            </Typography>
+            <Typography>
+              {import.meta.env.VITE_FILE_BASE_URL +
+                "/certificates/" +
+                cert.filePath}
+            </Typography>
+          </CertificateItem>
+        ))}
+      </CertificateScroll>
+    );
+  }, [selectedModule, certificates]);
+
   useEffect(() => {
     const fetchCertificates = async () => {
       try {
@@ -598,13 +642,7 @@ const StudentReactFlowCareerMap = ({ courseCode }) => {
             <Typography variant="h6" gutterBottom>
               Your Certificates
             </Typography>
-            {certificates
-              .filter((cert) => cert.moduleCode === selectedModule?.moduleCode)
-              .map((cert) => (
-                <Typography key={cert.id}>
-                  {cert.title} - {new Date(cert.createdAt).toLocaleDateString()}
-                </Typography>
-              ))}
+            {renderCertificates()}
           </Box>
           <Box mt={2}>
             <CertificateUpload

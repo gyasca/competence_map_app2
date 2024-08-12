@@ -31,7 +31,8 @@ import {
   CircularProgress,
   Pagination,
 } from "@mui/material";
-import DeleteIcon from '@mui/icons-material/Delete';
+import DeleteIcon from "@mui/icons-material/Delete";
+import CloseIcon from "@mui/icons-material/Close";
 import { styled } from "@mui/system";
 import http from "../../http";
 import { UserContext } from "../../main";
@@ -240,6 +241,7 @@ const CertificateItem = styled(Box)(({ theme }) => ({
   marginRight: theme.spacing(2),
   textAlign: "center",
   position: "relative",
+  cursor: "pointer",
 }));
 
 const CertificateImage = styled("img")({
@@ -259,6 +261,12 @@ const DeleteButton = styled(IconButton)(({ theme }) => ({
   },
 }));
 
+const EnlargedCertificateImage = styled("img")({
+  width: "100%",
+  maxHeight: "80vh",
+  objectFit: "contain",
+});
+
 const StudentReactFlowCareerMap = ({ courseCode }) => {
   const [courseModules, setCourseModules] = useState([]);
   const [modules, setModules] = useState({});
@@ -271,6 +279,10 @@ const StudentReactFlowCareerMap = ({ courseCode }) => {
   const [domainList, setDomainList] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [certificates, setCertificates] = useState([]);
+  const [enlargedCertificate, setEnlargedCertificate] = useState(null);
+  const [hasUnsavedUpload, setHasUnsavedUpload] = useState(false);
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+  const [unsavedFileName, setUnsavedFileName] = useState(null);
   const domainsPerPage = 8;
 
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
@@ -287,10 +299,53 @@ const StudentReactFlowCareerMap = ({ courseCode }) => {
     [modules]
   );
 
+  // const handleClose = useCallback(() => {
+  //   setOpen(false);
+  //   setSelectedModule(null);
+  //   setSelectedCourseModule(null);
+  // }, []);
+
   const handleClose = useCallback(() => {
+    if (hasUnsavedUpload) {
+      setShowConfirmDialog(true);
+    } else {
+      setOpen(false);
+      setSelectedModule(null);
+      setSelectedCourseModule(null);
+    }
+  }, [hasUnsavedUpload]);
+
+  const handleConfirmClose = useCallback(async () => {
+    if (unsavedFileName) {
+      try {
+        await http.delete(
+          `/file/delete/folder/certificates/file/${unsavedFileName}`
+        );
+        console.log("Unsaved file deleted successfully");
+      } catch (error) {
+        console.error("Error deleting unsaved file:", error);
+      }
+    }
+    setShowConfirmDialog(false);
     setOpen(false);
     setSelectedModule(null);
     setSelectedCourseModule(null);
+    setHasUnsavedUpload(false);
+    setUnsavedFileName(null);
+  }, [unsavedFileName]);
+
+  const handleCancelClose = useCallback(() => {
+    setShowConfirmDialog(false);
+  }, []);
+
+  const handleFileUpload = useCallback((fileName) => {
+    setHasUnsavedUpload(true);
+    setUnsavedFileName(fileName);
+  }, []);
+
+  const handleFileDelete = useCallback(() => {
+    setHasUnsavedUpload(false);
+    setUnsavedFileName(null);
   }, []);
 
   const getDomainColor = useCallback(
@@ -439,35 +494,56 @@ const StudentReactFlowCareerMap = ({ courseCode }) => {
       ...prevCertificates,
       newCertificate,
     ]);
+    setHasUnsavedUpload(false);
+    setUnsavedFileName(null);
   }, []);
 
-  const handleDeleteCertificate = useCallback(async (certificateId, filePath) => {
-    try {
-      // First, delete the certificate record from the database
-      await http.delete(`/certificate/${certificateId}`);
-      
-      // Then, delete the associated file
-      await http.delete(`/file/delete/folder/certificates/file/${filePath}`);
-      
-      // Update the local state to remove the deleted certificate
-      setCertificates((prevCertificates) =>
-        prevCertificates.filter((cert) => cert.id !== certificateId)
-      );
-      
-      console.log(`Certificate ${certificateId} and associated file deleted successfully`);
-      toast.success("Certificate deleted successfully");
-    } catch (error) {
-      console.error("Error deleting certificate:", error);
-      if (error.response) {
-        console.error("Error response:", error.response.data);
-        toast.error(`Deletion failed: ${error.response.data.message || error.response.data.error || "Unknown error"}`);
-      } else {
-        toast.error("Deletion failed. Please try again.");
+  const handleDeleteCertificate = useCallback(
+    async (certificateId, filePath) => {
+      try {
+        // First, delete the certificate record from the database
+        await http.delete(`/certificate/${certificateId}`);
+
+        // Then, delete the associated file
+        await http.delete(`/file/delete/folder/certificates/file/${filePath}`);
+
+        // Update the local state to remove the deleted certificate
+        setCertificates((prevCertificates) =>
+          prevCertificates.filter((cert) => cert.id !== certificateId)
+        );
+
+        console.log(
+          `Certificate ${certificateId} and associated file deleted successfully`
+        );
+        toast.success("Certificate deleted successfully");
+      } catch (error) {
+        console.error("Error deleting certificate:", error);
+        if (error.response) {
+          console.error("Error response:", error.response.data);
+          toast.error(
+            `Deletion failed: ${
+              error.response.data.message ||
+              error.response.data.error ||
+              "Unknown error"
+            }`
+          );
+        } else {
+          toast.error("Deletion failed. Please try again.");
+        }
       }
-    }
-  }, []);
+    },
+    []
+  );
 
   // horizontal cert list
+  const handleEnlargeCertificate = useCallback((certificate) => {
+    setEnlargedCertificate(certificate);
+  }, []);
+
+  const handleCloseEnlargedCertificate = useCallback(() => {
+    setEnlargedCertificate(null);
+  }, []);
+
   const renderCertificates = useCallback(() => {
     if (!selectedModule) return null;
 
@@ -482,11 +558,14 @@ const StudentReactFlowCareerMap = ({ courseCode }) => {
         </Typography>
       );
     }
-    // server/public/uploads/certificates/1723456672521H9TZuP71Ef.png
+
     return (
       <CertificateScroll>
         {moduleCertificates.map((cert) => (
-          <CertificateItem key={cert.id}>
+          <CertificateItem
+            key={cert.id}
+            onClick={() => handleEnlargeCertificate(cert)}
+          >
             <CertificateImage
               src={`${
                 import.meta.env.VITE_FILE_BASE_URL
@@ -494,7 +573,10 @@ const StudentReactFlowCareerMap = ({ courseCode }) => {
               alt={cert.title}
             />
             <DeleteButton
-              onClick={() => handleDeleteCertificate(cert.id, cert.filePath)}
+              onClick={(e) => {
+                e.stopPropagation();
+                handleDeleteCertificate(cert.id, cert.filePath);
+              }}
               size="small"
             >
               <DeleteIcon />
@@ -509,7 +591,12 @@ const StudentReactFlowCareerMap = ({ courseCode }) => {
         ))}
       </CertificateScroll>
     );
-  }, [selectedModule, certificates, handleDeleteCertificate]);
+  }, [
+    selectedModule,
+    certificates,
+    handleDeleteCertificate,
+    handleEnlargeCertificate,
+  ]);
 
   useEffect(() => {
     const fetchCertificates = async () => {
@@ -687,7 +774,8 @@ const StudentReactFlowCareerMap = ({ courseCode }) => {
               userId={user?.userId}
               moduleCode={selectedModule?.moduleCode}
               onUploadSuccess={handleCertificateUpload}
-              onClose={handleClose}
+              onFileUpload={handleFileUpload}
+              onFileDelete={handleFileDelete}
             />
           </Box>
         </DialogContent>
@@ -696,6 +784,65 @@ const StudentReactFlowCareerMap = ({ courseCode }) => {
             Close
           </Button>
         </DialogActions>
+      </Dialog>
+
+      <Dialog
+        open={showConfirmDialog}
+        onClose={handleCancelClose}
+        aria-labelledby="confirm-dialog-title"
+        aria-describedby="confirm-dialog-description"
+      >
+        <DialogTitle id="confirm-dialog-title">Unsaved Changes</DialogTitle>
+        <DialogContent>
+          <Typography>
+            You have an unsaved file upload. Are you sure you want to close
+            without saving?
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCancelClose} color="primary">
+            Cancel
+          </Button>
+          <Button onClick={handleConfirmClose} color="error" autoFocus>
+            Close Without Saving
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog
+        open={Boolean(enlargedCertificate)}
+        onClose={handleCloseEnlargedCertificate}
+        maxWidth="md"
+        fullWidth
+      >
+        <DialogTitle>
+          {enlargedCertificate?.title}
+          <IconButton
+            aria-label="close"
+            onClick={handleCloseEnlargedCertificate}
+            sx={{
+              position: "absolute",
+              right: 8,
+              top: 8,
+              color: (theme) => theme.palette.grey[500],
+            }}
+          >
+            <CloseIcon />
+          </IconButton>
+        </DialogTitle>
+        <DialogContent>
+          <EnlargedCertificateImage
+            src={`${import.meta.env.VITE_FILE_BASE_URL}/uploads/certificates/${
+              enlargedCertificate?.filePath
+            }`}
+            alt={enlargedCertificate?.title}
+          />
+          <Typography variant="body2" sx={{ mt: 2 }}>
+            Uploaded on:{" "}
+            {enlargedCertificate &&
+              new Date(enlargedCertificate.createdAt).toLocaleDateString()}
+          </Typography>
+        </DialogContent>
       </Dialog>
     </Container>
   );

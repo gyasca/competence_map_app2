@@ -5,6 +5,7 @@ import React, {
   useEffect,
   useContext,
 } from "react";
+import { Skeleton } from "@mui/material";
 import ReactFlow, {
   Controls,
   Background,
@@ -283,6 +284,8 @@ const StudentReactFlowCareerMap = ({ courseCode }) => {
   const [hasUnsavedUpload, setHasUnsavedUpload] = useState(false);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [unsavedFileName, setUnsavedFileName] = useState(null);
+  const [loadingCertificates, setLoadingCertificates] = useState({});
+  const [loadingImages, setLoadingImages] = useState({});
   const domainsPerPage = 8;
 
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
@@ -318,12 +321,13 @@ const StudentReactFlowCareerMap = ({ courseCode }) => {
   const handleConfirmClose = useCallback(async () => {
     if (unsavedFileName) {
       try {
-        await http.delete(
-          `/file/delete/folder/certificates/file/${unsavedFileName}`
-        );
+        // Update this to use the new Cloudinary delete endpoint
+        await http.delete(`/file/delete/${unsavedFileName}`);
         console.log("Unsaved file deleted successfully");
+        toast.success("Unsaved file deleted successfully");
       } catch (error) {
         console.error("Error deleting unsaved file:", error);
+        toast.error("Failed to delete unsaved file");
       }
     }
     setShowConfirmDialog(false);
@@ -490,22 +494,49 @@ const StudentReactFlowCareerMap = ({ courseCode }) => {
   }, [courseCode]);
 
   const handleCertificateUpload = useCallback((newCertificate) => {
+    const certificateWithPlaceholder = {
+      ...newCertificate,
+      fileUrl: '/path/to/placeholder/image.png', // Replace with an actual placeholder image path
+      isPlaceholder: true
+    };
+    
     setCertificates((prevCertificates) => [
       ...prevCertificates,
-      newCertificate,
+      certificateWithPlaceholder
     ]);
+
+    // Load the actual image
+    const img = new Image();
+    img.onload = () => {
+      setCertificates((prevCertificates) =>
+        prevCertificates.map((cert) =>
+          cert.id === newCertificate.id
+            ? { ...cert, fileUrl: img.src, isPlaceholder: false }
+            : cert
+        )
+      );
+      setLoadingImages((prev) => ({ ...prev, [newCertificate.id]: false }));
+    };
+    img.src = newCertificate.fileUrl || `https://res.cloudinary.com/${import.meta.env.VITE_CLOUDINARY_CLOUD_NAME}/image/upload/${newCertificate.filePath}`;
+
+    setLoadingImages((prev) => ({ ...prev, [newCertificate.id]: true }));
     setHasUnsavedUpload(false);
     setUnsavedFileName(null);
   }, []);
 
+  const handleImageLoad = useCallback((certId) => {
+    setLoadingImages(prev => ({ ...prev, [certId]: false }));
+  }, []);
+
   const handleDeleteCertificate = useCallback(
-    async (certificateId, filePath) => {
+    async (certificateId, publicId) => {
       try {
         // First, delete the certificate record from the database
         await http.delete(`/certificate/${certificateId}`);
 
-        // Then, delete the associated file
-        await http.delete(`/file/delete/folder/certificates/file/${filePath}`);
+        // Then, delete the associated file from Cloudinary
+        // Note: This should ideally be done on the backend for security
+        await http.delete(`/file/delete/${publicId}`);
 
         // Update the local state to remove the deleted certificate
         setCertificates((prevCertificates) =>
@@ -518,18 +549,7 @@ const StudentReactFlowCareerMap = ({ courseCode }) => {
         toast.success("Certificate deleted successfully");
       } catch (error) {
         console.error("Error deleting certificate:", error);
-        if (error.response) {
-          console.error("Error response:", error.response.data);
-          toast.error(
-            `Deletion failed: ${
-              error.response.data.message ||
-              error.response.data.error ||
-              "Unknown error"
-            }`
-          );
-        } else {
-          toast.error("Deletion failed. Please try again.");
-        }
+        toast.error("Failed to delete certificate. Please try again.");
       }
     },
     []
@@ -566,12 +586,15 @@ const StudentReactFlowCareerMap = ({ courseCode }) => {
             key={cert.id}
             onClick={() => handleEnlargeCertificate(cert)}
           >
-            <CertificateImage
-              src={`${
-                import.meta.env.VITE_FILE_BASE_URL
-              }/uploads/certificates/${cert.filePath}`}
-              alt={cert.title}
-            />
+            {loadingImages[cert.id] ? (
+              <Skeleton variant="rectangular" width={200} height={150} />
+            ) : (
+              <CertificateImage
+                src={cert.fileUrl || `https://res.cloudinary.com/${import.meta.env.VITE_CLOUDINARY_CLOUD_NAME}/image/upload/${cert.filePath}`}
+                alt={cert.title}
+                onLoad={() => handleImageLoad(cert.id)}
+              />
+            )}
             <DeleteButton
               onClick={(e) => {
                 e.stopPropagation();
@@ -594,8 +617,10 @@ const StudentReactFlowCareerMap = ({ courseCode }) => {
   }, [
     selectedModule,
     certificates,
+    loadingImages,
     handleDeleteCertificate,
     handleEnlargeCertificate,
+    handleImageLoad,
   ]);
 
   useEffect(() => {
@@ -630,7 +655,7 @@ const StudentReactFlowCareerMap = ({ courseCode }) => {
 
   return (
     <Container maxWidth="xl" sx={{ marginTop: "2rem", height: "80vh" }}>
-      <Typography variant="h4" gutterBottom sx={{fontWeight: "bold"}}>
+      <Typography variant="h4" gutterBottom sx={{ fontWeight: "bold" }}>
         My Competence Map
       </Typography>
       <Grid container spacing={4} style={{ height: "100%" }}>
@@ -835,9 +860,13 @@ const StudentReactFlowCareerMap = ({ courseCode }) => {
         </DialogTitle>
         <DialogContent>
           <EnlargedCertificateImage
-            src={`${import.meta.env.VITE_FILE_BASE_URL}/uploads/certificates/${
-              enlargedCertificate?.filePath
-            }`}
+            src={
+              enlargedCertificate?.fileUrl ||
+              (enlargedCertificate?.filePath &&
+                `https://res.cloudinary.com/${
+                  import.meta.env.VITE_CLOUDINARY_CLOUD_NAME
+                }/image/upload/${enlargedCertificate.filePath}`)
+            }
             alt={enlargedCertificate?.title}
           />
           <Typography variant="body2" sx={{ mt: 2 }}>
@@ -847,6 +876,7 @@ const StudentReactFlowCareerMap = ({ courseCode }) => {
           </Typography>
         </DialogContent>
       </Dialog>
+      {/* <ToastContainer /> */}
     </Container>
   );
 };

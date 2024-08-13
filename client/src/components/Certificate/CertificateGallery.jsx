@@ -61,8 +61,12 @@ const CertificateGallery = ({ userId }) => {
   const fetchCertificates = useCallback(async () => {
     try {
       const response = await http.get(`/certificate/user/${userId}`);
-      setCertificates(response.data);
-      setFilteredCertificates(response.data);
+      const certificatesWithUrls = response.data.map(cert => ({
+        ...cert,
+        fileUrl: cert.fileUrl || `https://res.cloudinary.com/${import.meta.env.VITE_CLOUDINARY_CLOUD_NAME}/image/upload/${cert.filePath}`
+      }));
+      setCertificates(certificatesWithUrls);
+      setFilteredCertificates(certificatesWithUrls);
     } catch (error) {
       console.error("Error fetching certificates:", error);
       toast.error("Failed to fetch certificates");
@@ -93,8 +97,8 @@ const CertificateGallery = ({ userId }) => {
     setFilteredCertificates(filtered);
   }, [searchTerm, selectedModule, certificates]);
 
-  const handleDeleteCertificate = async (certificateId, filePath) => {
-    setDeleteConfirmation({ id: certificateId, filePath: filePath });
+  const handleDeleteCertificate = async (certificateId, publicId) => {
+    setDeleteConfirmation({ id: certificateId, publicId: publicId });
   };
 
   const confirmDelete = async () => {
@@ -102,9 +106,8 @@ const CertificateGallery = ({ userId }) => {
 
     try {
       await http.delete(`/certificate/${deleteConfirmation.id}`);
-      await http.delete(
-        `/file/delete/folder/certificates/file/${deleteConfirmation.filePath}`
-      );
+      // Note: Deleting from Cloudinary should be done on the backend for security
+      await http.delete(`/file/delete/${deleteConfirmation.publicId}`);
       toast.success("Certificate deleted successfully");
       fetchCertificates();
     } catch (error) {
@@ -114,6 +117,7 @@ const CertificateGallery = ({ userId }) => {
       setDeleteConfirmation(null);
     }
   };
+
 
   const cancelDelete = () => {
     setDeleteConfirmation(null);
@@ -168,9 +172,7 @@ const CertificateGallery = ({ userId }) => {
           <Grid item key={certificate.id} xs={12} sm={6} md={4}>
             <StyledCard>
               <StyledCardMedia
-                image={`${
-                  import.meta.env.VITE_FILE_BASE_URL
-                }/uploads/certificates/${certificate.filePath}`}
+                image={certificate.fileUrl}
                 title={certificate.title}
                 onClick={() => handleEnlargeCertificate(certificate)}
               />
@@ -235,9 +237,7 @@ const CertificateGallery = ({ userId }) => {
             </DialogTitle>
             <DialogContent>
               <EnlargedImage
-                src={`${
-                  import.meta.env.VITE_FILE_BASE_URL
-                }/uploads/certificates/${enlargedCertificate.filePath}`}
+                src={enlargedCertificate.fileUrl}
                 alt={enlargedCertificate.title}
               />
               <Typography variant="body2" sx={{ mt: 2 }}>

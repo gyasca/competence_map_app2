@@ -377,6 +377,46 @@ export function Navbar() {
               <ListItemText primary={"Home"} />
             </ListItemButton>
           </ListItem>
+
+          <ListItem key={"Competence Map"} disablePadding>
+            <ListItemButton
+              component={Link}
+              to="/competence-map"
+              onClick={() => setIsDrawerOpen(false)}
+            >
+              <ListItemIcon>
+                <AccountTreeIcon />
+              </ListItemIcon>
+              <ListItemText primary={"Competence Map"} />
+            </ListItemButton>
+          </ListItem>
+
+          <ListItem key={"Certificates"} disablePadding>
+            <ListItemButton
+              component={Link}
+              to="/certificates"
+              onClick={() => setIsDrawerOpen(false)}
+            >
+              <ListItemIcon>
+                <GradeIcon />
+              </ListItemIcon>
+              <ListItemText primary={"Certificates"} />
+            </ListItemButton>
+          </ListItem>
+
+          <ListItem key={"StudentPortal"} disablePadding>
+            <ListItemButton
+              component={Link}
+              to="/studentportal"
+              onClick={() => setIsDrawerOpen(false)}
+            >
+              <ListItemIcon>
+                <SchoolIcon />
+              </ListItemIcon>
+              <ListItemText primary={"Student Portal"} />
+            </ListItemButton>
+          </ListItem>
+
         </List>
       </Drawer>
       <Drawer

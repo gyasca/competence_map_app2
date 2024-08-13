@@ -173,6 +173,9 @@ const StudentPortal = () => {
 
   return (
     <Container maxWidth="xl" sx={{ mt: 4, mb: 4 }}>
+      <Typography variant="h4" gutterBottom sx={{ fontWeight: "bold" }}>
+        Student Portal{" "}
+      </Typography>
       <StyledPaper elevation={0} sx={{ mb: 3 }}>
         <Typography variant="h6" gutterBottom>
           <EventAvailable sx={{ mr: 1 }} />

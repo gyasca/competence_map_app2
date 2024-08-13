@@ -18,8 +18,6 @@ import "react-toastify/dist/ReactToastify.css";
 import http from "../../http";
 
 const MAX_FILE_SIZE = 2048 * 2048; // 2MB
-const FOLDER_NAME = "certificates"; // Folder name for certificate uploads
-const FILE_BASE_URL = import.meta.env.VITE_FILE_BASE_URL;
 
 const CertificateUpload = ({
   userId,
@@ -47,44 +45,37 @@ const CertificateUpload = ({
 
         const formData = new FormData();
         formData.append("file", file);
+        formData.append(
+          "upload_preset",
+          import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET
+        );
 
         try {
-          // Upload the file
-          const uploadResponse = await http.post(
-            `/file/upload/${FOLDER_NAME}`,
-            formData,
+          const response = await fetch(
+            `https://api.cloudinary.com/v1_1/${
+              import.meta.env.VITE_CLOUDINARY_CLOUD_NAME
+            }/image/upload`,
             {
-              headers: {
-                "Content-Type": "multipart/form-data",
-              },
+              method: "POST",
+              body: formData,
             }
           );
 
-          console.log("File upload response:", uploadResponse.data);
+          const data = await response.json();
+
           setUploadedFile({
-            filename: uploadResponse.data.filename,
+            publicId: data.public_id,
+            url: data.secure_url,
             originalname: file.name,
-            previewUrl: URL.createObjectURL(file),
           });
           toast.success(
             "File uploaded successfully. Please submit the certificate."
           );
-          onFileUpload(uploadResponse.data.filename); // Notify parent component about the upload with filename
+          onFileUpload(data.public_id);
         } catch (err) {
           setError("Failed to upload file. Please try again.");
           console.error("Upload error:", err);
-          if (err.response) {
-            console.error("Error response:", err.response.data);
-            toast.error(
-              `Upload failed: ${
-                err.response.data.message ||
-                err.response.data.error ||
-                "Unknown error"
-              }`
-            );
-          } else {
-            toast.error("Upload failed. Please try again.");
-          }
+          toast.error("Upload failed. Please try again.");
         } finally {
           setUploading(false);
         }
@@ -134,21 +125,17 @@ const CertificateUpload = ({
     setError(null);
 
     try {
-      // Create the certificate
       const certificateData = {
         moduleCode,
         title: title.trim(),
-        filePath: uploadedFile.filename,
+        filePath: uploadedFile.publicId,
+        fileUrl: uploadedFile.url,
       };
-
-      console.log("Certificate data:", certificateData);
 
       const certificateResponse = await http.post(
         `/certificate/create/${userId}`,
         certificateData
       );
-
-      console.log("Certificate creation response:", certificateResponse.data);
 
       onUploadSuccess(certificateResponse.data);
       toast.success("Certificate submitted successfully!");
@@ -157,18 +144,7 @@ const CertificateUpload = ({
     } catch (err) {
       setError("Failed to submit certificate. Please try again.");
       console.error("Submission error:", err);
-      if (err.response) {
-        console.error("Error response:", err.response.data);
-        toast.error(
-          `Submission failed: ${
-            err.response.data.message ||
-            err.response.data.error ||
-            "Unknown error"
-          }`
-        );
-      } else {
-        toast.error("Submission failed. Please try again.");
-      }
+      toast.error("Submission failed. Please try again.");
     } finally {
       setUploading(false);
     }
@@ -177,13 +153,11 @@ const CertificateUpload = ({
   const handleDelete = async () => {
     if (uploadedFile) {
       try {
-        await http.delete(
-          `/file/delete/folder/${FOLDER_NAME}/file/${uploadedFile.filename}`
-        );
-        URL.revokeObjectURL(uploadedFile.previewUrl); // Revoke the preview URL
+        // Note: Deleting from Cloudinary should be done on the backend for security
+        await http.delete(`/file/delete/${uploadedFile.publicId}`);
         setUploadedFile(null);
         toast.success("File deleted successfully");
-        onFileDelete(); // Notify parent that the upload has been removed
+        onFileDelete();
       } catch (error) {
         console.error("Error deleting uploaded file:", error);
         toast.error("Failed to delete uploaded file");
@@ -257,7 +231,7 @@ const CertificateUpload = ({
               alignItems: "center",
             }}
           >
-            {uploadedFile.filename.match(/\.(jpeg|jpg|png|gif)$/i) ? (
+            {uploadedFile.url.match(/\.(jpeg|jpg|png|gif)$/i) ? (
               <Box
                 sx={{
                   width: "100%",
@@ -271,7 +245,7 @@ const CertificateUpload = ({
                 }}
               >
                 <img
-                  src={uploadedFile.previewUrl}
+                  src={uploadedFile.url}
                   alt="Uploaded certificate"
                   style={{
                     maxWidth: "100%",

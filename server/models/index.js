@@ -17,6 +17,11 @@ let sequelize = new Sequelize(
     dialect: "mysql",
     logging: false,
     timezone: "+08:00",
+    dialectOptions: {
+      ssl: {
+        rejectUnauthorized: false
+      }
+    }
   }
 );
 fs.readdirSync(__dirname)

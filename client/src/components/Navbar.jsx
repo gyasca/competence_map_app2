@@ -22,7 +22,7 @@ import LoginIcon from "@mui/icons-material/Login";
 import AccountTreeIcon from "@mui/icons-material/AccountTree";
 import SchoolIcon from "@mui/icons-material/School";
 import LogoutIcon from "@mui/icons-material/Logout";
-import GradeIcon from '@mui/icons-material/Grade';
+import GradeIcon from "@mui/icons-material/Grade";
 import { Link } from "react-router-dom";
 import { UserContext } from "../main";
 import { NavbarProfile } from "./NavbarProfile";
@@ -378,45 +378,48 @@ export function Navbar() {
             </ListItemButton>
           </ListItem>
 
-          <ListItem key={"Competence Map"} disablePadding>
-            <ListItemButton
-              component={Link}
-              to="/competence-map"
-              onClick={() => setIsDrawerOpen(false)}
-            >
-              <ListItemIcon>
-                <AccountTreeIcon />
-              </ListItemIcon>
-              <ListItemText primary={"Competence Map"} />
-            </ListItemButton>
-          </ListItem>
+          {user && (
+            <>
+              <ListItem key={"Competence Map"} disablePadding>
+                <ListItemButton
+                  component={Link}
+                  to="/competence-map"
+                  onClick={() => setIsDrawerOpen(false)}
+                >
+                  <ListItemIcon>
+                    <AccountTreeIcon />
+                  </ListItemIcon>
+                  <ListItemText primary={"Competence Map"} />
+                </ListItemButton>
+              </ListItem>
 
-          <ListItem key={"Certificates"} disablePadding>
-            <ListItemButton
-              component={Link}
-              to="/certificates"
-              onClick={() => setIsDrawerOpen(false)}
-            >
-              <ListItemIcon>
-                <GradeIcon />
-              </ListItemIcon>
-              <ListItemText primary={"Certificates"} />
-            </ListItemButton>
-          </ListItem>
+              <ListItem key={"Certificates"} disablePadding>
+                <ListItemButton
+                  component={Link}
+                  to="/certificates"
+                  onClick={() => setIsDrawerOpen(false)}
+                >
+                  <ListItemIcon>
+                    <GradeIcon />
+                  </ListItemIcon>
+                  <ListItemText primary={"Certificates"} />
+                </ListItemButton>
+              </ListItem>
 
-          <ListItem key={"StudentPortal"} disablePadding>
-            <ListItemButton
-              component={Link}
-              to="/studentportal"
-              onClick={() => setIsDrawerOpen(false)}
-            >
-              <ListItemIcon>
-                <SchoolIcon />
-              </ListItemIcon>
-              <ListItemText primary={"Student Portal"} />
-            </ListItemButton>
-          </ListItem>
-
+              <ListItem key={"StudentPortal"} disablePadding>
+                <ListItemButton
+                  component={Link}
+                  to="/studentportal"
+                  onClick={() => setIsDrawerOpen(false)}
+                >
+                  <ListItemIcon>
+                    <SchoolIcon />
+                  </ListItemIcon>
+                  <ListItemText primary={"Student Portal"} />
+                </ListItemButton>
+              </ListItem>
+            </>
+          )}
         </List>
       </Drawer>
       <Drawer
